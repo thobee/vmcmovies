@@ -1,0 +1,2 @@
+/** Shared easing curve for beui-style motion components. */
+export const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];

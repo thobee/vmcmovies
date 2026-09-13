@@ -1,0 +1,50 @@
+{
+  "name": "vmc",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed": "npx tsx scripts/seed-catalog.ts",
+    "migrate:slugs": "npx tsx scripts/migrate-slugs.ts",
+    "mongo:local": "npx tsx scripts/start-local-mongo.ts",
+    "admin:hash-password": "npx tsx scripts/hash-admin-password.ts",
+    "email:test": "npx tsx scripts/test-resend.ts",
+    "payment:smoke": "npx tsx scripts/test-payment-smoke.ts",
+    "email:backfill": "npx tsx scripts/backfill-payment-emails.ts",
+    "audit": "npm audit --omit=dev"
+  },
+  "dependencies": {
+    "@types/video.js": "^7.3.58",
+    "@videojs/http-streaming": "^3.17.5",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "google-auth-library": "^11.0.2",
+    "jose": "^6.2.8",
+    "lucide-react": "^1.31.0",
+    "mongodb": "^7.5.0",
+    "motion": "^13.1.0",
+    "next": "16.3.0",
+    "qrcode": "^1.5.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwind-merge": "^3.6.0",
+    "video.js": "^8.24.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.0",
+    "mongodb-memory-server": "^11.2.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  }
+}
