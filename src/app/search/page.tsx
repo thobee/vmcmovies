@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { Film, Loader2, Search, SearchX, Tv } from "lucide-react";
+import { CircleNotch, FilmStrip, MagnifyingGlass, MagnifyingGlassMinus, Television } from "@phosphor-icons/react";
 import MovieCard from "@/components/media/MovieCard";
 import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
@@ -48,7 +48,7 @@ function SearchInner() {
           </p>
 
           <div className="relative mt-8 max-w-2xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+            <MagnifyingGlass className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" weight="bold" />
             <input
               type="text"
               inputMode="search"
@@ -84,9 +84,9 @@ function SearchInner() {
                         <p className="mt-0.5 flex items-center gap-2 text-[11px] text-white/45">
                           <span className="inline-flex items-center gap-1">
                             {item.type === "series" ? (
-                              <Tv className="h-3 w-3" />
+                              <Television className="h-3 w-3" weight="light" />
                             ) : (
-                              <Film className="h-3 w-3" />
+                              <FilmStrip className="h-3 w-3" weight="light" />
                             )}
                             {item.type === "series" ? "Series" : "Movie"}
                           </span>
@@ -105,7 +105,7 @@ function SearchInner() {
       <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
         {loading && searched && (
           <div className="flex items-center justify-center gap-2.5 py-20 text-sm text-white/50">
-            <Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
+            <CircleNotch className="h-5 w-5 animate-spin text-emerald-400" weight="bold" />
             Searching…
           </div>
         )}
@@ -113,7 +113,7 @@ function SearchInner() {
         {!loading && searched && results.length === 0 && (
           <div className="rounded-[28px] border border-white/10 bg-[#101214] px-6 py-16 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04]">
-              <SearchX className="h-6 w-6 text-white/30" />
+              <MagnifyingGlassMinus className="h-6 w-6 text-white/30" weight="light" />
             </div>
             <p className="text-lg font-semibold text-white">No results for &ldquo;{trimmed}&rdquo;</p>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-white/55">
@@ -144,7 +144,7 @@ function SearchInner() {
         {!searched && (
           <div className="rounded-[28px] border border-white/10 bg-[#101214] px-6 py-20 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10">
-              <Search className="h-6 w-6 text-emerald-400" />
+              <MagnifyingGlass className="h-6 w-6 text-emerald-400" weight="light" />
             </div>
             <p className="text-lg font-semibold text-white">Start typing to search</p>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-white/55">
@@ -163,7 +163,7 @@ export default function SearchPage() {
       <Suspense
         fallback={
           <div className="flex justify-center py-24">
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+            <CircleNotch className="h-6 w-6 animate-spin text-emerald-400" weight="bold" />
           </div>
         }
       >

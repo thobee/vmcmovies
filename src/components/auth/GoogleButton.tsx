@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { CircleNotch } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 
 function isPublicGoogleConfigured(): boolean {
@@ -36,7 +36,7 @@ export default function GoogleButton({
       className={cn("auth-social-btn", (disabled || loading) && "cursor-not-allowed opacity-60")}
     >
       {loading ? (
-        <Loader2 className="h-4.5 w-4.5 animate-spin text-white/70" aria-hidden />
+        <CircleNotch className="h-4.5 w-4.5 animate-spin text-white/70" weight="bold" aria-hidden />
       ) : (
         <GoogleIcon />
       )}

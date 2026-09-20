@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Crown, X } from "lucide-react";
+import { Crown, X } from "@phosphor-icons/react";
 import type { BillingConfig } from "@/lib/payments/billing/types";
 
 const SEEN_KEY = "vmc_welcome_premium_seen";
@@ -39,10 +39,10 @@ export default function WelcomePremiumCard({ welcome }: { welcome: BillingConfig
         aria-label="Dismiss welcome"
         className="absolute right-4 top-4 rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
       >
-        <X className="h-4 w-4" />
+        <X className="h-4 w-4" weight="bold" />
       </button>
       <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">
-        <Crown className="h-4 w-4" />
+        <Crown className="h-4 w-4" weight="fill" />
         {welcome.title}
       </p>
       <p className="mt-2 max-w-lg text-sm leading-6 text-white/75">{welcome.intro}</p>

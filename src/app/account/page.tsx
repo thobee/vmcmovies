@@ -1,12 +1,12 @@
 import Link from "next/link";
 import {
   ArrowUpRight,
+  ChatCircle,
   Crown,
-  Film,
-  HelpCircle,
-  MessageCircle,
-  Tv,
-} from "lucide-react";
+  FilmStrip,
+  Question,
+  Television,
+} from "@phosphor-icons/react/dist/ssr";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import SitePage from "@/components/layout/SitePage";
@@ -47,9 +47,9 @@ const STATUS: Record<
 };
 
 const QUICK_LINKS = [
-  { href: "/movies", label: "Movies", icon: Film },
-  { href: "/series", label: "TV Shows", icon: Tv },
-  { href: "/support", label: "Support", icon: HelpCircle },
+  { href: "/movies", label: "Movies", icon: FilmStrip },
+  { href: "/series", label: "TV Shows", icon: Television },
+  { href: "/support", label: "Support", icon: Question },
 ] as const;
 
 export default async function AccountPage({
@@ -112,7 +112,7 @@ export default async function AccountPage({
                   )}
                 >
                   {user.premiumStatus === "active" && (
-                    <Crown className="h-3 w-3" strokeWidth={2.5} />
+                    <Crown className="h-3 w-3" weight="fill" />
                   )}
                   {status.label}
                 </span>
@@ -132,7 +132,7 @@ export default async function AccountPage({
                 : user.premiumStatus === "active"
                   ? "Extend access"
                   : "Get premium"}
-              <ArrowUpRight className="h-4 w-4" />
+              <ArrowUpRight className="h-4 w-4" weight="bold" />
             </Link>
           </div>
         </section>
@@ -151,7 +151,7 @@ export default async function AccountPage({
                   : "bg-white/6 text-white/60",
               )}
             >
-              <Crown className="h-5 w-5" strokeWidth={2.5} />
+              <Crown className="h-5 w-5" weight="fill" />
             </div>
             <div>
               <h2 className="text-sm font-semibold text-white">Downloads</h2>
@@ -182,9 +182,9 @@ export default async function AccountPage({
               href={href}
               className="group flex min-h-13 items-center gap-3 rounded-2xl border border-white/12 bg-[#101214] px-4 py-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition hover:border-emerald-400/35 hover:bg-emerald-500/5"
             >
-              <Icon className="h-4 w-4 text-white/40 transition group-hover:text-emerald-400" />
+              <Icon className="h-4 w-4 text-white/40 transition group-hover:text-emerald-400" weight="light" />
               <span className="text-sm font-medium text-white/75 group-hover:text-white">{label}</span>
-              <ArrowUpRight className="ml-auto h-3.5 w-3.5 text-white/20 group-hover:text-emerald-400" />
+              <ArrowUpRight className="ml-auto h-3.5 w-3.5 text-white/20 group-hover:text-emerald-400" weight="bold" />
             </Link>
           ))}
         </div>
@@ -194,7 +194,7 @@ export default async function AccountPage({
             href="/support"
             className="inline-flex items-center gap-2 text-sm text-white/50 transition hover:text-white"
           >
-            <MessageCircle className="h-4 w-4" />
+            <ChatCircle className="h-4 w-4" weight="bold" />
             Contact support
           </Link>
           <LogoutButton />

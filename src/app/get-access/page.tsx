@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Download } from "lucide-react";
+import { Check, DownloadSimple } from "@phosphor-icons/react/dist/ssr";
 import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
 import PricingGrid from "@/components/access/PricingGrid";
@@ -69,7 +69,7 @@ export default async function GetAccessPage() {
                   className="flex items-start gap-3 text-sm leading-6 text-white/80 sm:text-[15px]"
                 >
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15">
-                    <Check className="h-3.5 w-3.5 text-emerald-400" strokeWidth={2.6} />
+                    <Check className="h-3.5 w-3.5 text-emerald-400" weight="bold" />
                   </span>
                   {f}
                 </li>
@@ -140,7 +140,7 @@ export default async function GetAccessPage() {
                     </Link>
                   </div>
                   <p className="mx-auto mt-6 flex max-w-xs items-center justify-center gap-2 text-xs text-white/40">
-                    <Download className="h-3.5 w-3.5 text-emerald-400/80" />
+                    <DownloadSimple className="h-3.5 w-3.5 text-emerald-400/80" weight="bold" />
                     Browse free — pay only when you want downloads
                   </p>
                 </div>

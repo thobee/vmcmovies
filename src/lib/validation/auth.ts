@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { passwordSchema } from "@/lib/validation/password";
 
 export const telegramUsernameSchema = z
   .string()
@@ -13,7 +14,7 @@ export const telegramUsernameSchema = z
 
 export const signupSchema = z.object({
   email: z.string().email("Enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: passwordSchema,
   telegramUsername: telegramUsernameSchema,
 });
 
@@ -29,7 +30,7 @@ export const updateTelegramSchema = z.object({
 
 export const adminSignupSchema = z.object({
   email: z.string().email("Enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: passwordSchema,
 });
 
 export type SignupInput = z.infer<typeof signupSchema>;

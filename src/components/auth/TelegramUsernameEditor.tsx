@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2 } from "lucide-react";
+import { Check, CircleNotch } from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useSiteToast } from "@/components/ui/SiteToast";
 
@@ -94,10 +94,10 @@ export default function TelegramUsernameEditor({
           className="auth-btn min-h-10 shrink-0 gap-1.5 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-40"
         >
           {pending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <CircleNotch className="h-4 w-4 animate-spin" weight="bold" />
           ) : ok ? (
             <>
-              <Check className="h-4 w-4" strokeWidth={2.5} />
+              <Check className="h-4 w-4" weight="bold" />
               Saved
             </>
           ) : (

@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Clock, Film, Star, Tv } from "lucide-react";
+import { ArrowLeft, Clock, FilmStrip, Star, Television } from "@phosphor-icons/react/dist/ssr";
+import CatalogImage from "@/components/ui/CatalogImage";
+import { resolvePosterImage } from "@/lib/catalog/image";
 import type { Content } from "@/lib/catalog/types";
 import type { PremiumStatus } from "@/lib/auth/types";
 import { genrePath } from "@/lib/catalog/genres";
@@ -27,26 +28,30 @@ export default function TitleView({
   const browseHref = isSeries ? "/series" : "/movies";
   const browseLabel = isSeries ? "TV Shows" : "Movies";
   const seasonCount = item.seasons?.filter((s) => s.downloadUrl.trim()).length ?? 0;
-  const backdrop = item.backdropImageUrl || item.posterImageUrl;
+  const poster = resolvePosterImage(item.posterImageUrl, item.backdropImageUrl);
 
   return (
     <SitePage glow={false}>
       <section className="relative isolate overflow-hidden">
-        <div className="absolute inset-0" aria-hidden>
-          <Image
-            src={backdrop}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[min(72vh,580px)] overflow-hidden"
+          aria-hidden
+        >
+          <CatalogImage
+            src={item.backdropImageUrl}
+            fallback={item.posterImageUrl}
             alt=""
             fill
             priority
-            className="object-cover object-top"
             sizes="100vw"
+            className="object-cover object-[center_22%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/78 to-black/35" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/40" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_10%,rgba(34,197,94,0.18),transparent_52%)]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/15" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#060809] via-black/35 to-black/20" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_0%,rgba(34,197,94,0.12),transparent_55%)]" />
         </div>
 
-        <div className="relative mx-auto max-w-screen-2xl px-4 pb-10 pt-[104px] sm:px-6 sm:pb-12 lg:px-10 lg:pb-14">
+        <div className="relative z-10 mx-auto max-w-screen-2xl px-4 pb-10 pt-[104px] sm:px-6 sm:pb-12 lg:px-10 lg:pb-14">
           <Link
             href={browseHref}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-white/55 transition hover:text-white"
@@ -57,14 +62,15 @@ export default function TitleView({
 
           <div className="mt-6 grid items-start gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-12">
             <div className="mx-auto w-44 sm:w-52 lg:mx-0 lg:w-full">
-              <div className="relative aspect-[2/3] overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.55)] ring-1 ring-white/15">
-                <Image
-                  src={item.posterImageUrl}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 208px, 240px"
-                />
+              <div className="bezel-outer">
+                <div className="bezel-inner relative aspect-[2/3] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+                  <CatalogImage
+                    src={poster}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 1024px) 208px, 240px"
+                  />
+                </div>
               </div>
             </div>
 
@@ -95,13 +101,13 @@ export default function TitleView({
                 <QualityBadges qualities={item.qualities} />
                 {item.rating && (
                   <span className="inline-flex items-center gap-1 font-semibold text-amber-300">
-                    <Star className="h-3.5 w-3.5 fill-current" />
+                    <Star className="h-3.5 w-3.5" weight="fill" />
                     {item.rating}
                   </span>
                 )}
                 {item.year && (
                   <span className="inline-flex items-center gap-1.5">
-                    <Film className="h-3.5 w-3.5" />
+                    <FilmStrip className="h-3.5 w-3.5" weight="light" />
                     {item.year}
                   </span>
                 )}
@@ -113,7 +119,7 @@ export default function TitleView({
                 )}
                 {isSeries && seasonCount > 0 && (
                   <span className="inline-flex items-center gap-1.5">
-                    <Tv className="h-3.5 w-3.5" />
+                    <Television className="h-3.5 w-3.5" weight="light" />
                     {seasonCount} {seasonCount === 1 ? "season" : "seasons"}
                   </span>
                 )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import MovieCard from "@/components/media/MovieCard";
 import ViewAllLink from "@/components/ui/ViewAllLink";
 import type { Content } from "@/lib/catalog/types";
@@ -106,7 +106,7 @@ export default function ContentRail({
               : "pointer-events-none opacity-0 group-hover/rail:opacity-40",
           )}
         >
-          <ChevronLeft className="h-4.5 w-4.5" strokeWidth={2.25} />
+          <CaretLeft className="h-4.5 w-4.5" weight="bold" />
         </button>
         <button
           type="button"
@@ -119,7 +119,7 @@ export default function ContentRail({
               : "pointer-events-none opacity-0 group-hover/rail:opacity-40",
           )}
         >
-          <ChevronRight className="h-4.5 w-4.5" strokeWidth={2.25} />
+          <CaretRight className="h-4.5 w-4.5" weight="bold" />
         </button>
       </div>
 

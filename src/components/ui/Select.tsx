@@ -1,7 +1,7 @@
 "use client";
 // Adapted from beui.dev/components/motion/select
 
-import { Check, ChevronDown } from "lucide-react";
+import { CaretDown, Check } from "@phosphor-icons/react";
 import {
   motion,
   type Transition,
@@ -211,7 +211,7 @@ export function SelectTrigger({ className, children }: SelectTriggerProps) {
         transition={ctx.reduce ? { duration: 0 } : CHEVRON_TRANSITION}
         className="text-white/40"
       >
-        <ChevronDown className="h-4 w-4" />
+        <CaretDown className="h-4 w-4" weight="bold" />
       </motion.span>
     </motion.button>
   );
@@ -387,7 +387,7 @@ export function SelectItem({ value, disabled = false, className, children }: Sel
         )}
       >
         {children}
-        {selected ? <Check className="h-3.5 w-3.5 shrink-0" /> : null}
+        {selected ? <Check className="h-3.5 w-3.5 shrink-0" weight="bold" /> : null}
       </button>
     </motion.li>
   );

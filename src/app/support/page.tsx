@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { HelpCircle, Mail } from "lucide-react";
+import { EnvelopeSimple, Question } from "@phosphor-icons/react/dist/ssr";
 import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
 import SupportForm from "@/components/support/SupportForm";
@@ -16,7 +16,7 @@ export default async function SupportPage() {
         <div className="relative grid items-start gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
           <div>
             <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">
-              <HelpCircle className="h-4 w-4" />
+              <Question className="h-4 w-4" weight="bold" />
               Support
             </p>
             <h1
@@ -52,7 +52,7 @@ export default async function SupportPage() {
             </ul>
 
             <div className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#101214] px-4 py-3.5 text-sm text-white/60">
-              <Mail className="h-4 w-4 shrink-0 text-emerald-400" />
+              <EnvelopeSimple className="h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
               {session?.user.email ? (
                 <span>
                   Logged in as{" "}

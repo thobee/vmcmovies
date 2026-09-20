@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Loader2, Send } from "lucide-react";
+import { CheckCircle, CircleNotch, PaperPlaneTilt } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import type { SupportCategory } from "@/lib/support/types";
 import HoneypotField from "@/components/security/HoneypotField";
@@ -80,7 +80,7 @@ export default function SupportForm({ loggedIn, email, telegramUsername }: Suppo
     return (
       <div className="rounded-[28px] border border-white/10 bg-[#101214] px-6 py-12 text-center sm:px-8">
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15">
-          <CheckCircle className="h-7 w-7 text-emerald-400" />
+          <CheckCircle className="h-7 w-7 text-emerald-400" weight="fill" />
         </div>
         <h2
           className="text-2xl font-bold text-white"
@@ -240,12 +240,12 @@ export default function SupportForm({ loggedIn, email, telegramUsername }: Suppo
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <CircleNotch className="h-4 w-4 animate-spin" weight="bold" />
               Sending…
             </>
           ) : (
             <>
-              <Send className="h-4 w-4" />
+              <PaperPlaneTilt className="h-4 w-4" weight="bold" />
               Send to support
             </>
           )}

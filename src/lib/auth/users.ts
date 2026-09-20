@@ -78,6 +78,26 @@ export async function countAdmins(): Promise<number> {
   return (await users()).countDocuments({ role: "admin" });
 }
 
+/** Promote an existing member account to admin (CLI / ops — not exposed in the panel). */
+export async function promoteUserToAdmin(email: string): Promise<
+  | { status: "promoted"; user: User }
+  | { status: "already_admin"; user: User }
+  | { status: "not_found" }
+> {
+  const normalized = email.toLowerCase().trim();
+  const existing = await findUserByEmail(normalized);
+  if (!existing) return { status: "not_found" };
+  if (existing.role === "admin") return { status: "already_admin", user: existing };
+
+  const result = await (await users()).findOneAndUpdate(
+    { email: normalized },
+    { $set: { role: "admin" } },
+    { returnDocument: "after" },
+  );
+  if (!result) return { status: "not_found" };
+  return { status: "promoted", user: toUser(result) };
+}
+
 export async function findUserByGoogleId(googleId: string): Promise<User | null> {
   const doc = await (await users()).findOne({ googleId });
   return doc ? toUser(doc) : null;

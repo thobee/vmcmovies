@@ -3,13 +3,18 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AtSign } from "lucide-react";
+import { At } from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import AuthField from "@/components/auth/AuthField";
 import GoogleButton from "@/components/auth/GoogleButton";
 import PasswordField from "@/components/auth/PasswordField";
 import { cn } from "@/lib/cn";
 import HoneypotField from "@/components/security/HoneypotField";
+import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  passwordSchema,
+} from "@/lib/validation/password";
 
 const GOOGLE_ERRORS: Record<string, string> = {
   google_cancelled: "Google sign-in was cancelled.",
@@ -44,9 +49,16 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
     e.preventDefault();
     setError("");
 
-    if (isSignup && password !== confirm) {
-      setError("Passwords don’t match");
-      return;
+    if (isSignup) {
+      const pw = passwordSchema.safeParse(password);
+      if (!pw.success) {
+        setError(pw.error.issues[0]?.message ?? "Invalid password");
+        return;
+      }
+      if (password !== confirm) {
+        setError("Passwords don’t match");
+        return;
+      }
     }
 
     const website = String(new FormData(e.currentTarget).get("website") ?? "");
@@ -94,7 +106,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Enter your email"
-        icon={<AtSign className="h-[18px] w-[18px]" />}
+        icon={<At className="h-[18px] w-[18px]" weight="light" />}
       />
 
       {isSignup && (
@@ -117,8 +129,10 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         value={password}
         onChange={setPassword}
         autoComplete={isSignup ? "new-password" : "current-password"}
-        minLength={isSignup ? 8 : 1}
-        placeholder={isSignup ? "At least 8 characters" : "Enter your password"}
+        minLength={isSignup ? PASSWORD_MIN_LENGTH : 1}
+        maxLength={isSignup ? PASSWORD_MAX_LENGTH : undefined}
+        showPolicyHint={isSignup}
+        placeholder={isSignup ? "8–12 characters" : "Enter your password"}
       />
 
       {isSignup && (
@@ -128,13 +142,15 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
           value={confirm}
           onChange={setConfirm}
           autoComplete="new-password"
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
+          maxLength={PASSWORD_MAX_LENGTH}
+          showPolicyHint
           placeholder="Repeat your password"
         />
       )}
 
       {!isSignup && (
-        <div className="flex items-center justify-between gap-3 pt-0.5 text-sm">
+        <div className="flex flex-col gap-3 pt-0.5 text-sm sm:flex-row sm:items-center sm:justify-between">
           <label className="flex cursor-pointer items-center gap-2.5 text-white/50">
             <input
               type="checkbox"
@@ -146,7 +162,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
           </label>
           <Link
             href="/forgot-password"
-            className="font-medium text-white/45 transition hover:text-emerald-300"
+            className="font-medium text-white/45 transition hover:text-emerald-300 sm:text-right"
           >
             Forgot password?
           </Link>

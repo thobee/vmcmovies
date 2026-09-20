@@ -80,7 +80,7 @@ export async function requestAdminPasswordReset(
       subject: "Your VMC admin reset code",
       html: adminResetOtpEmail(otp),
     });
-    if (!sent) {
+    if (!sent.ok) {
       return { ok: false, error: "Couldn’t send the reset code. Try again shortly.", status: 502 };
     }
   }

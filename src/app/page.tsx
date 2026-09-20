@@ -29,7 +29,6 @@ export default async function HomePage() {
   ]);
 
   const titles = homepage.sectionTitles;
-  const posters = [...movies, ...series].filter((item) => item.id !== featured.id).slice(0, 4);
 
   const trendingMovies = movies.slice(0, HOMEPAGE_RAIL_LIMIT);
   const popularSeries = series.slice(0, HOMEPAGE_RAIL_LIMIT);
@@ -38,7 +37,11 @@ export default async function HomePage() {
 
   return (
     <SitePage className="overflow-x-hidden">
-      <FeaturedStrip slides={homepage.slides} fallback={featured} posters={posters} />
+      <FeaturedStrip
+        slides={homepage.slides}
+        fallback={featured}
+        catalog={[...movies, ...series]}
+      />
 
       <div className="flex flex-col gap-12 pt-10 pb-6 sm:gap-14 sm:pt-12">
         <ContentRail title={titles.trendingMovies} items={trendingMovies} viewAllHref="/movies" />

@@ -4,6 +4,7 @@ import {
   completeUserPasswordReset,
   requestUserPasswordReset,
 } from "@/lib/auth/password-reset";
+import { passwordSchema } from "@/lib/validation/password";
 import { honeypotTripped } from "@/lib/security/honeypot";
 import { clientIp, rateLimited, RATE_LIMIT_MSG } from "@/lib/security/rate-limit";
 
@@ -11,7 +12,7 @@ const requestSchema = z.object({ email: z.string().email() });
 const resetSchema = z.object({
   email: z.string().email(),
   otp: z.string().min(4).max(8),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: passwordSchema,
 });
 
 export async function POST(request: Request) {

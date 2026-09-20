@@ -11,12 +11,14 @@
     "migrate:slugs": "npx tsx scripts/migrate-slugs.ts",
     "mongo:local": "npx tsx scripts/start-local-mongo.ts",
     "admin:hash-password": "npx tsx scripts/hash-admin-password.ts",
+    "admin:promote": "npx tsx scripts/promote-admin.ts",
     "email:test": "npx tsx scripts/test-resend.ts",
     "payment:smoke": "npx tsx scripts/test-payment-smoke.ts",
     "email:backfill": "npx tsx scripts/backfill-payment-emails.ts",
     "audit": "npm audit --omit=dev"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@types/video.js": "^7.3.58",
     "@videojs/http-streaming": "^3.17.5",
     "bcryptjs": "^3.0.3",

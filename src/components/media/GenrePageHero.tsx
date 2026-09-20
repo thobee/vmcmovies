@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Film, Sparkles, Tv } from "lucide-react";
+import { FilmStrip, Sparkle, Television } from "@phosphor-icons/react/dist/ssr";
 import { genrePath } from "@/lib/catalog/genres";
 import { cn } from "@/lib/cn";
 
@@ -33,8 +33,8 @@ export default function GenrePageHero({
 
         <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">
-              <Sparkles className="h-3.5 w-3.5" />
+            <p className="eyebrow-pill gap-2">
+              <Sparkle className="h-3.5 w-3.5" weight="fill" />
               Browse by genre
             </p>
             <h1
@@ -51,11 +51,11 @@ export default function GenrePageHero({
 
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-white/70">
-                <Film className="h-3.5 w-3.5 text-emerald-400" />
+                <FilmStrip className="h-3.5 w-3.5 text-emerald-400" weight="light" />
                 {movieCount} {movieCount === 1 ? "movie" : "movies"}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-white/70">
-                <Tv className="h-3.5 w-3.5 text-emerald-400" />
+                <Television className="h-3.5 w-3.5 text-emerald-400" weight="light" />
                 {seriesCount} {seriesCount === 1 ? "series" : "series"}
               </span>
             </div>

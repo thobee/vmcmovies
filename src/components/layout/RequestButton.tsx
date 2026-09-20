@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clapperboard } from "lucide-react";
+import { FilmSlate } from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import RequestModal from "@/components/requests/RequestModal";
 import { cn } from "@/lib/cn";
@@ -22,7 +22,7 @@ export default function RequestButton({ className }: { className?: string }) {
           className,
         )}
       >
-        <Clapperboard className="h-4 w-4 shrink-0 text-emerald-400" strokeWidth={2.25} />
+        <FilmSlate className="h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
         <span className="hidden min-[420px]:inline">Request</span>
       </button>
       <RequestModal open={open} onClose={() => setOpen(false)} />

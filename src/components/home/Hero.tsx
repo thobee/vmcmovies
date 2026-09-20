@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Info, Star } from "lucide-react";
+import { Info, Star } from "@phosphor-icons/react/dist/ssr";
 import type { Content } from "@/lib/catalog/types";
 import { contentDetailPath } from "@/lib/catalog/paths";
 import QualityBadges from "@/components/media/QualityBadges";
@@ -55,7 +55,7 @@ export default function Hero({ item }: HeroProps) {
             </span>
             {item.rating && (
               <span className="flex items-center gap-1 font-semibold text-white/90">
-                <Star className="w-3.5 h-3.5" fill="var(--gold)" stroke="var(--gold)" />
+                <Star className="w-3.5 h-3.5 text-[var(--gold)]" weight="fill" />
                 {item.rating}
               </span>
             )}
@@ -72,7 +72,7 @@ export default function Hero({ item }: HeroProps) {
 
           <div className="flex flex-wrap gap-3 fade-up delay-4">
             <Link href={contentDetailPath(item)} className="btn-pill btn-pill-primary">
-              <Info className="w-4 h-4" />
+              <Info className="w-4 h-4" weight="bold" />
               View Details
             </Link>
             <Link href="/get-access" className="btn-pill glass text-white hover:bg-[var(--surface-2)]">

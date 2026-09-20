@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Film, Loader2, Tv, X } from "lucide-react";
+import { CircleNotch, FilmStrip, Television, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 import { useSiteToast } from "@/components/ui/SiteToast";
 import type { TitleRequestType } from "@/lib/requests/types";
@@ -95,7 +95,7 @@ export default function RequestModal({
           className="absolute right-4 top-4 rounded-lg p-1.5 text-white/40 transition hover:bg-white/5 hover:text-white"
           aria-label="Close"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4" weight="bold" />
         </button>
 
         <h2
@@ -117,8 +117,8 @@ export default function RequestModal({
             <div className="flex gap-2">
               {(
                 [
-                  { id: "movie" as const, label: "Movie", icon: Film },
-                  { id: "series" as const, label: "Series", icon: Tv },
+                  { id: "movie" as const, label: "Movie", icon: FilmStrip },
+                  { id: "series" as const, label: "Series", icon: Television },
                 ] as const
               ).map(({ id, label, icon: Icon }) => (
                 <button
@@ -132,7 +132,7 @@ export default function RequestModal({
                       : "border-white/10 bg-white/3 text-white/55 hover:border-white/20",
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4" weight="bold" />
                   {label}
                 </button>
               ))}
@@ -184,7 +184,7 @@ export default function RequestModal({
           >
             {pending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <CircleNotch className="h-4 w-4 animate-spin" weight="bold" />
                 Sending…
               </>
             ) : (

@@ -4,17 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  ArrowsClockwise,
+  ChatCircle,
   CheckCircle,
+  CircleNotch,
   Copy,
   Crown,
-  Download,
-  Loader2,
-  MessageCircle,
-  RefreshCw,
+  DownloadSimple,
   ShieldCheck,
-  Sparkles,
+  Sparkle,
   XCircle,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { cn } from "@/lib/cn";
 
@@ -78,9 +78,9 @@ function ReferenceChip({
         aria-label="Copy payment reference"
       >
         {copied ? (
-          <CheckCircle className="h-4 w-4 text-emerald-400" />
+          <CheckCircle className="h-4 w-4 text-emerald-400" weight="fill" />
         ) : (
-          <Copy className="h-4 w-4" />
+          <Copy className="h-4 w-4" weight="bold" />
         )}
       </button>
     </div>
@@ -228,14 +228,14 @@ export default function PaymentCallbackClient() {
 
         <div className="px-4 py-8 text-center sm:px-8 sm:py-10">
           <p className="mb-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-400 sm:text-xs">
-            <Crown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <Crown className="h-3.5 w-3.5 sm:h-4 sm:w-4" weight="fill" />
             VMC Premium
           </p>
 
           {status === "loading" && (
             <>
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/15 sm:h-[4.5rem] sm:w-[4.5rem]">
-                <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+                <CircleNotch className="h-8 w-8 animate-spin text-emerald-400" weight="bold" />
               </div>
               <h1
                 className="text-2xl font-bold leading-tight text-white sm:text-3xl"
@@ -269,11 +269,11 @@ export default function PaymentCallbackClient() {
                           !done && !active && "border-white/15",
                         )}
                       >
-                        {done ? <CheckCircle className="h-3.5 w-3.5" /> : i + 1}
+                        {done ? <CheckCircle className="h-3.5 w-3.5" weight="fill" /> : i + 1}
                       </span>
                       {step}
                       {active && (
-                        <Loader2 className="ml-auto h-3.5 w-3.5 animate-spin text-emerald-400" />
+                        <CircleNotch className="ml-auto h-3.5 w-3.5 animate-spin text-emerald-400" weight="bold" />
                       )}
                     </li>
                   );
@@ -289,7 +289,7 @@ export default function PaymentCallbackClient() {
           {status === "success" && (
             <>
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/15 ring-1 ring-emerald-400/25 sm:h-[4.5rem] sm:w-[4.5rem]">
-                <Sparkles className="h-8 w-8 text-emerald-400" />
+                <Sparkle className="h-8 w-8 text-emerald-400" weight="fill" />
               </div>
               <h1
                 className="text-2xl font-bold leading-tight text-white sm:text-3xl"
@@ -302,7 +302,7 @@ export default function PaymentCallbackClient() {
               {expiryLabel && (
                 <div className="mx-auto mt-5 max-w-sm rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3.5">
                   <p className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald-300/80">
-                    <ShieldCheck className="h-4 w-4" />
+                    <ShieldCheck className="h-4 w-4" weight="bold" />
                     Premium active
                   </p>
                   <p className="mt-1 text-base font-bold text-white sm:text-lg">
@@ -317,11 +317,11 @@ export default function PaymentCallbackClient() {
 
               <ul className="mx-auto mt-5 max-w-sm space-y-2 text-left text-sm text-white/60">
                 <li className="flex items-start gap-2.5">
-                  <Download className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  <DownloadSimple className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
                   Open any title → tap Download → Telegram sends the file
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  <ChatCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
                   Save your Telegram username on Account for deliveries
                 </li>
               </ul>
@@ -343,7 +343,7 @@ export default function PaymentCallbackClient() {
           {status === "failed" && (
             <>
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/15 sm:h-[4.5rem] sm:w-[4.5rem]">
-                <XCircle className="h-8 w-8 text-red-400" />
+                <XCircle className="h-8 w-8 text-red-400" weight="fill" />
               </div>
               <h1
                 className="text-2xl font-bold leading-tight text-white sm:text-3xl"
@@ -369,7 +369,7 @@ export default function PaymentCallbackClient() {
                   onClick={() => window.location.reload()}
                   className="auth-btn min-h-12 w-full gap-2 py-3.5 text-sm"
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  <ArrowsClockwise className="h-4 w-4" weight="bold" />
                   Try again
                 </button>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

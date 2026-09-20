@@ -2,11 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AtSign } from "lucide-react";
+import { At } from "@phosphor-icons/react";
 import AuthField from "@/components/auth/AuthField";
 import PasswordField from "@/components/auth/PasswordField";
 import { cn } from "@/lib/cn";
 import HoneypotField from "@/components/security/HoneypotField";
+import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  passwordSchema,
+} from "@/lib/validation/password";
 
 export default function ForgotPasswordForm() {
   const [step, setStep] = useState<"request" | "reset">("request");
@@ -48,6 +53,11 @@ export default function ForgotPasswordForm() {
     e.preventDefault();
     setError("");
     setOk("");
+    const pw = passwordSchema.safeParse(password);
+    if (!pw.success) {
+      setError(pw.error.issues[0]?.message ?? "Invalid password");
+      return;
+    }
     if (password !== confirm) {
       setError("Passwords don’t match");
       return;
@@ -90,8 +100,8 @@ export default function ForgotPasswordForm() {
       {step === "request" ? (
         <>
           <p className="text-sm leading-relaxed text-white/45">
-            Google-only accounts should use <span className="text-white/70">Sign in with Google</span>{" "}
-            on the login page instead.
+            Use the same email you signed up with. Check spam/promotions. Codes expire in 10
+            minutes. Google sign-in accounts can set a password here too.
           </p>
           <AuthField
             id="forgot-email"
@@ -101,7 +111,7 @@ export default function ForgotPasswordForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            icon={<AtSign className="h-[18px] w-[18px]" />}
+            icon={<At className="h-[18px] w-[18px]" weight="light" />}
           />
           <button
             type="submit"
@@ -129,15 +139,19 @@ export default function ForgotPasswordForm() {
             value={password}
             onChange={setPassword}
             autoComplete="new-password"
-            minLength={8}
-            placeholder="At least 8 characters"
+            minLength={PASSWORD_MIN_LENGTH}
+            maxLength={PASSWORD_MAX_LENGTH}
+            showPolicyHint
+            placeholder="8–12 characters"
           />
           <PasswordField
             label="Confirm password"
             value={confirm}
             onChange={setConfirm}
             autoComplete="new-password"
-            minLength={8}
+            minLength={PASSWORD_MIN_LENGTH}
+            maxLength={PASSWORD_MAX_LENGTH}
+            showPolicyHint
             placeholder="Repeat password"
           />
           <button

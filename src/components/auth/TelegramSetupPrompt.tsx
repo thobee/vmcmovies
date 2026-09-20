@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, MessageCircle } from "lucide-react";
+import { ChatCircle, CircleNotch } from "@phosphor-icons/react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useSiteToast } from "@/components/ui/SiteToast";
 import { cn } from "@/lib/cn";
@@ -82,7 +82,7 @@ export default function TelegramSetupPrompt({
         className="relative w-full max-w-md rounded-[28px] border border-white/10 bg-[#101214] p-6 shadow-2xl sm:p-7"
       >
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400">
-          <MessageCircle className="h-6 w-6" strokeWidth={2.2} />
+          <ChatCircle className="h-6 w-6" weight="light" />
         </div>
 
         <h2
@@ -142,7 +142,7 @@ export default function TelegramSetupPrompt({
           >
             {pending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <CircleNotch className="h-4 w-4 animate-spin" weight="bold" />
                 Saving…
               </>
             ) : (

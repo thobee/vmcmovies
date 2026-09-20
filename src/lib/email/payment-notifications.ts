@@ -86,7 +86,7 @@ export async function ensurePaymentNotificationEmails(
         }),
       });
 
-      if (userOk) {
+      if (userOk.ok) {
         await markUserReceiptSent(reference);
       } else {
         console.warn(
@@ -117,7 +117,7 @@ export async function ensurePaymentNotificationEmails(
         }),
       });
 
-      if (adminOk) {
+      if (adminOk.ok) {
         await markAdminNotified(reference);
       }
     }

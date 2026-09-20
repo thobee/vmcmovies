@@ -1,9 +1,15 @@
 /** Public app URL helpers — shared outside the payment provider. */
 
+/** Accepts `https://site.com` or bare `site.com` (common in Vercel env). */
+export function normalizePublicUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/\/$/, "");
+  if (!trimmed) return trimmed;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 export function getAppUrl(): string {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
-  }
+  const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (fromEnv) return normalizePublicUrl(fromEnv);
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
@@ -46,8 +52,9 @@ export function originFromRequest(request: Request): string {
  * Prefer your deployed site URL when developing locally.
  */
 export function bachsReturnBase(request: Request): string {
+  const bachsBase = process.env.BACHS_RETURN_BASE_URL?.trim();
   const candidates = [
-    process.env.BACHS_RETURN_BASE_URL?.trim().replace(/\/$/, ""),
+    bachsBase ? normalizePublicUrl(bachsBase) : null,
     originFromRequest(request),
     getAppUrl(),
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
@@ -60,5 +67,12 @@ export function bachsReturnBase(request: Request): string {
   throw new Error(
     "Bachs needs a public success URL (localhost is blocked). " +
       "Deploy the app and set BACHS_RETURN_BASE_URL to your live domain.",
+  );
+}
+
+if (process.env.NODE_ENV === "test") {
+  console.assert(
+    normalizePublicUrl("www.vmcmovies.xyz") === "https://www.vmcmovies.xyz",
+    "normalizePublicUrl should prefix https://",
   );
 }

@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
-import { Baloo_2, Inter, Sora } from "next/font/google";
+import { Baloo_2, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import SessionIdleMonitor from "@/components/auth/SessionIdleMonitor";
 import { SiteToastProvider } from "@/components/ui/SiteToast";
 import { getSession } from "@/lib/auth/session";
 import { getAppUrl } from "@/lib/payments/app-url";
 import "./globals.css";
 
-const inter = Inter({
+/** Body copy — Plus Jakarta Sans reads warmer and more premium than Inter at small sizes. */
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const sora = Sora({
+/** Headlines — wide geometric grotesk, replaces Sora for a sharper agency feel. */
+const grotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["600", "700", "800"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -61,11 +64,14 @@ export default async function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${sora.variable} ${baloo.variable}`}
+      className={`${jakarta.variable} ${grotesk.variable} ${baloo.variable}`}
     >
       <body className="min-h-screen antialiased">
         <AuthProvider initialUser={session?.user ?? null}>
-          <SiteToastProvider>{children}</SiteToastProvider>
+          <SiteToastProvider>
+            <SessionIdleMonitor />
+            {children}
+          </SiteToastProvider>
         </AuthProvider>
       </body>
     </html>

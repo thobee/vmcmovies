@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, User, X } from "lucide-react";
+import { List, User, X } from "@phosphor-icons/react";
 import VmcLogo from "@/components/brand/VmcLogo";
 import NavbarSearch from "@/components/layout/NavbarSearch";
 import NotificationBell from "@/components/layout/NotificationBell";
@@ -35,11 +35,11 @@ export default function Navbar() {
 
   return (
     <>
-      <header
-        className="fixed inset-x-0 top-0 z-50 border-b border-white/15 bg-[#101214]/95 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl supports-backdrop-filter:bg-[#101214]/90"
-      >
-        <div className="mx-auto flex h-[80px] max-w-screen-2xl items-center gap-4 px-4 sm:px-6 lg:gap-8 lg:px-10">
-          <VmcLogo href="/" height={52} priority className="transition-transform hover:scale-[1.02]" />
+      <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+        <div
+          className="mx-auto flex h-[68px] max-w-screen-2xl items-center gap-4 rounded-full border border-white/10 bg-[#101214]/85 px-4 shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur-2xl supports-backdrop-filter:bg-[#101214]/70 sm:px-6 lg:gap-8 lg:px-8"
+        >
+          <VmcLogo href="/" height={44} priority className="transition-transform hover:scale-[1.02]" />
 
           <NavbarSearch variant="desktop" className="hidden md:block" />
 
@@ -91,7 +91,7 @@ export default function Navbar() {
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
             </button>
           </div>
         </div>
@@ -99,13 +99,13 @@ export default function Navbar() {
 
       <div
         className={cn(
-          "fixed inset-x-0 top-[80px] z-40 origin-top transition-all duration-300 lg:hidden",
+          "fixed inset-x-0 top-[92px] z-40 origin-top px-3 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-4 lg:hidden",
           mobileOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0",
         )}
       >
-        <div className="border-b border-white/10 bg-[#101214]/98 shadow-2xl backdrop-blur-xl">
+        <div className="mx-auto max-w-screen-2xl overflow-hidden rounded-3xl border border-white/10 bg-[#101214]/98 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
           <div className="px-4 pt-4">
             <NavbarSearch variant="mobile" onNavigate={() => setMobileOpen(false)} />
           </div>

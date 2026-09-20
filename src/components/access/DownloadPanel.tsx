@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
-  Bot,
-  Download,
+  Broadcast,
+  DownloadSimple,
   Eye,
-  EyeOff,
+  EyeSlash,
   Lock,
-  Radio,
-} from "lucide-react";
+  Robot,
+} from "@phosphor-icons/react";
 import type { Season } from "@/lib/catalog/types";
 import { seasonLabel } from "@/lib/catalog/series";
 import {
@@ -72,14 +72,14 @@ export default function DownloadPanel({
             rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/35 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200"
           >
-            <Radio className="h-3.5 w-3.5" />
+            <Broadcast className="h-3.5 w-3.5" weight="bold" />
             Join channel
           </a>
           <button
             disabled
             className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white/5 px-5 py-3 text-sm font-semibold text-white/35 sm:w-auto"
           >
-            <Lock className="h-4 w-4" />
+            <Lock className="h-4 w-4" weight="bold" />
             Download (pending)
           </button>
         </section>
@@ -162,7 +162,7 @@ function StickyCta({
           premiumStatus === "pending" && "pointer-events-none opacity-50",
         )}
       >
-        {premiumStatus === "active" ? <Download className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+        {premiumStatus === "active" ? <DownloadSimple className="h-4 w-4" weight="bold" /> : <Lock className="h-4 w-4" weight="bold" />}
         {label}
       </a>
     </div>
@@ -228,12 +228,12 @@ function PremiumDownloadPanel({
           >
             {guideOpen ? (
               <>
-                <EyeOff className="h-3 w-3" />
+                <EyeSlash className="h-3 w-3" weight="bold" />
                 Hide
               </>
             ) : (
               <>
-                <Eye className="h-3 w-3" />
+                <Eye className="h-3 w-3" weight="bold" />
                 Guide
               </>
             )}
@@ -280,7 +280,7 @@ function PremiumDownloadPanel({
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-[10px] font-bold text-white">
                     2
                   </span>
-                  <Bot className="h-5 w-5 shrink-0" strokeWidth={2.5} />
+                  <Robot className="h-5 w-5 shrink-0" weight="bold" />
                   Open bot &amp; Start
                 </a>
               </div>
@@ -295,7 +295,7 @@ function PremiumDownloadPanel({
                 onClick={hideGuide}
                 className="inline-flex cursor-pointer items-center gap-1 text-[11px] font-semibold text-white/45 hover:text-white/80"
               >
-                <EyeOff className="h-3 w-3" />
+                <EyeSlash className="h-3 w-3" weight="bold" />
                 Don&apos;t show again
               </button>
             </div>
@@ -311,7 +311,7 @@ function PremiumDownloadPanel({
             rel="noopener noreferrer"
             className={BTN_PRIMARY}
           >
-            <Download className="h-4 w-4" />
+            <DownloadSimple className="h-4 w-4" weight="bold" />
             Download
           </a>
         </div>
@@ -332,7 +332,7 @@ function PremiumDownloadPanel({
                 className="inline-flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm font-bold text-white transition hover:border-emerald-400/40 hover:bg-emerald-500/10"
               >
                 <span>{seasonLabel(season)}</span>
-                <Download className="h-4 w-4 shrink-0 text-emerald-400" />
+                <DownloadSimple className="h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
               </a>
             ))}
           </div>

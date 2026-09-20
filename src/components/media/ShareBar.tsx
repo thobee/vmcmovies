@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Copy, Link2, Share2 } from "lucide-react";
+import { Check, Copy, Link, ShareNetwork } from "@phosphor-icons/react";
 import { contentDetailPath } from "@/lib/catalog/paths";
 import type { Content } from "@/lib/catalog/types";
 import { cn } from "@/lib/cn";
@@ -70,13 +70,13 @@ export default function ShareBar({ item }: { item: Content }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/30 p-4 sm:p-5">
       <div className="mb-3 flex items-center gap-2">
-        <Share2 className="h-4 w-4 text-emerald-400" />
+        <ShareNetwork className="h-4 w-4 text-emerald-400" weight="bold" />
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/55">Share</p>
       </div>
 
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
         <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-white/10 bg-[#101214] px-3 py-2.5">
-          <Link2 className="h-3.5 w-3.5 shrink-0 text-white/35" />
+          <Link className="h-3.5 w-3.5 shrink-0 text-white/35" weight="bold" />
           <p className="min-w-0 flex-1 truncate text-xs text-white/55" title={url}>
             {url}
           </p>
@@ -90,7 +90,7 @@ export default function ShareBar({ item }: { item: Content }) {
                 : "bg-white/[0.06] text-white/70 hover:bg-white/10 hover:text-white",
             )}
           >
-            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <Check className="h-3.5 w-3.5" weight="bold" /> : <Copy className="h-3.5 w-3.5" weight="bold" />}
             {copied ? "Copied" : "Copy"}
           </button>
         </div>
@@ -99,7 +99,7 @@ export default function ShareBar({ item }: { item: Content }) {
       <div className="mt-3 flex flex-wrap gap-2">
         {canNativeShare && (
           <button type="button" onClick={nativeShare} className={BTN}>
-            <Share2 className="h-3.5 w-3.5" />
+            <ShareNetwork className="h-3.5 w-3.5" weight="bold" />
             Share
           </button>
         )}

@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Check, Info, X } from "lucide-react";
+import { Check, Info, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/cn";
 
 export type SiteToastTone = "success" | "error" | "info";
@@ -65,11 +65,11 @@ export function SiteToastProvider({ children }: { children: ReactNode }) {
               )}
             >
               {t.tone === "error" ? (
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" weight="bold" />
               ) : t.tone === "info" ? (
-                <Info className="h-4 w-4" />
+                <Info className="h-4 w-4" weight="bold" />
               ) : (
-                <Check className="h-4 w-4" strokeWidth={2.5} />
+                <Check className="h-4 w-4" weight="bold" />
               )}
             </div>
             <div className="min-w-0 flex-1 pt-0.5">
@@ -84,7 +84,7 @@ export function SiteToastProvider({ children }: { children: ReactNode }) {
               className="self-start rounded-lg p-1 text-white/25 hover:text-white/70"
               aria-label="Dismiss"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-3.5 w-3.5" weight="bold" />
             </button>
           </div>
         ))}

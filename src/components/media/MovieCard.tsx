@@ -1,8 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Download } from "lucide-react";
+import { DownloadSimple } from "@phosphor-icons/react/dist/ssr";
 import type { Content } from "@/lib/catalog/types";
 import { contentDetailPath } from "@/lib/catalog/paths";
+import CatalogImage from "@/components/ui/CatalogImage";
+import { resolveCatalogImage, resolvePosterImage } from "@/lib/catalog/image";
 import QualityBadges from "@/components/media/QualityBadges";
 import { cn } from "@/lib/cn";
 
@@ -11,11 +12,9 @@ interface MovieCardProps {
   landscape?: boolean;
   index?: number;
   className?: string;
-  /** No quality/type badges; title only (recommended grid). */
   simple?: boolean;
 }
 
-/** Plex-style card: clean poster, badges on the art, title + genre below. */
 export default function MovieCard({
   item,
   landscape = false,
@@ -23,6 +22,10 @@ export default function MovieCard({
   className,
   simple = false,
 }: MovieCardProps) {
+  const imageSrc = landscape
+    ? resolveCatalogImage(item.backdropImageUrl, item.posterImageUrl)
+    : resolvePosterImage(item.posterImageUrl, item.backdropImageUrl);
+
   return (
     <Link
       href={contentDetailPath(item)}
@@ -30,55 +33,51 @@ export default function MovieCard({
         "group relative flex-shrink-0 cursor-pointer",
         landscape
           ? "w-[232px] sm:w-[264px] md:w-[296px]"
-          : "w-[168px] sm:w-[192px] md:w-[216px]",
-        className
+          : "w-[148px] sm:w-[168px] md:w-[192px]",
+        className,
       )}
       style={{ animationDelay: `${Math.min(index * 45, 270)}ms` }}
     >
-      <div
-        className={cn(
-          "relative overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/8",
-          landscape ? "aspect-video" : "aspect-[2/3]"
-        )}
-      >
-        <Image
-          src={
-            landscape && item.backdropImageUrl
-              ? item.backdropImageUrl
-              : item.posterImageUrl
-          }
-          alt={item.title}
-          fill
-          sizes={landscape ? "296px" : "216px"}
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-        />
+      <div className="bezel-outer">
+        <div
+          className={cn(
+            "bezel-inner relative overflow-hidden",
+            landscape ? "aspect-video" : "aspect-[2/3]",
+          )}
+        >
+          <CatalogImage
+            src={imageSrc}
+            alt={item.title}
+            fill
+            sizes={landscape ? "296px" : "192px"}
+            className="transition-transform duration-500 group-hover:scale-[1.04]"
+          />
 
-        {!simple && (
-          <div className="absolute top-2 left-2 right-2 z-10 flex flex-wrap items-start gap-1">
-            <QualityBadges qualities={item.qualities} size="sm" hd />
-            <span className="rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none text-black">
-              {item.type === "series" ? "Series" : "Movie"}
-            </span>
-          </div>
-        )}
-
-        {!simple && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg)]/0 group-hover:bg-[var(--bg)]/35 transition-colors duration-250">
-            <div className="flex h-11 w-11 scale-90 items-center justify-center rounded-full bg-emerald-400 opacity-0 shadow-xl shadow-emerald-950/40 transition-all duration-250 group-hover:scale-100 group-hover:opacity-100">
-              <Download className="h-5 w-5 text-black" />
+          {!simple && (
+            <div className="absolute top-2 left-2 right-2 z-10 flex flex-wrap items-start gap-1">
+              <QualityBadges qualities={item.qualities} size="sm" hd />
+              <span className="rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none text-black">
+                {item.type === "series" ? "Series" : "Movie"}
+              </span>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="absolute inset-0 rounded-xl ring-0 ring-emerald-400/0 transition group-hover:ring-2 group-hover:ring-emerald-400/50" />
+          {!simple && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/35">
+              <div className="flex h-11 w-11 scale-90 items-center justify-center rounded-full bg-emerald-400 opacity-0 shadow-xl transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
+                <DownloadSimple className="h-5 w-5 text-black" weight="bold" />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="pt-2 px-0.5">
-        <p className="text-white/90 text-xs sm:text-sm font-semibold leading-tight line-clamp-1 group-hover:text-white transition-colors">
+      <div className="pt-2.5 px-0.5">
+        <p className="line-clamp-1 text-xs font-semibold leading-tight text-white/90 transition-colors group-hover:text-white sm:text-sm">
           {item.title}
         </p>
         {!simple && item.genres[0] && (
-          <p className="text-[var(--muted)] text-[10px] sm:text-xs mt-0.5 line-clamp-1">
+          <p className="mt-0.5 line-clamp-1 text-[10px] text-[var(--muted)] sm:text-xs">
             {item.genres[0]}
           </p>
         )}

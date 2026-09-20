@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import VmcLogo from "@/components/brand/VmcLogo";
 import { getTelegramChannelUrl } from "@/lib/catalog/telegram";
 
@@ -59,10 +59,12 @@ export default function Footer() {
           </div>
           <Link
             href="/get-access"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-bold text-emerald-300 transition hover:bg-black/90 hover:text-lime-300"
+            className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-black pl-6 pr-1.5 py-1.5 text-sm font-bold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-lime-300 active:scale-[0.98]"
           >
             Get premium
-            <ArrowUpRight className="h-4 w-4" />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-[1px]">
+              <ArrowUpRight className="h-4 w-4" weight="bold" />
+            </span>
           </Link>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Info } from "lucide-react";
+import { Info } from "@phosphor-icons/react";
 import type { Content } from "@/lib/catalog/types";
 import type { HeroSlide } from "@/lib/site/types";
 import { contentDetailPath } from "@/lib/catalog/paths";
@@ -124,7 +124,7 @@ export default function HeroCarousel({ slides, fallback }: HeroCarouselProps) {
               href={active.ctaHref}
               className="flex items-center gap-2.5 px-7 py-3 rounded-xl bg-[var(--amber)] text-white text-sm font-bold tracking-wide hover:bg-[var(--amber-hover)] active:scale-95 transition-all shadow-xl shadow-[var(--amber)]/30"
             >
-              <Info className="w-4 h-4" />
+              <Info className="w-4 h-4" weight="bold" />
               {active.ctaLabel}
             </Link>
             <Link

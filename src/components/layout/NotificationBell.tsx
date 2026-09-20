@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ArrowSquareOut,
   Bell,
+  CircleNotch,
   Crown,
-  ExternalLink,
-  Film,
-  Loader2,
+  FilmStrip,
   Megaphone,
-  Tv,
-} from "lucide-react";
+  Television,
+} from "@phosphor-icons/react";
 import type { SiteUpdateKind } from "@/lib/site/updates/types";
 import { UPDATE_KIND_LABELS } from "@/lib/site/updates/types";
 import { timeAgo } from "@/lib/format/timeAgo";
@@ -32,8 +32,8 @@ function kindIcon(kind: string) {
   if (kind === "premium_expiring" || kind === "premium_expired" || kind === "premium_upsell") {
     return Crown;
   }
-  if (kind === "movie") return Film;
-  if (kind === "series") return Tv;
+  if (kind === "movie") return FilmStrip;
+  if (kind === "series") return Television;
   return Megaphone;
 }
 
@@ -133,7 +133,7 @@ export default function NotificationBell() {
             : "text-white/50 hover:bg-white/5 hover:text-white",
         )}
       >
-        <Bell className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
+        <Bell className="h-4.5 w-4.5 shrink-0" weight="bold" />
         <span className="hidden text-xs font-semibold sm:inline">Updates</span>
         {unread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-black shadow-sm shadow-emerald-500/40">
@@ -164,7 +164,7 @@ export default function NotificationBell() {
 
           {loading && (
             <div className="flex items-center justify-center gap-2 py-10 text-sm text-white/45">
-              <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+              <CircleNotch className="h-4 w-4 animate-spin text-emerald-400" weight="bold" />
               Loading…
             </div>
           )}
@@ -197,7 +197,7 @@ export default function NotificationBell() {
                           "bg-amber-500/15 text-amber-300",
                       )}
                     >
-                      <Icon className="h-4 w-4" strokeWidth={2.25} />
+                      <Icon className="h-4 w-4" weight="bold" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
@@ -247,12 +247,12 @@ export default function NotificationBell() {
                           className={rowClass}
                         >
                           {inner}
-                          <ExternalLink className="mt-1 h-3.5 w-3.5 shrink-0 text-white/25" />
+                          <ArrowSquareOut className="mt-1 h-3.5 w-3.5 shrink-0 text-white/25" weight="bold" />
                         </a>
                       ) : (
                         <Link href={item.href} onClick={() => onItemOpen(item.id)} className={rowClass}>
                           {inner}
-                          <ExternalLink className="mt-1 h-3.5 w-3.5 shrink-0 text-white/25" />
+                          <ArrowSquareOut className="mt-1 h-3.5 w-3.5 shrink-0 text-white/25" weight="bold" />
                         </Link>
                       )
                     ) : (

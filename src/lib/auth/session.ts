@@ -8,6 +8,7 @@ import type { SessionUser } from "@/lib/auth/types";
 import { sessionCookieOptions } from "@/lib/security/cookies";
 
 const COOKIE_NAME = "vmc_session";
+/** Absolute session lifetime (not idle). Idle logout is client-side — see lib/auth/idle.ts */
 const MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 days
 
 function getSecret(): Uint8Array | null {

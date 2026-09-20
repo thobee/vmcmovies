@@ -23,11 +23,9 @@ export default function CatalogPageHero({
       <div className="relative mx-auto max-w-screen-2xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-400">
-              {eyebrow}
-            </p>
+            <p className="eyebrow-pill">{eyebrow}</p>
             <h1
-              className="mt-3 text-[2.25rem] font-bold leading-[1.05] text-white sm:text-5xl"
+              className="mt-4 text-[2rem] font-semibold leading-[1.05] text-white sm:text-5xl"
               style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}
             >
               {title}

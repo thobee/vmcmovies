@@ -1,27 +1,38 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-
-const W = 1983;
-const H = 793;
+import { motion } from "motion/react";
 
 export default function VmcBrandBanner() {
   return (
-    <section className="px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
-      <Link
-        href="/get-access"
-        className="group relative mx-auto block max-w-screen-2xl overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_60px_-28px_rgba(0,0,0,0.65)] transition hover:border-emerald-400/25 sm:rounded-[28px]"
-        aria-label="VMC — Your Ultimate Movie Experience. Get premium access"
+    <section className="px-4 py-4 sm:px-6 sm:py-6 lg:px-10">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+        className="mx-auto max-w-xl sm:max-w-2xl"
       >
-        <Image
-          src="/vmcbanner.png"
-          alt="VMC — Your Ultimate Movie Experience. High quality downloads, fast access, no ads, watch on any device."
-          width={W}
-          height={H}
-          sizes="(max-width: 1536px) 100vw, 1536px"
-          className="h-auto w-full object-cover transition duration-500 group-hover:scale-[1.01]"
-          priority={false}
-        />
-      </Link>
+        <div className="bezel-outer">
+          <Link
+            href="/get-access"
+            className="bezel-inner group relative block overflow-hidden"
+            aria-label="VMC — Your Ultimate Movie Experience. Get premium access"
+          >
+            <div className="relative aspect-[5/2] w-full sm:aspect-[2.5/1]">
+              <Image
+                src="/vmcbanner.png"
+                alt="VMC — Your Ultimate Movie Experience. High quality downloads, fast access, no ads, watch on any device."
+                fill
+                sizes="(max-width: 640px) 100vw, 672px"
+                className="object-cover object-center transition duration-500 group-hover:scale-[1.02]"
+                priority={false}
+              />
+            </div>
+          </Link>
+        </div>
+      </motion.div>
     </section>
   );
 }

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Film, Loader2, Search, Tv, X } from "lucide-react";
+import { CircleNotch, FilmStrip, MagnifyingGlass, Television, X } from "@phosphor-icons/react";
 import { contentDetailPath } from "@/lib/catalog/paths";
 import type { Content } from "@/lib/catalog/types";
 import { useCatalogSearch } from "@/hooks/useCatalogSearch";
@@ -95,7 +95,7 @@ export default function NavbarSearch({
             : "h-11 rounded-2xl px-4",
         )}
       >
-        <Search className="h-4 w-4 shrink-0 text-white/35" />
+        <MagnifyingGlass className="h-4 w-4 shrink-0 text-white/35" weight="bold" />
         <input
           ref={inputRef}
           type="text"
@@ -126,7 +126,7 @@ export default function NavbarSearch({
             aria-label="Clear search"
             className="rounded-full p-0.5 text-white/40 transition hover:bg-white/10 hover:text-white"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-3.5 w-3.5" weight="bold" />
           </button>
         )}
       </form>
@@ -142,7 +142,7 @@ export default function NavbarSearch({
         >
           {loading && (
             <div className="flex items-center gap-2.5 px-4 py-3.5 text-sm text-white/50">
-              <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+              <CircleNotch className="h-4 w-4 animate-spin text-emerald-400" weight="bold" />
               Searching…
             </div>
           )}
@@ -181,9 +181,9 @@ export default function NavbarSearch({
                       <p className="mt-0.5 flex items-center gap-2 text-[11px] text-white/45">
                         <span className="inline-flex items-center gap-1">
                           {item.type === "series" ? (
-                            <Tv className="h-3 w-3" />
+                            <Television className="h-3 w-3" weight="light" />
                           ) : (
-                            <Film className="h-3 w-3" />
+                            <FilmStrip className="h-3 w-3" weight="light" />
                           )}
                           {item.type === "series" ? "Series" : "Movie"}
                         </span>

@@ -58,7 +58,8 @@ export async function requestUserPasswordReset(
   const normalized = email.toLowerCase().trim();
   const user = await findUserByEmail(normalized);
 
-  if (user && user.role !== "admin" && user.passwordHash) {
+  // Email/password and Google sign-in accounts (passwordHash may be empty until first reset).
+  if (user && user.role !== "admin") {
     const otp = String(crypto.randomInt(100000, 1000000));
     const now = new Date();
     await (await col()).updateOne(
@@ -80,8 +81,16 @@ export async function requestUserPasswordReset(
       subject: "Your VMC password reset code",
       html: userResetOtpEmail(otp),
     });
-    if (!sent) {
-      return { ok: false, error: "Couldn’t send the reset code. Try again shortly.", status: 502 };
+    if (!sent.ok) {
+      const hint =
+        process.env.NODE_ENV === "development" && sent.detail
+          ? ` ${sent.detail}`
+          : "";
+      return {
+        ok: false,
+        error: `Couldn’t send the reset code. Check Resend settings and try again.${hint}`,
+        status: 502,
+      };
     }
   }
 
@@ -114,7 +123,7 @@ export async function completeUserPasswordReset(input: {
   }
 
   const user = await findUserByEmail(email);
-  if (!user || user.role === "admin" || !user.passwordHash) {
+  if (!user || user.role === "admin") {
     await c.deleteOne({ email });
     return { ok: false, error: "Invalid or expired code", status: 400 };
   }

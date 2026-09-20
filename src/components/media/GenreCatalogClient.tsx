@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowUpDown, Film, Search, Tv, X } from "lucide-react";
+import { ArrowsDownUp, FilmStrip, MagnifyingGlass, Television, X } from "@phosphor-icons/react";
 import MovieCard from "@/components/media/MovieCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import type { Content } from "@/lib/catalog/types";
@@ -56,8 +56,8 @@ export default function GenreCatalogClient({
 
   const filters = [
     { id: "all" as const, label: "All", count: total },
-    { id: "movie" as const, label: "Movies", count: movies.length, icon: Film },
-    { id: "series" as const, label: "TV Shows", count: series.length, icon: Tv },
+    { id: "movie" as const, label: "Movies", count: movies.length, icon: FilmStrip },
+    { id: "series" as const, label: "TV Shows", count: series.length, icon: Television },
   ];
 
   return (
@@ -65,7 +65,7 @@ export default function GenreCatalogClient({
       <div className="sticky top-[72px] z-30 -mx-4 mb-8 border-b border-white/10 bg-black/90 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+            <MagnifyingGlass className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" weight="bold" />
             <input
               type="search"
               value={query}
@@ -80,13 +80,13 @@ export default function GenreCatalogClient({
                 aria-label="Clear search"
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-white/40 transition hover:bg-white/10 hover:text-white"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" weight="bold" />
               </button>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <ArrowUpDown className="h-4 w-4 text-white/35" />
+            <ArrowsDownUp className="h-4 w-4 text-white/35" weight="bold" />
             <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
               <SelectTrigger className="w-[148px] border-white/10 bg-[#101214] hover:border-emerald-400/30">
                 <SelectValue />
@@ -118,7 +118,7 @@ export default function GenreCatalogClient({
                   disabled && "cursor-not-allowed opacity-40",
                 )}
               >
-                {Icon && <Icon className="h-3.5 w-3.5" />}
+                {Icon && <Icon className="h-3.5 w-3.5" weight="bold" />}
                 {label}
                 <span
                   className={cn(
