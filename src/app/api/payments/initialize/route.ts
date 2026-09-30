@@ -5,8 +5,8 @@ import { isPaymentCurrency } from "@/lib/payments/currency";
 import { isPlanId } from "@/lib/payments/plans";
 import { generatePaymentReference } from "@/lib/payments/reference";
 import { createPendingPayment, setPaymentCheckoutId } from "@/lib/payments/records";
-import { bachsReturnBase } from "@/lib/payments/app-url";
-import { createCheckoutSession } from "@/lib/payments/bachs";
+import { paymentReturnBase } from "@/lib/payments/app-url";
+import { initializeTransaction } from "@/lib/payments/paystack";
 import { resolveChargeForUser } from "@/lib/payments/billing/resolve";
 import { clientIp, rateLimited, RATE_LIMIT_MSG } from "@/lib/security/rate-limit";
 import { PLANS } from "@/lib/payments/plans";
@@ -52,16 +52,16 @@ export async function POST(request: Request) {
       pricingKind: pricing.pricingKind,
     });
 
-    const origin = bachsReturnBase(request);
-    const successUrl = `${origin}/payment/callback?reference=${encodeURIComponent(reference)}`;
+    const origin = paymentReturnBase(request);
+    const callbackUrl = `${origin}/payment/callback?reference=${encodeURIComponent(reference)}`;
     const cancelUrl = `${origin}/get-access?cancelled=1`;
 
-    const data = await createCheckoutSession({
+    const data = await initializeTransaction({
       email: session.user.email,
-      amountDisplay: pricing.display,
+      amountMinor: pricing.amountMinor,
       currency,
       reference,
-      successUrl,
+      callbackUrl,
       cancelUrl,
       metadata: {
         user_id: session.user.id,
@@ -72,10 +72,10 @@ export async function POST(request: Request) {
       },
     });
 
-    await setPaymentCheckoutId(reference, data.checkout_id);
+    await setPaymentCheckoutId(reference, data.access_code);
 
     return NextResponse.json({
-      authorizationUrl: data.checkout_url,
+      authorizationUrl: data.authorization_url,
       reference,
     });
   } catch (err) {

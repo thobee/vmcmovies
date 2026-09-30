@@ -3,50 +3,39 @@ import { getSession } from "@/lib/auth/session";
 import { findUserById } from "@/lib/auth/users";
 import { ensurePaymentNotificationEmails } from "@/lib/email/payment-notifications";
 import { fulfillPayment } from "@/lib/payments/fulfill";
-import type { BachsVerifyData } from "@/lib/payments/bachs";
+import type { PaymentVerifyData } from "@/lib/payments/paystack";
 import {
-  checkoutSessionToVerifyData,
-  getCheckoutSession,
-  isBachsPaid,
+  isPaystackPaid,
   toVerifyData,
-} from "@/lib/payments/bachs";
-import {
-  findPaymentByCheckoutId,
-  findPaymentByReference,
-} from "@/lib/payments/records";
-import { minorToDecimal } from "@/lib/payments/amount";
+  verifyTransaction,
+} from "@/lib/payments/paystack";
+import { findPaymentByReference } from "@/lib/payments/records";
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function verifyWithRetry(
-  checkoutId: string,
   reference: string
-): Promise<BachsVerifyData | null> {
-  let last = await getCheckoutSession(checkoutId);
-  let data = last ? checkoutSessionToVerifyData(last) : null;
-  if (data && isBachsPaid(data.status)) return data;
+): Promise<PaymentVerifyData | null> {
+  let data = await verifyTransaction(reference);
+  if (data && isPaystackPaid(data.status)) return data;
 
   for (const wait of [1200, 2000, 3000]) {
     await sleep(wait);
-    last = await getCheckoutSession(checkoutId);
-    data = last ? checkoutSessionToVerifyData(last) : null;
-    if (data && isBachsPaid(data.status)) return data;
+    data = await verifyTransaction(reference);
+    if (data && isPaystackPaid(data.status)) return data;
   }
 
-  return data ?? (last?.reference === reference
-    ? checkoutSessionToVerifyData(last)
-    : null);
+  return data;
 }
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const reference = searchParams.get("reference");
-    const checkoutId = searchParams.get("checkout_id");
+    const reference = searchParams.get("reference") ?? searchParams.get("trxref");
 
-    if (!reference && !checkoutId) {
+    if (!reference) {
       return NextResponse.json({ error: "Missing reference" }, { status: 400 });
     }
 
@@ -55,9 +44,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Log in to continue" }, { status: 401 });
     }
 
-    const payment =
-      (reference ? await findPaymentByReference(reference) : null) ??
-      (checkoutId ? await findPaymentByCheckoutId(checkoutId) : null);
+    const payment = await findPaymentByReference(reference);
 
     if (!payment || payment.userId !== session.user.id) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
@@ -77,32 +64,30 @@ export async function GET(request: Request) {
       });
     }
 
-    const sessionCheckoutId = payment.checkoutId ?? checkoutId;
-    let bachsData =
-      sessionCheckoutId ? await verifyWithRetry(sessionCheckoutId, ref) : null;
+    let paymentData = await verifyWithRetry(ref);
 
-    if (!bachsData && payment.status === "success") {
-      bachsData = toVerifyData({
+    if (!paymentData && payment.status === "success") {
+      paymentData = toVerifyData({
         reference: ref,
-        amount: minorToDecimal(payment.amountMinor),
+        amount: payment.amountMinor,
         currency: payment.currency,
-        status: "succeeded",
+        status: "success",
         paid_at: payment.paidAt?.toISOString() ?? null,
         metadata: { user_id: payment.userId, plan_id: payment.planId },
       });
     }
 
-    if (!bachsData) {
+    if (!paymentData) {
       return NextResponse.json(
         {
-          error: "Bachs has not confirmed this charge yet. Wait a few seconds and refresh.",
+          error: "Paystack has not confirmed this charge yet. Wait a few seconds and refresh.",
           retryable: true,
         },
         { status: 502 }
       );
     }
 
-    const result = await fulfillPayment(ref, bachsData);
+    const result = await fulfillPayment(ref, paymentData);
 
     if (!result.ok) {
       return NextResponse.json(

@@ -47,14 +47,11 @@ export function originFromRequest(request: Request): string {
   return `${proto}://${host}`;
 }
 
-/**
- * Bachs rejects localhost for success_url / cancel_url.
- * Prefer your deployed site URL when developing locally.
- */
-export function bachsReturnBase(request: Request): string {
-  const bachsBase = process.env.BACHS_RETURN_BASE_URL?.trim();
+/** Prefer your deployed site URL when developing local payment callbacks. */
+export function paymentReturnBase(request: Request): string {
+  const paymentBase = process.env.PAYSTACK_RETURN_BASE_URL?.trim();
   const candidates = [
-    bachsBase ? normalizePublicUrl(bachsBase) : null,
+    paymentBase ? normalizePublicUrl(paymentBase) : null,
     originFromRequest(request),
     getAppUrl(),
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
@@ -65,8 +62,7 @@ export function bachsReturnBase(request: Request): string {
   }
 
   throw new Error(
-    "Bachs needs a public success URL (localhost is blocked). " +
-      "Deploy the app and set BACHS_RETURN_BASE_URL to your live domain.",
+    "Payments need a public callback URL. Deploy the app and set PAYSTACK_RETURN_BASE_URL to your live domain.",
   );
 }
 

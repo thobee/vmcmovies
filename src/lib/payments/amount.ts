@@ -1,4 +1,4 @@
-/** Convert between our DB minor units (kobo/pesewas) and Bachs decimal strings. */
+/** Convert between our DB minor units (kobo/pesewas) and decimal strings. */
 
 export function minorToDecimal(amountMinor: number): string {
   return (amountMinor / 100).toFixed(2);

@@ -1,6 +1,6 @@
 import { paymentMismatch } from "@/lib/payments/match";
 import { getPlanMonths, isKnownPlanId } from "@/lib/payments/plans";
-import type { BachsVerifyData } from "@/lib/payments/bachs";
+import type { PaymentVerifyData } from "@/lib/payments/paystack";
 import {
   findPaymentByReference,
   markPaymentFailed,
@@ -15,15 +15,15 @@ export interface FulfillResult {
   alreadyFulfilled?: boolean;
   error?: string;
   expiryDate?: Date;
-  /** Permanent failures — webhook should return 200 so Bachs stops retrying */
+  /** Permanent failures — webhook should return 200 so Paystack stops retrying */
   permanent?: boolean;
-  /** Transient failures — webhook should return 500 so Bachs retries */
+  /** Transient failures — webhook should return 500 so Paystack retries */
   retryable?: boolean;
 }
 
 export async function fulfillPayment(
   reference: string,
-  bachsData: BachsVerifyData
+  paymentData: PaymentVerifyData
 ): Promise<FulfillResult> {
   const payment = await findPaymentByReference(reference);
 
@@ -60,28 +60,28 @@ export async function fulfillPayment(
     }
   }
 
-  const mismatch = paymentMismatch(bachsData, payment);
+  const mismatch = paymentMismatch(paymentData, payment);
   if (mismatch) {
     if (mismatch === "Payment not successful") {
-      await markPaymentFailed(reference, `Bachs status: ${bachsData.status}`);
+      await markPaymentFailed(reference, `Paystack status: ${paymentData.status}`);
     }
     return { ok: false, error: mismatch, permanent: true };
   }
 
-  const metaUserId = bachsData.metadata?.user_id;
+  const metaUserId = paymentData.metadata?.user_id;
   if (metaUserId && metaUserId !== payment.userId) {
     await markPaymentFailed(reference, "User mismatch in metadata");
     return { ok: false, error: "User mismatch", permanent: true };
   }
 
-  const metaPlanId = bachsData.metadata?.plan_id;
+  const metaPlanId = paymentData.metadata?.plan_id;
   if (metaPlanId && metaPlanId !== payment.planId) {
     await markPaymentFailed(reference, "Plan mismatch in metadata");
     return { ok: false, error: "Plan mismatch", permanent: true };
   }
 
-  const metaCurrency = bachsData.metadata?.currency
-    ? String(bachsData.metadata.currency).toUpperCase()
+  const metaCurrency = paymentData.metadata?.currency
+    ? String(paymentData.metadata.currency).toUpperCase()
     : undefined;
   if (metaCurrency && metaCurrency !== currency) {
     await markPaymentFailed(reference, "Currency mismatch in metadata");
@@ -90,7 +90,7 @@ export async function fulfillPayment(
 
   try {
     const expiryDate = await activatePremium(payment.userId, planMonths);
-    const paidAt = bachsData.paid_at ? new Date(bachsData.paid_at) : new Date();
+    const paidAt = paymentData.paid_at ? new Date(paymentData.paid_at) : new Date();
     const updated = await markPaymentFulfilled(reference, paidAt);
 
     if (!updated?.premiumActivated) {

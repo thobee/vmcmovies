@@ -13,7 +13,7 @@
     "admin:hash-password": "npx tsx scripts/hash-admin-password.ts",
     "admin:promote": "npx tsx scripts/promote-admin.ts",
     "email:test": "npx tsx scripts/test-resend.ts",
-    "payment:smoke": "npx tsx scripts/test-payment-smoke.ts",
+    "payment:smoke": "node scripts/test-payment-smoke.mjs",
     "email:backfill": "npx tsx scripts/backfill-payment-emails.ts",
     "audit": "npm audit --omit=dev"
   },

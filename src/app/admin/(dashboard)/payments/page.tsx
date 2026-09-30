@@ -5,7 +5,6 @@ import { PLANS, getPlanMonths, isKnownPlanId, isPlanId } from "@/lib/payments/pl
 import { ObjectId } from "mongodb";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import PaymentsTable, { type AdminPaymentRow } from "@/components/admin/PaymentsTable";
-import BachsWithdraw from "@/components/admin/BachsWithdraw";
 import { cn } from "@/lib/cn";
 
 export default async function AdminPaymentsPage() {
@@ -84,7 +83,7 @@ export default async function AdminPaymentsPage() {
       <AdminPageHeader
         title="Payments"
         badge={`${stats.successful} paid`}
-        subtitle="Bachs checkouts, revenue, and withdrawals to your bank account."
+        subtitle="Paystack checkouts, revenue, and premium activation status."
       />
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
@@ -92,8 +91,6 @@ export default async function AdminPaymentsPage() {
         <Stat label="Successful" value={stats.successful} accent="emerald" />
         <Stat label="Revenue (NGN)" value={stats.revenueNgn} small />
       </div>
-
-      <BachsWithdraw />
 
       <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/30">
         Recent payments

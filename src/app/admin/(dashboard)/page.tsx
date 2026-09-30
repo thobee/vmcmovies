@@ -95,7 +95,7 @@ export default async function AdminDashboardPage() {
           href="/admin/payments"
           icon={CreditCard}
           title="Payments"
-          description="Revenue, Bachs balance, and withdrawals."
+          description="Revenue, Paystack checkouts, and premium status."
         />
         <ActionCard
           href="/admin/support"

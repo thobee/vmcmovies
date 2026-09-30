@@ -1,62 +1,45 @@
 import { NextResponse } from "next/server";
 import {
-  isBachsPaid,
+  isPaystackPaid,
   toVerifyData,
   verifyWebhookSignature,
-} from "@/lib/payments/bachs";
+  type PaystackTransactionData,
+} from "@/lib/payments/paystack";
 import { fulfillPayment } from "@/lib/payments/fulfill";
 
 export const runtime = "nodejs";
 
 type CollectionSucceededEvent = {
-  id: string;
-  type: string;
-  data?: {
-    reference?: string | null;
-    status?: string;
-    amount?: string;
-    currency?: string;
-    metadata?: Record<string, string>;
-    created_at?: string;
-  };
+  event: string;
+  data?: PaystackTransactionData;
 };
 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
-    const timestamp = request.headers.get("x-bachs-timestamp");
-    const signature = request.headers.get("x-bachs-signature");
+    const signature = request.headers.get("x-paystack-signature");
 
-    if (!verifyWebhookSignature(rawBody, timestamp, signature)) {
+    if (!verifyWebhookSignature(rawBody, signature)) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     const event = JSON.parse(rawBody) as CollectionSucceededEvent;
 
-    if (event.type !== "collection.succeeded") {
+    if (event.event !== "charge.success") {
       return NextResponse.json({ received: true });
     }
 
     const data = event.data;
     const reference = data?.reference;
-    if (!reference || !data?.amount || !data?.currency || !data?.status) {
+    if (!reference || typeof data?.amount !== "number" || !data?.currency || !data?.status) {
       return NextResponse.json({ error: "Incomplete webhook payload" }, { status: 400 });
     }
 
-    if (!isBachsPaid(data.status)) {
+    if (!isPaystackPaid(data.status)) {
       return NextResponse.json({ received: true });
     }
 
-    const bachsData = toVerifyData({
-      reference,
-      amount: data.amount,
-      currency: data.currency,
-      status: data.status,
-      paid_at: data.created_at ?? null,
-      metadata: data.metadata,
-    });
-
-    const result = await fulfillPayment(reference, bachsData);
+    const result = await fulfillPayment(reference, toVerifyData(data));
 
     if (!result.ok) {
       if (result.retryable) {
