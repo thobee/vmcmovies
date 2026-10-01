@@ -71,9 +71,9 @@ Hero slides: admin `settings` document + catalog. `FeaturedStrip` resolves slide
 Prefix `/admin`. Dashboard group: `(dashboard)` — movies, series, users, requests, payments, billing, homepage, updates, support.
 
 - **Bootstrap:** `/admin/signup` only while `countAdmins() === 0`. After that, closed.
-- **Second admin:** CLI only — `npm run admin:promote -- email@domain` → `promoteUserToAdmin` in `users.ts`. **Not in the admin UI.**
+- **Second admin / mini admin:** CLI only — `npm run admin:promote -- email@domain admin` for full admin, or `npm run admin:promote -- email@domain content` for a content admin. The helper calls `promoteUserToAdminRole` in `users.ts`. **Not in the admin UI.**
 - Env bootstrap also: `ADMIN_EMAIL` + `ADMIN_PASSWORD_HASH` (`npm run admin:hash-password`).
-- Login requires **TOTP** (`totpEnabled` + encrypted secret). Session cookie `vmc_admin_session`, **12h**, JWT secret = `admin:${AUTH_SECRET}`.
+- Login requires **TOTP** (`totpEnabled` + encrypted secret). Session cookie `vmc_admin_session`, **12h**, JWT secret = `admin:${AUTH_SECRET}`. Admin roles: `admin` = full access; `content_admin` = movies, series, homepage, updates, requests, support only. Content admins are blocked from users, billing, payments, revenue, and finance APIs.
 - Optional `ADMIN_GATE`: without `?g=` or cookie `vmc_admin_gate`, `/admin/login` (and related auth APIs) look like 404. Implemented in `src/proxy.ts`.
 - Admin **does not** use member idle logout (`SessionIdleMonitor` is root layout for members).
 

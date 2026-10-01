@@ -12,6 +12,7 @@
     "mongo:local": "npx tsx scripts/start-local-mongo.ts",
     "admin:hash-password": "npx tsx scripts/hash-admin-password.ts",
     "admin:promote": "npx tsx scripts/promote-admin.ts",
+    "admin:reset-mfa": "npx tsx scripts/reset-admin-mfa.ts",
     "email:test": "npx tsx scripts/test-resend.ts",
     "payment:smoke": "node scripts/test-payment-smoke.mjs",
     "email:backfill": "npx tsx scripts/backfill-payment-emails.ts",

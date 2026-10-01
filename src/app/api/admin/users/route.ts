@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAdminSession } from "@/lib/admin/session";
+import { canAdmin } from "@/lib/admin/permissions";
 import { listUsers, setUserPremiumStatus } from "@/lib/auth/users";
 import type { PremiumStatus } from "@/lib/auth/types";
 
@@ -12,6 +13,9 @@ export async function GET() {
   const admin = await requireAdmin();
   if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!canAdmin(admin.role, "users")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
@@ -32,6 +36,9 @@ export async function PATCH(request: Request) {
   const admin = await requireAdmin();
   if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!canAdmin(admin.role, "users")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {

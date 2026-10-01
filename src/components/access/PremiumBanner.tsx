@@ -7,6 +7,11 @@ import { PLAN_LIST, PREMIUM_FEATURES, formatPlanPrice } from "@/lib/payments/pla
 import VmcLogo from "@/components/brand/VmcLogo";
 import { cn } from "@/lib/cn";
 
+const TRUST_POINTS = [
+  "No automatic renewal",
+  "Telegram delivery",
+];
+
 export default function PremiumBanner() {
   return (
     <section className="px-4 pb-4 sm:px-6 lg:px-10">
@@ -40,6 +45,18 @@ export default function PremiumBanner() {
             <p className="mt-2.5 inline-flex rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 sm:mt-3 sm:px-3.5 sm:py-1.5 sm:text-sm">
               Launch offer: first month from ₦700 for new members.
             </p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {TRUST_POINTS.map((point) => (
+                <span
+                  key={point}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-white/58"
+                >
+                  <Check className="h-3.5 w-3.5 text-emerald-400" weight="bold" />
+                  {point}
+                </span>
+              ))}
+            </div>
 
             <ul className="mt-5 space-y-2.5 sm:mt-7 sm:space-y-3 md:space-y-3.5">
               {PREMIUM_FEATURES.map((f) => (

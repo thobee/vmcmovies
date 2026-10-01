@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAdminSession } from "@/lib/admin/session";
+import { canAdmin } from "@/lib/admin/permissions";
 import { getBillingConfig, saveBillingConfig } from "@/lib/payments/billing/db";
 import type { BillingConfig } from "@/lib/payments/billing/types";
 
@@ -73,6 +74,7 @@ const patchSchema = z.object({
 export async function GET() {
   const admin = await getAdminSession();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canAdmin(admin.role, "billing")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const config = await getBillingConfig();
   return NextResponse.json({ config });
 }
@@ -80,6 +82,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   const admin = await getAdminSession();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canAdmin(admin.role, "billing")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const body = await request.json();

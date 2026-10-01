@@ -39,28 +39,24 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing reference" }, { status: 400 });
     }
 
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Log in to continue" }, { status: 401 });
-    }
-
     const payment = await findPaymentByReference(reference);
-
-    if (!payment || payment.userId !== session.user.id) {
+    if (!payment) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
 
     const ref = payment.reference;
+    const session = await getSession();
+    const paidForYou = session?.user.id === payment.userId;
 
     if (payment.premiumActivated) {
       await ensurePaymentNotificationEmails(ref);
-      const user = await findUserById(session.user.id);
+      const user = paidForYou && session ? await findUserById(session.user.id) : null;
       return NextResponse.json({
         status: "success",
         alreadyFulfilled: true,
         reference: ref,
         expiryDate: user?.premiumExpiryDate?.toISOString() ?? null,
-        paidForYou: true,
+        paidForYou,
       });
     }
 
@@ -100,8 +96,8 @@ export async function GET(request: Request) {
       status: "success",
       alreadyFulfilled: result.alreadyFulfilled ?? false,
       reference: ref,
-      expiryDate: result.expiryDate?.toISOString() ?? null,
-      paidForYou: true,
+      expiryDate: paidForYou ? result.expiryDate?.toISOString() ?? null : null,
+      paidForYou,
     });
   } catch (err) {
     console.error("[payments/verify]", err);

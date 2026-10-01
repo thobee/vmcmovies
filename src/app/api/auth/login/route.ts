@@ -6,6 +6,7 @@ import {
   findUserByEmail,
 } from "@/lib/auth/users";
 import { createSession } from "@/lib/auth/session";
+import { isAdminRole } from "@/lib/admin/permissions";
 import { honeypotTripped } from "@/lib/security/honeypot";
 import { clientIp, rateLimited, RATE_LIMIT_MSG } from "@/lib/security/rate-limit";
 
@@ -33,8 +34,8 @@ export async function POST(request: Request) {
     const { email, password, remember } = parsed.data;
     const user = await findUserByEmail(email);
 
-    if (!user || user.role === "admin" || !user.passwordHash) {
-      if (user && user.role !== "admin" && !user.passwordHash) {
+    if (!user || isAdminRole(user.role) || !user.passwordHash) {
+      if (user && !isAdminRole(user.role) && !user.passwordHash) {
         return NextResponse.json(
           { error: "This account uses Google sign-in. Use the Google button below." },
           { status: 401 },

@@ -15,11 +15,14 @@ import {
   LogOut,
   Menu,
   MessageCircle,
+  ShieldCheck,
   Tv,
   Users,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import type { AdminRole } from "@/lib/auth/types";
+import { adminRoleLabel, canAdmin, type AdminPermission } from "@/lib/admin/permissions";
 import VmcLogo from "@/components/brand/VmcLogo";
 import { AdminToastProvider } from "@/components/admin/toast";
 
@@ -28,6 +31,7 @@ type NavItem = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   exact?: boolean;
+  permission?: AdminPermission;
 };
 
 const NAV: { section: string; items: NavItem[] }[] = [
@@ -38,20 +42,21 @@ const NAV: { section: string; items: NavItem[] }[] = [
   {
     section: "Catalog",
     items: [
-      { href: "/admin/movies", label: "Movies", icon: Film },
-      { href: "/admin/series", label: "Series", icon: Tv },
+      { href: "/admin/movies", label: "Movies", icon: Film, permission: "catalog" },
+      { href: "/admin/series", label: "Series", icon: Tv, permission: "catalog" },
     ],
   },
   {
     section: "Site",
     items: [
-      { href: "/admin/homepage", label: "Homepage", icon: Home },
-      { href: "/admin/updates", label: "Updates", icon: Bell },
-      { href: "/admin/requests", label: "Requests", icon: Clapperboard },
-      { href: "/admin/users", label: "Users", icon: Users },
-      { href: "/admin/billing", label: "Billing", icon: BadgePercent },
-      { href: "/admin/payments", label: "Payments", icon: CreditCard },
-      { href: "/admin/support", label: "Support", icon: MessageCircle },
+      { href: "/admin/homepage", label: "Homepage", icon: Home, permission: "homepage" },
+      { href: "/admin/updates", label: "Updates", icon: Bell, permission: "updates" },
+      { href: "/admin/requests", label: "Requests", icon: Clapperboard, permission: "requests" },
+      { href: "/admin/users", label: "Users", icon: Users, permission: "users" },
+      { href: "/admin/team", label: "Team", icon: ShieldCheck, permission: "team" },
+      { href: "/admin/billing", label: "Billing", icon: BadgePercent, permission: "billing" },
+      { href: "/admin/payments", label: "Payments", icon: CreditCard, permission: "payments" },
+      { href: "/admin/support", label: "Support", icon: MessageCircle, permission: "support" },
     ],
   },
 ];
@@ -62,20 +67,25 @@ function isActive(pathname: string, href: string, exact?: boolean) {
 
 function NavLinks({
   pathname,
+  role,
   onNavigate,
 }: {
   pathname: string;
+  role: AdminRole;
   onNavigate?: () => void;
 }) {
   return (
     <nav className="flex-1 space-y-5">
-      {NAV.map(({ section, items }) => (
+      {NAV.map(({ section, items }) => {
+        const allowedItems = items.filter((item) => !item.permission || canAdmin(role, item.permission));
+        if (allowedItems.length === 0) return null;
+        return (
         <div key={section}>
           <p className="px-3 mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-white/25">
             {section}
           </p>
           <div className="space-y-0.5">
-            {items.map(({ href, label, icon: Icon, exact = false }) => {
+            {allowedItems.map(({ href, label, icon: Icon, exact = false }) => {
               const active = isActive(pathname, href, exact);
               return (
                 <Link
@@ -101,7 +111,8 @@ function NavLinks({
             })}
           </div>
         </div>
-      ))}
+      );
+      })}
     </nav>
   );
 }
@@ -112,9 +123,11 @@ function BrandMark({ size = "md" }: { size?: "sm" | "md" }) {
 
 export default function AdminShell({
   email,
+  role,
   children,
 }: {
   email: string;
+  role: AdminRole;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -163,6 +176,9 @@ export default function AdminShell({
           {email.charAt(0)}
         </div>
         <p className="flex-1 min-w-0 truncate text-[11px] text-white/45">{email}</p>
+        <span className="hidden rounded-full bg-white/6 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white/35 lg:inline">
+          {adminRoleLabel(role)}
+        </span>
         <button
           type="button"
           onClick={logout}
@@ -190,7 +206,7 @@ export default function AdminShell({
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-3">
-          <NavLinks pathname={pathname} />
+          <NavLinks pathname={pathname} role={role} />
         </div>
         {sidebarFooter}
       </aside>
@@ -235,7 +251,7 @@ export default function AdminShell({
             </button>
           </div>
           <div className="flex-1 overflow-y-auto px-3">
-            <NavLinks pathname={pathname} onNavigate={closeMenu} />
+            <NavLinks pathname={pathname} role={role} onNavigate={closeMenu} />
           </div>
           {sidebarFooter}
         </aside>

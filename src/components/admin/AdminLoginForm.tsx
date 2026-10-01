@@ -23,6 +23,22 @@ export default function AdminLoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const resetToPassword = () => {
+    setStep("password");
+    setCode("");
+    setUseRecovery(false);
+    setQrDataUrl("");
+    setSecret("");
+    setRecoveryCodes([]);
+    setSaved(false);
+    setError("");
+  };
+
+  const restartExpiredLogin = () => {
+    resetToPassword();
+    setError("Your authenticator session expired. Enter your email and password again.");
+  };
+
   const submitPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -70,6 +86,7 @@ export default function AdminLoginForm() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error ?? "Invalid authenticator code");
+        if (data.error === "Sign in again") restartExpiredLogin();
         return;
       }
       if (data.step === "recovery" && Array.isArray(data.recoveryCodes)) {
@@ -91,25 +108,7 @@ export default function AdminLoginForm() {
       setError("Tick the box after you save the codes.");
       return;
     }
-    setError("");
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ack: true }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.error ?? "Sign in again");
-        return;
-      }
-      window.location.assign("/admin");
-    } catch {
-      setError("Network error");
-    } finally {
-      setLoading(false);
-    }
+    window.location.assign("/admin");
   };
 
   return (
@@ -199,6 +198,13 @@ export default function AdminLoginForm() {
           >
             {loading ? "Verifying…" : "Verify and continue"}
           </button>
+          <button
+            type="button"
+            onClick={resetToPassword}
+            className="w-full text-center text-xs font-medium text-white/40 hover:text-[var(--amber)]"
+          >
+            Start over with email and password
+          </button>
         </>
       )}
 
@@ -242,6 +248,13 @@ export default function AdminLoginForm() {
             className={cn("btn-pill btn-pill-primary w-full py-3.5", loading && "opacity-60 cursor-not-allowed")}
           >
             {loading ? "Verifying…" : "Sign in"}
+          </button>
+          <button
+            type="button"
+            onClick={resetToPassword}
+            className="w-full text-center text-xs font-medium text-white/40 hover:text-[var(--amber)]"
+          >
+            Start over with email and password
           </button>
         </>
       )}

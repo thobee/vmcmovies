@@ -20,6 +20,10 @@ function useDatabase(): boolean {
   return Boolean(process.env.MONGODB_URI?.trim());
 }
 
+function allowMockCatalog(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
 /**
  * ponytail: Mongo can be unreachable/misconfigured (bad auth, network access, etc).
  * Any failure here should degrade to mock data rather than crash the page —
@@ -35,27 +39,27 @@ async function safeDb<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   }
 }
 
-export async function getFeaturedContent(): Promise<Content> {
+export async function getFeaturedContent(): Promise<Content | null> {
   const item = await safeDb(dbGetFeaturedContent, null);
-  return item ?? FEATURED;
+  return item ?? (allowMockCatalog() ? FEATURED : null);
 }
 
 export async function getMovies(options?: ContentListOptions): Promise<Content[]> {
   const items = await safeDb(() => dbGetMovies(options), []);
   if (items.length > 0 || options?.search || options?.genre) return items;
-  return filterMock(MOVIES, options);
+  return allowMockCatalog() ? filterMock(MOVIES, options) : [];
 }
 
 export async function getSeriesList(options?: ContentListOptions): Promise<Content[]> {
   const items = await safeDb(() => dbGetSeriesList(options), []);
   if (items.length > 0 || options?.search || options?.genre) return items;
-  return filterMock(SERIES, options);
+  return allowMockCatalog() ? filterMock(SERIES, options) : [];
 }
 
 export async function getAllContent(options?: ContentListOptions): Promise<Content[]> {
   const items = await safeDb(() => dbGetAllContent(options), []);
   if (items.length > 0 || options?.search || options?.genre) return items;
-  return filterMock(ALL_CONTENT, options);
+  return allowMockCatalog() ? filterMock(ALL_CONTENT, options) : [];
 }
 
 export async function getMovieBySlugOrId(key: string): Promise<Content | null> {
@@ -71,11 +75,8 @@ export async function getMovieBySlugOrId(key: string): Promise<Content | null> {
     if (fromDb) return fromDb;
   }
 
-  return (
-    MOVIES.find(
-      (m) => contentSlug(m) === decoded || m.slug === decoded || m.id === decoded
-    ) ?? null
-  );
+  if (!allowMockCatalog()) return null;
+  return MOVIES.find((m) => contentSlug(m) === decoded || m.slug === decoded || m.id === decoded) ?? null;
 }
 
 /** @deprecated Use getMovieBySlugOrId */
@@ -96,11 +97,8 @@ export async function getSeriesBySlugOrId(key: string): Promise<Content | null> 
     if (fromDb) return fromDb;
   }
 
-  return (
-    SERIES.find(
-      (s) => contentSlug(s) === decoded || s.slug === decoded || s.id === decoded
-    ) ?? null
-  );
+  if (!allowMockCatalog()) return null;
+  return SERIES.find((s) => contentSlug(s) === decoded || s.slug === decoded || s.id === decoded) ?? null;
 }
 
 /** @deprecated Use getSeriesBySlugOrId */
@@ -128,7 +126,7 @@ export async function getRecommended(item: Content, limit = 12): Promise<Content
 export async function searchContent(query: string): Promise<Content[]> {
   const items = await safeDb(() => dbSearchContent(query), []);
   if (items.length > 0) return items;
-  return filterMock(ALL_CONTENT, { search: query });
+  return allowMockCatalog() ? filterMock(ALL_CONTENT, { search: query }) : [];
 }
 
 function filterMock(items: Content[], options?: ContentListOptions): Content[] {

@@ -12,5 +12,5 @@ export default async function AdminDashboardLayout({
     redirect("/admin/login");
   }
 
-  return <AdminShell email={session.email}>{children}</AdminShell>;
+  return <AdminShell email={session.email} role={session.role}>{children}</AdminShell>;
 }

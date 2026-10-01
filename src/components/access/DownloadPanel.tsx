@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Broadcast,
+  CheckCircle,
   DownloadSimple,
   Eye,
   EyeSlash,
@@ -23,10 +24,10 @@ import { cn } from "@/lib/cn";
 const GUIDE_KEY = "vmc_tg_guide_done";
 
 const PANEL_SHELL =
-  "w-full max-w-xl rounded-[28px] border border-white/10 bg-[#101214]/95 p-5 sm:p-6 backdrop-blur-md";
+  "w-full max-w-xl rounded-[28px] border border-white/10 bg-[#101214]/95 p-5 shadow-[0_18px_52px_rgba(0,0,0,0.35)] sm:p-6";
 const BTN_PRIMARY = "auth-btn w-full gap-2 px-6 py-3 text-sm sm:w-auto sm:min-w-[11.5rem]";
 const BTN_SECONDARY =
-  "inline-flex w-full cursor-pointer items-center justify-center rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08] sm:w-auto sm:min-w-[7.5rem]";
+  "inline-flex w-full cursor-pointer items-center justify-center rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08] active:scale-[0.98] sm:w-auto sm:min-w-[7.5rem]";
 const BTN_GUIDE_CHANNEL =
   "inline-flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#2AABEE]/50 bg-[#2AABEE]/15 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#2AABEE]/25 sm:w-auto";
 const BTN_GUIDE_BOT =
@@ -60,12 +61,20 @@ export default function DownloadPanel({
         />
       ) : premiumStatus === "pending" ? (
         <section id="download" className={PANEL_SHELL}>
-          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-            Download
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-white/70">
-            Join the Telegram channel. Downloads unlock after payment is verified.
-          </p>
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400/12 text-amber-200 ring-1 ring-amber-300/20">
+              <Lock className="h-5 w-5" weight="bold" />
+            </div>
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-amber-200">
+                Payment pending
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-white/70">
+                Your premium download opens as soon as Paystack confirms the payment.
+                Join the Telegram channel now so the file can arrive smoothly.
+              </p>
+            </div>
+          </div>
           <a
             href={channelUrl}
             target="_blank"
@@ -85,14 +94,32 @@ export default function DownloadPanel({
         </section>
       ) : (
         <section id="download" className={PANEL_SHELL}>
-          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-            Download
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-white/70">
-            {loggedIn
-              ? "Browse is free. Premium unlocks Telegram downloads."
-              : "Browse is free. Log in and get premium to download on Telegram."}
-          </p>
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/12 text-emerald-300 ring-1 ring-emerald-400/20">
+              <Lock className="h-5 w-5" weight="bold" />
+            </div>
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
+                Premium download
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-white/70">
+                {loggedIn
+                  ? "Browse is free. Premium unlocks Telegram delivery for every available title."
+                  : "Browse is free. Log in, get premium, then download through Telegram."}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 text-xs text-white/52 sm:grid-cols-3">
+            {["Secure checkout", "Telegram delivery", "No auto-renewal"].map((item) => (
+              <span
+                key={item}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2"
+              >
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-300" weight="fill" />
+                {item}
+              </span>
+            ))}
+          </div>
           <div className="mt-5 flex flex-col items-stretch gap-2.5 sm:flex-row sm:flex-wrap">
             {!loggedIn && (
               <Link href="/login" className={BTN_SECONDARY}>
@@ -211,16 +238,21 @@ function PremiumDownloadPanel({
   return (
     <section id="download" className={cn(PANEL_SHELL, "ring-1 ring-emerald-400/20")}>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-400">
-          Download
-        </h2>
+        <div>
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-400">
+            Download unlocked
+          </h2>
+          <p className="mt-1.5 text-sm text-white/60">
+            Choose your file below. Telegram will open in a new tab.
+          </p>
+        </div>
         {guideOpen !== null && (
           <button
             type="button"
             onClick={guideOpen ? hideGuide : showGuide}
             aria-label={guideOpen ? "Hide setup guide" : "Show setup guide"}
             className={cn(
-              "inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+              "inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
               guideOpen
                 ? "border-white/12 bg-white/[0.04] text-white/50"
                 : "border-emerald-400/30 bg-emerald-500/15 text-emerald-200",
@@ -304,23 +336,23 @@ function PremiumDownloadPanel({
       </AnimatePresence>
 
       {movieDownloadUrl && (
-        <div className="mt-5">
+          <div className="mt-5 rounded-3xl border border-emerald-400/18 bg-emerald-500/[0.06] p-3">
           <a
             href={movieDownloadUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={BTN_PRIMARY}
+              className={cn(BTN_PRIMARY, "sm:w-full")}
           >
             <DownloadSimple className="h-4 w-4" weight="bold" />
-            Download
+              Download movie
           </a>
         </div>
       )}
 
       {seasons.length > 0 && (
         <div className="mt-5 space-y-3">
-          <p className="text-xs leading-5 text-white/50">
-            Pick a season — Telegram opens and the bot sends it.
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+            Available seasons
           </p>
           <div className="grid gap-2">
             {seasons.map((season) => (

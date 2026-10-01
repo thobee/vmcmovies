@@ -34,14 +34,36 @@ export default async function HomePage() {
   const popularSeries = series.slice(0, HOMEPAGE_RAIL_LIMIT);
   const recentlyAdded = sortByNewest([...movies, ...series]).slice(0, HOMEPAGE_RAIL_LIMIT);
   const topRated = sortByRating(movies).slice(0, HOMEPAGE_RAIL_LIMIT);
+  const catalog = [...movies, ...series];
+  const heroFallback = featured ?? catalog[0] ?? null;
 
   return (
     <SitePage className="overflow-x-hidden">
-      <FeaturedStrip
-        slides={homepage.slides}
-        fallback={featured}
-        catalog={[...movies, ...series]}
-      />
+      {heroFallback ? (
+        <FeaturedStrip
+          slides={homepage.slides}
+          fallback={heroFallback}
+          catalog={catalog}
+        />
+      ) : (
+        <section className="px-4 pt-[110px] pb-16 sm:px-6 lg:px-10">
+          <div className="bezel-outer mx-auto max-w-screen-2xl">
+            <div className="bezel-inner border border-white/[0.08] px-6 py-14 text-center sm:px-10 sm:py-20">
+              <p className="eyebrow-pill mb-4">VMC</p>
+              <h1
+                className="text-3xl font-semibold leading-tight text-white sm:text-5xl"
+                style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}
+              >
+                Catalog temporarily unavailable
+              </h1>
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/60 sm:text-base sm:leading-7">
+                We could not load the movie catalog right now. Please check back shortly while we
+                reconnect the database.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="flex flex-col gap-12 pt-10 pb-6 sm:gap-14 sm:pt-12">
         <ContentRail title={titles.trendingMovies} items={trendingMovies} viewAllHref="/movies" />

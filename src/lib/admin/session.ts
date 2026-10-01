@@ -2,6 +2,8 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { findUserById } from "@/lib/auth/users";
+import type { AdminRole } from "@/lib/auth/types";
+import { isAdminRole } from "@/lib/admin/permissions";
 import { sessionCookieOptions } from "@/lib/security/cookies";
 
 const COOKIE_NAME = "vmc_admin_session";
@@ -25,8 +27,8 @@ function cookieOptions() {
   return sessionCookieOptions(MAX_AGE_SEC);
 }
 
-export async function signAdminSession(userId: string, email: string): Promise<string> {
-  return new SignJWT({ email, role: "admin", sub: userId })
+export async function signAdminSession(userId: string, email: string, role: AdminRole): Promise<string> {
+  return new SignJWT({ email, role, sub: userId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE_SEC}s`)
@@ -44,7 +46,7 @@ export function clearAdminSession(res: NextResponse): NextResponse {
   return res;
 }
 
-export async function getAdminSession(): Promise<{ email: string; userId: string } | null> {
+export async function getAdminSession(): Promise<{ email: string; userId: string; role: AdminRole } | null> {
   const secret = getSecret();
   if (!secret) return null;
 
@@ -54,14 +56,14 @@ export async function getAdminSession(): Promise<{ email: string; userId: string
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    if (payload.role !== "admin") return null;
+    if (!isAdminRole(typeof payload.role === "string" ? payload.role : null)) return null;
     const userId = typeof payload.sub === "string" ? payload.sub : "";
     if (!userId) return null;
 
     const user = await findUserById(userId);
-    if (!user || user.role !== "admin" || !user.totpEnabled) return null;
+    if (!user || !isAdminRole(user.role) || user.role !== payload.role || !user.totpEnabled) return null;
 
-    return { email: user.email, userId: user._id };
+    return { email: user.email, userId: user._id, role: user.role };
   } catch {
     return null;
   }

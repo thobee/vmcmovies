@@ -89,7 +89,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative space-y-5">
+    <form onSubmit={handleSubmit} className="relative space-y-4">
       <HoneypotField />
       {error && (
         <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
@@ -97,6 +97,20 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         </div>
       )}
 
+      {googleEnabled && (
+        <>
+          <GoogleButton mode={mode} disabled={pending} />
+          <div className="flex items-center gap-4 py-1">
+            <span className="h-px flex-1 bg-white/10" />
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/35">
+              Or use email
+            </span>
+            <span className="h-px flex-1 bg-white/10" />
+          </div>
+        </>
+      )}
+
+      <div className={cn("grid gap-4", isSignup && "sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2")}>
       <AuthField
         id="email"
         label="Email"
@@ -144,10 +158,10 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
           autoComplete="new-password"
           minLength={PASSWORD_MIN_LENGTH}
           maxLength={PASSWORD_MAX_LENGTH}
-          showPolicyHint
           placeholder="Repeat your password"
         />
       )}
+      </div>
 
       {!isSignup && (
         <div className="flex flex-col gap-3 pt-0.5 text-sm sm:flex-row sm:items-center sm:justify-between">
@@ -177,20 +191,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         {pending ? "Please wait…" : isSignup ? "Create account" : "Log in"}
       </button>
 
-      {googleEnabled && (
-        <>
-          <div className="flex items-center gap-4 py-1">
-            <span className="h-px flex-1 bg-white/10" />
-            <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/35">
-              Or
-            </span>
-            <span className="h-px flex-1 bg-white/10" />
-          </div>
-          <GoogleButton mode={mode} disabled={pending} />
-        </>
-      )}
-
-      <p className="pt-3 text-center text-sm text-white/40">
+      <p className="pt-1 text-center text-sm text-white/50">
         {isSignup ? "Already have an account?" : "Don’t have an account?"}{" "}
         <Link
           href={isSignup ? "/login" : "/signup"}

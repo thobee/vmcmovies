@@ -1,6 +1,7 @@
 import { ObjectId, type Collection, type Document } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
-import type { PremiumStatus, User, UserRole } from "@/lib/auth/types";
+import type { AdminRole, PremiumStatus, User, UserRole } from "@/lib/auth/types";
+import { isAdminRole } from "@/lib/admin/permissions";
 
 const COLLECTION = "users";
 
@@ -78,24 +79,32 @@ export async function countAdmins(): Promise<number> {
   return (await users()).countDocuments({ role: "admin" });
 }
 
-/** Promote an existing member account to admin (CLI / ops — not exposed in the panel). */
-export async function promoteUserToAdmin(email: string): Promise<
+/** Promote an existing member account to an admin role (CLI / ops — not exposed in the panel). */
+export async function promoteUserToAdminRole(email: string, role: AdminRole = "admin"): Promise<
   | { status: "promoted"; user: User }
+  | { status: "already_role"; user: User }
   | { status: "already_admin"; user: User }
   | { status: "not_found" }
 > {
   const normalized = email.toLowerCase().trim();
   const existing = await findUserByEmail(normalized);
   if (!existing) return { status: "not_found" };
-  if (existing.role === "admin") return { status: "already_admin", user: existing };
+  if (existing.role === role) return { status: "already_role", user: existing };
 
   const result = await (await users()).findOneAndUpdate(
     { email: normalized },
-    { $set: { role: "admin" } },
+    { $set: { role } },
     { returnDocument: "after" },
   );
   if (!result) return { status: "not_found" };
   return { status: "promoted", user: toUser(result) };
+}
+
+export async function promoteUserToAdmin(email: string) {
+  const result = await promoteUserToAdminRole(email, "admin");
+  return result.status === "already_role"
+    ? { status: "already_admin" as const, user: result.user }
+    : result;
 }
 
 export async function findUserByGoogleId(googleId: string): Promise<User | null> {
@@ -119,7 +128,7 @@ export async function loginOrCreateGoogleUser(profile: {
 
   const byEmail = await findUserByEmail(profile.email);
   if (byEmail) {
-    if (byEmail.role === "admin") {
+    if (isAdminRole(byEmail.role)) {
       throw new Error("Use admin login for this account");
     }
     await (await users()).updateOne(
@@ -226,10 +235,75 @@ function toPublicUser(user: User): PublicUser {
 
 export async function listUsers(): Promise<PublicUser[]> {
   const docs = await (await users())
-    .find({ role: { $ne: "admin" } })
+    .find({ role: { $nin: ["admin", "content_admin"] } })
     .sort({ createdAt: -1 })
     .toArray();
   return docs.map((doc) => toPublicUser(toUser(doc)));
+}
+
+export type TeamUser = Pick<User, "_id" | "email" | "telegramUsername" | "role"> & {
+  createdAt: string;
+  totpEnabled: boolean;
+  hasPassword: boolean;
+};
+
+function toTeamUser(doc: UserDoc): TeamUser {
+  const user = toUser(doc);
+  return {
+    _id: user._id,
+    email: user.email,
+    telegramUsername: user.telegramUsername,
+    role: user.role,
+    createdAt: user.createdAt.toISOString(),
+    totpEnabled: Boolean(user.totpEnabled),
+    hasPassword: Boolean(user.passwordHash),
+  };
+}
+
+export async function listTeamUsers(search = ""): Promise<TeamUser[]> {
+  const query = search.trim().toLowerCase();
+  const filter = query
+    ? { email: { $regex: query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" } }
+    : {};
+  const docs = await (await users())
+    .find(filter)
+    .sort({ role: 1, createdAt: -1 })
+    .limit(80)
+    .toArray();
+  return docs.map((doc) => toTeamUser(doc));
+}
+
+export async function setUserRole(userId: string, role: UserRole): Promise<TeamUser | null> {
+  if (!ObjectId.isValid(userId)) return null;
+
+  const update =
+    role === "user"
+      ? {
+          $set: { role },
+          $unset: { totpEnabled: "", totpSecretEnc: "", totpRecoveryHashes: "" },
+        }
+      : { $set: { role } };
+
+  const result = await (await users()).findOneAndUpdate(
+    { _id: new ObjectId(userId) },
+    update,
+    { returnDocument: "after" },
+  );
+
+  return result ? toTeamUser(result) : null;
+}
+
+export async function resetAdminMfaById(userId: string): Promise<TeamUser | null> {
+  if (!ObjectId.isValid(userId)) return null;
+  const result = await (await users()).findOneAndUpdate(
+    { _id: new ObjectId(userId), role: { $in: ["admin", "content_admin"] } },
+    {
+      $set: { totpEnabled: false },
+      $unset: { totpSecretEnc: "", totpRecoveryHashes: "" },
+    },
+    { returnDocument: "after" },
+  );
+  return result ? toTeamUser(result) : null;
 }
 
 export async function updateTelegramUsername(
@@ -260,7 +334,7 @@ export async function setUserPremiumStatus(
   }
 
   const result = await (await users()).findOneAndUpdate(
-    { _id: new ObjectId(userId), role: { $ne: "admin" } },
+    { _id: new ObjectId(userId), role: { $nin: ["admin", "content_admin"] } },
     { $set: update },
     { returnDocument: "after" }
   );
@@ -273,7 +347,7 @@ export async function updateAdminPassword(
   passwordHash: string
 ): Promise<boolean> {
   const result = await (await users()).updateOne(
-    { email: email.toLowerCase().trim(), role: "admin" },
+    { email: email.toLowerCase().trim(), role: { $in: ["admin", "content_admin"] } },
     { $set: { passwordHash } }
   );
   return result.matchedCount === 1;
@@ -281,7 +355,7 @@ export async function updateAdminPassword(
 
 export async function updateUserPassword(email: string, passwordHash: string): Promise<boolean> {
   const result = await (await users()).updateOne(
-    { email: email.toLowerCase().trim(), role: { $ne: "admin" } },
+    { email: email.toLowerCase().trim(), role: { $nin: ["admin", "content_admin"] } },
     { $set: { passwordHash } },
   );
   return result.matchedCount === 1;
@@ -294,7 +368,7 @@ export async function getAdminMfa(userId: string): Promise<{
 } | null> {
   if (!ObjectId.isValid(userId)) return null;
   const doc = await (await users()).findOne(
-    { _id: new ObjectId(userId), role: "admin" },
+    { _id: new ObjectId(userId), role: { $in: ["admin", "content_admin"] } },
     { projection: { totpEnabled: 1, totpSecretEnc: 1, totpRecoveryHashes: 1 } },
   );
   if (!doc) return null;
@@ -312,7 +386,7 @@ export async function enableAdminTotp(
 ): Promise<boolean> {
   if (!ObjectId.isValid(userId)) return false;
   const result = await (await users()).updateOne(
-    { _id: new ObjectId(userId), role: "admin" },
+    { _id: new ObjectId(userId), role: { $in: ["admin", "content_admin"] } },
     { $set: { totpEnabled: true, totpSecretEnc: secretEnc, totpRecoveryHashes: recoveryHashes } },
   );
   return result.matchedCount === 1;
@@ -321,7 +395,7 @@ export async function enableAdminTotp(
 export async function setAdminRecoveryHashes(userId: string, recoveryHashes: string[]): Promise<boolean> {
   if (!ObjectId.isValid(userId)) return false;
   const result = await (await users()).updateOne(
-    { _id: new ObjectId(userId), role: "admin" },
+    { _id: new ObjectId(userId), role: { $in: ["admin", "content_admin"] } },
     { $set: { totpRecoveryHashes: recoveryHashes } },
   );
   return result.matchedCount === 1;

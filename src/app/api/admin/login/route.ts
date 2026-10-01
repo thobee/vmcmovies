@@ -13,6 +13,7 @@ import {
   setAdminRecoveryHashes,
 } from "@/lib/auth/users";
 import { getAdminEmail, getAdminPasswordHash, isAdminConfigured } from "@/lib/admin/config";
+import { isAdminRole } from "@/lib/admin/permissions";
 import { signAdminSession, withAdminSession } from "@/lib/admin/session";
 import { clearMfaPending, readMfaPending, signMfaPending, withMfaPending } from "@/lib/admin/mfa";
 import {
@@ -41,9 +42,19 @@ const codeSchema = z.object({
 const INVALID = "Invalid email or password";
 const INVALID_CODE = "Invalid authenticator code";
 
+function signInAgainResponse() {
+  return clearMfaPending(NextResponse.json({ error: "Sign in again" }, { status: 401 }));
+}
+
 async function finishLogin(userId: string, email: string) {
-  const token = await signAdminSession(userId, email);
-  return clearMfaPending(withAdminSession(NextResponse.json({ ok: true, email }), token));
+  const user = await findUserById(userId);
+  if (!user || !isAdminRole(user.role)) {
+    return NextResponse.json({ error: INVALID }, { status: 401 });
+  }
+  const token = await signAdminSession(userId, email, user.role);
+  return clearMfaPending(
+    withAdminSession(NextResponse.json({ ok: true, email, role: user.role }), token),
+  );
 }
 
 async function afterPasswordOk(userId: string, email: string) {
@@ -114,7 +125,7 @@ async function verifyPasswordStep(body: unknown) {
   const user = await findUserByEmail(normalized);
 
   if (user) {
-    if (user.role !== "admin") {
+    if (!isAdminRole(user.role)) {
       return NextResponse.json({ error: INVALID }, { status: 401 });
     }
     const passwordOk = await verifyPassword(parsed.data.password, user.passwordHash);
@@ -152,23 +163,23 @@ async function verifyCode(request: NextRequest, body: unknown) {
 
   const pending = await readMfaPending(request);
   if (!pending) {
-    return NextResponse.json({ error: "Sign in again" }, { status: 401 });
+    return signInAgainResponse();
   }
 
   const user = await findUserById(pending.userId);
-  if (!user || user.role !== "admin") {
+  if (!user || !isAdminRole(user.role)) {
     return NextResponse.json({ error: INVALID_CODE }, { status: 401 });
   }
 
   if (pending.enroll) {
     if (!pending.secretEnc) {
-      return NextResponse.json({ error: "Sign in again" }, { status: 401 });
+      return signInAgainResponse();
     }
     let secret: Buffer;
     try {
       secret = base32Decode(decryptTotpSecret(pending.secretEnc));
     } catch {
-      return NextResponse.json({ error: "Sign in again" }, { status: 401 });
+      return signInAgainResponse();
     }
     if (!verifyTotp(secret, parsed.data.code)) {
       return NextResponse.json({ error: INVALID_CODE }, { status: 401 });
@@ -176,7 +187,19 @@ async function verifyCode(request: NextRequest, body: unknown) {
     const codes = generateRecoveryCodes();
     const hashes = codes.map(hashRecovery);
     await enableAdminTotp(user._id, pending.secretEnc, hashes);
-    return NextResponse.json({ ok: true, step: "recovery", recoveryCodes: codes });
+    const token = await signAdminSession(user._id, user.email, user.role);
+    return clearMfaPending(
+      withAdminSession(
+        NextResponse.json({
+          ok: true,
+          step: "recovery",
+          email: user.email,
+          role: user.role,
+          recoveryCodes: codes,
+        }),
+        token,
+      ),
+    );
   }
 
   const mfa = await getAdminMfa(user._id);
@@ -209,15 +232,15 @@ async function verifyCode(request: NextRequest, body: unknown) {
 async function ackRecovery(request: NextRequest) {
   const pending = await readMfaPending(request);
   if (!pending) {
-    return NextResponse.json({ error: "Sign in again" }, { status: 401 });
+    return signInAgainResponse();
   }
   const user = await findUserById(pending.userId);
-  if (!user || user.role !== "admin") {
-    return NextResponse.json({ error: "Sign in again" }, { status: 401 });
+  if (!user || !isAdminRole(user.role)) {
+    return signInAgainResponse();
   }
   const mfa = await getAdminMfa(user._id);
   if (!mfa?.enabled) {
-    return NextResponse.json({ error: "Sign in again" }, { status: 401 });
+    return signInAgainResponse();
   }
   return finishLogin(user._id, user.email);
 }

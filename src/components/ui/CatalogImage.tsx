@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   isDataImage,
@@ -32,8 +35,21 @@ export default function CatalogImage({
   priority,
   className,
 }: CatalogImageProps) {
-  const resolved = resolveCatalogImage(src, fallback);
+  const primary = resolveCatalogImage(src, fallback);
+  const firstFallback = fallback?.trim() ? resolveCatalogImage(fallback) : POSTER_PLACEHOLDER;
+  const [resolved, setResolved] = useState(primary);
+
+  useEffect(() => {
+    setResolved(primary);
+  }, [primary]);
+
   const unoptimized = isDataImage(resolved);
+  const handleError = () => {
+    setResolved((current) => {
+      if (current !== firstFallback) return firstFallback;
+      return current === POSTER_PLACEHOLDER ? current : POSTER_PLACEHOLDER;
+    });
+  };
 
   if (fill) {
     return (
@@ -46,6 +62,7 @@ export default function CatalogImage({
           priority={priority}
           unoptimized={unoptimized}
           referrerPolicy={unoptimized ? undefined : "no-referrer"}
+          onError={handleError}
           className={cn("object-cover", className)}
         />
       </div>
@@ -62,6 +79,7 @@ export default function CatalogImage({
       priority={priority}
       unoptimized={unoptimized}
       referrerPolicy={unoptimized ? undefined : "no-referrer"}
+      onError={handleError}
       className={cn("object-cover", className)}
     />
   );

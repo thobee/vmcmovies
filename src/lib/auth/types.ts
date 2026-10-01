@@ -1,5 +1,6 @@
 export type PremiumStatus = "none" | "active" | "expired" | "pending";
-export type UserRole = "user" | "admin";
+export type AdminRole = "admin" | "content_admin";
+export type UserRole = "user" | AdminRole;
 
 export interface User {
   _id: string;

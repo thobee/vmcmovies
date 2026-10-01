@@ -17,10 +17,14 @@ import {
   dbGetSeriesList,
 } from "@/lib/catalog/db";
 import { listUsers } from "@/lib/auth/users";
+import { getAdminSession } from "@/lib/admin/session";
+import { canAdmin } from "@/lib/admin/permissions";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import { cn } from "@/lib/cn";
 
 export default async function AdminDashboardPage() {
+  const session = await getAdminSession();
+  const role = session?.role ?? "content_admin";
   let movieCount = 0;
   let seriesCount = 0;
   let total = 0;
@@ -31,7 +35,7 @@ export default async function AdminDashboardPage() {
     const [movies, series, users] = await Promise.all([
       dbGetMovies(),
       dbGetSeriesList(),
-      listUsers(),
+      canAdmin(role, "users") ? listUsers() : Promise.resolve([]),
     ]);
     movieCount = movies.length;
     seriesCount = series.length;
@@ -46,15 +50,23 @@ export default async function AdminDashboardPage() {
     <div>
       <AdminPageHeader
         title="Dashboard"
-        subtitle="Catalog, subscribers, and site controls in one place."
+        subtitle={
+          role === "admin"
+            ? "Catalog, subscribers, and site controls in one place."
+            : "Catalog and site content controls in one place."
+        }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-10">
         <StatCard label="Total titles" value={total} icon={Layers} accent="blue" />
         <StatCard label="Movies" value={movieCount} icon={Film} accent="blue" />
         <StatCard label="Series" value={seriesCount} icon={Tv} accent="blue" />
-        <StatCard label="Users" value={userCount} icon={Users} accent="neutral" />
-        <StatCard label="Premium" value={premiumCount} icon={Crown} accent="gold" />
+        {canAdmin(role, "users") && (
+          <>
+            <StatCard label="Users" value={userCount} icon={Users} accent="neutral" />
+            <StatCard label="Premium" value={premiumCount} icon={Crown} accent="gold" />
+          </>
+        )}
       </div>
 
       <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/30">
@@ -85,18 +97,22 @@ export default async function AdminDashboardPage() {
           title="Edit homepage"
           description="Hero carousel slides and section titles."
         />
-        <ActionCard
-          href="/admin/users"
-          icon={Users}
-          title="Manage users"
-          description="See signups and set premium status."
-        />
-        <ActionCard
-          href="/admin/payments"
-          icon={CreditCard}
-          title="Payments"
-          description="Revenue, Paystack checkouts, and premium status."
-        />
+        {canAdmin(role, "users") && (
+          <ActionCard
+            href="/admin/users"
+            icon={Users}
+            title="Manage users"
+            description="See signups and set premium status."
+          />
+        )}
+        {canAdmin(role, "payments") && (
+          <ActionCard
+            href="/admin/payments"
+            icon={CreditCard}
+            title="Payments"
+            description="Revenue, Paystack checkouts, and premium status."
+          />
+        )}
         <ActionCard
           href="/admin/support"
           icon={MessageCircle}

@@ -1,9 +1,15 @@
+import { redirect } from "next/navigation";
 import { listUsers } from "@/lib/auth/users";
 import { listUserAlerts } from "@/lib/admin/user-alerts";
+import { getAdminSession } from "@/lib/admin/session";
+import { canAdmin } from "@/lib/admin/permissions";
 import UsersSection from "@/components/admin/UsersSection";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 
 export default async function AdminUsersPage() {
+  const session = await getAdminSession();
+  if (!session || !canAdmin(session.role, "users")) redirect("/admin");
+
   let users: Awaited<ReturnType<typeof listUsers>> = [];
   let alerts: Awaited<ReturnType<typeof listUserAlerts>> = [];
 

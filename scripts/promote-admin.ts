@@ -1,6 +1,7 @@
 /**
- * Promote an existing site user to admin.
- * Usage: npm run admin:promote -- someone@example.com
+ * Promote an existing site user to an admin role.
+ * Usage: npm run admin:promote -- someone@example.com content
+ *        npm run admin:promote -- owner@example.com admin
  *
  * Run on your machine (or deploy shell) with MONGODB_URI pointing at your database.
  * Not available in the admin panel — only trusted operators should run this.
@@ -30,14 +31,27 @@ loadEnvFile();
 
 async function main() {
   const email = process.argv[2]?.trim();
+  const roleArg = process.argv[3]?.trim().toLowerCase() ?? "admin";
+  const role =
+    roleArg === "content" || roleArg === "content_admin"
+      ? "content_admin"
+      : roleArg === "admin" || roleArg === "full"
+        ? "admin"
+        : null;
+
   if (!email || !email.includes("@")) {
-    console.error("Usage: npm run admin:promote -- <email>");
-    console.error("Example: npm run admin:promote -- ops@vmcmovies.xyz");
+    console.error("Usage: npm run admin:promote -- <email> [admin|content]");
+    console.error("Example: npm run admin:promote -- editor@vmcmovies.xyz content");
     process.exit(1);
   }
 
-  const { promoteUserToAdmin } = await import("../src/lib/auth/users");
-  const result = await promoteUserToAdmin(email);
+  if (!role) {
+    console.error("Role must be either 'admin' or 'content'.");
+    process.exit(1);
+  }
+
+  const { promoteUserToAdminRole } = await import("../src/lib/auth/users");
+  const result = await promoteUserToAdminRole(email, role);
 
   if (result.status === "not_found") {
     console.error(`No user found for ${email}.`);
@@ -45,13 +59,14 @@ async function main() {
     process.exit(1);
   }
 
-  if (result.status === "already_admin") {
-    console.log(`${email} is already an admin.`);
+  if (result.status === "already_role" || result.status === "already_admin") {
+    console.log(`${email} already has the ${role} role.`);
     process.exit(0);
   }
 
   const { user } = result;
-  console.log(`\nPromoted to admin: ${user.email} (id: ${user._id})\n`);
+  const label = role === "admin" ? "full admin" : "content admin";
+  console.log(`\nPromoted to ${label}: ${user.email} (id: ${user._id})\n`);
   console.log("Next steps for them:");
   console.log("  1. Open /admin/login (not /login)");
   if (!user.passwordHash) {
@@ -61,6 +76,10 @@ async function main() {
   }
   console.log("  3. Complete authenticator (TOTP) enrollment on first login");
   console.log("  4. Save the recovery codes shown once\n");
+  if (role === "content_admin") {
+    console.log("Content admins can manage movies, series, homepage, updates, requests, and support.");
+    console.log("They cannot access users, billing, payments, revenue, or finance settings.\n");
+  }
 }
 
 main().catch((err) => {

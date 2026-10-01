@@ -10,8 +10,8 @@ import {
 const ALPH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 const STEP = 30;
 const DIGITS = 6;
-/** ±1 step (90s) covers phone-clock drift. Upgrade: NTP on the server. */
-const WINDOW = 1;
+/** ±2 steps covers modest phone-clock drift. Upgrade: NTP on the server. */
+const WINDOW = 2;
 
 function authSecret(): string {
   const s = process.env.AUTH_SECRET;

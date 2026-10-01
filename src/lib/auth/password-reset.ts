@@ -3,6 +3,7 @@ import type { Collection, Document } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
 import { findUserByEmail, updateUserPassword } from "@/lib/auth/users";
 import { hashPassword } from "@/lib/auth/password";
+import { isAdminRole } from "@/lib/admin/permissions";
 import { isEmailConfigured } from "@/lib/email/config";
 import { sendEmail } from "@/lib/email/resend";
 import { userResetOtpEmail } from "@/lib/email/templates";
@@ -59,7 +60,7 @@ export async function requestUserPasswordReset(
   const user = await findUserByEmail(normalized);
 
   // Email/password and Google sign-in accounts (passwordHash may be empty until first reset).
-  if (user && user.role !== "admin") {
+  if (user && !isAdminRole(user.role)) {
     const otp = String(crypto.randomInt(100000, 1000000));
     const now = new Date();
     await (await col()).updateOne(
@@ -123,7 +124,7 @@ export async function completeUserPasswordReset(input: {
   }
 
   const user = await findUserByEmail(email);
-  if (!user || user.role === "admin") {
+  if (!user || isAdminRole(user.role)) {
     await c.deleteOne({ email });
     return { ok: false, error: "Invalid or expired code", status: 400 };
   }
