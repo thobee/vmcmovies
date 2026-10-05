@@ -1,7 +1,7 @@
 import { formatMoney, type PaymentCurrency } from "./currency";
 
-export type PlanId = "monthly" | "quarterly" | "biannual";
-/** @deprecated Legacy plan — existing payments only */
+export type PlanId = "monthly" | "quarterly" | "biannual" | "yearly";
+/** @deprecated Use PlanId. Kept for compatibility with older imports. */
 export type LegacyPlanId = "yearly";
 
 export interface PlanPricing {
@@ -34,11 +34,11 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "3 Months",
     months: 3,
     pricing: {
-      NGN: { amountMinor: 250_000, display: 2_500 },
+      NGN: { amountMinor: 280_000, display: 2_800 },
     },
     badge: "Most Popular",
     savings: {
-      NGN: `Save ${formatMoney(NGN_MONTHLY * 3 - 2_500, "NGN")}`,
+      NGN: `Save ${formatMoney(NGN_MONTHLY * 3 - 2_800, "NGN")}`,
     },
   },
   biannual: {
@@ -46,16 +46,32 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "6 Months",
     months: 6,
     pricing: {
-      NGN: { amountMinor: 450_000, display: 4_500 },
+      NGN: { amountMinor: 520_000, display: 5_200 },
+    },
+    savings: {
+      NGN: `Save ${formatMoney(NGN_MONTHLY * 6 - 5_200, "NGN")}`,
+    },
+  },
+  yearly: {
+    id: "yearly",
+    name: "12 Months",
+    months: 12,
+    pricing: {
+      NGN: { amountMinor: 960_000, display: 9_600 },
     },
     badge: "Best Value",
     savings: {
-      NGN: `Save ${formatMoney(NGN_MONTHLY * 6 - 4_500, "NGN")}`,
+      NGN: `Save ${formatMoney(NGN_MONTHLY * 12 - 9_600, "NGN")}`,
     },
   },
 };
 
-export const PLAN_LIST: Plan[] = [PLANS.monthly, PLANS.quarterly, PLANS.biannual];
+export const PLAN_LIST: Plan[] = [
+  PLANS.monthly,
+  PLANS.quarterly,
+  PLANS.biannual,
+  PLANS.yearly,
+];
 
 export const PREMIUM_FEATURES = [
   "Unlimited Telegram downloads",
@@ -68,7 +84,7 @@ export const PREMIUM_FEATURES = [
 const ALL_PLAN_IDS = new Set<string>(["monthly", "quarterly", "biannual", "yearly"]);
 
 export function isPlanId(value: string): value is PlanId {
-  return value === "monthly" || value === "quarterly" || value === "biannual";
+  return ALL_PLAN_IDS.has(value);
 }
 
 export function isKnownPlanId(value: string): boolean {
@@ -76,12 +92,12 @@ export function isKnownPlanId(value: string): boolean {
 }
 
 export function getPlanMonths(planId: string): number {
-  if (planId === "yearly") return 12;
   if (isPlanId(planId)) return PLANS[planId].months;
   return 1;
 }
 
-export function getPlanPricing(planId: PlanId, currency: PaymentCurrency = "NGN"): PlanPricing {
+export function getPlanPricing(planId: PlanId, _currency: PaymentCurrency = "NGN"): PlanPricing {
+  void _currency;
   return PLANS[planId].pricing.NGN;
 }
 

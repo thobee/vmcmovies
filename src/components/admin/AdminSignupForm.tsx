@@ -1,19 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { Arc } from "@/components/loading-ui/arc";
 import AdminPasswordField from "@/components/admin/AdminPasswordField";
 
 export default function AdminSignupForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const busy = loading || navigating;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    let submitted = false;
 
     try {
       const res = await fetch("/api/admin/signup", {
@@ -28,11 +34,15 @@ export default function AdminSignupForm() {
         return;
       }
 
-      window.location.assign("/admin/login");
+      submitted = true;
+      setNavigating(true);
+      router.push("/admin/login");
     } catch {
       setError("Network error");
     } finally {
-      setLoading(false);
+      if (!submitted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -70,10 +80,12 @@ export default function AdminSignupForm() {
 
       <button
         type="submit"
-        disabled={loading}
-        className={cn("btn-pill btn-pill-primary w-full py-3.5", loading && "opacity-60 cursor-not-allowed")}
+        disabled={busy}
+        aria-busy={busy}
+        className={cn("btn-pill btn-pill-primary w-full gap-2 py-3.5", busy && "opacity-70 cursor-wait")}
       >
-        {loading ? "Creating account…" : "Create admin account"}
+        {busy && <Arc className="size-4 border-[2px]" />}
+        {navigating ? "Opening sign in..." : loading ? "Creating account..." : "Create admin account"}
       </button>
     </form>
   );

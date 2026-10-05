@@ -1,20 +1,20 @@
 import type { PremiumStatus } from "@/lib/auth/types";
-import { formatMoney, type PaymentCurrency } from "@/lib/payments/currency";
 import { getSession } from "@/lib/auth/session";
 import { findUserById } from "@/lib/auth/users";
-import { getBillingPlansForUser } from "@/lib/payments/billing/resolve";
+import { userHasSuccessfulPayment } from "@/lib/payments/records";
+import { getBillingConfig } from "./db";
+import { isUserEligibleForWelcomeTrial } from "./resolve";
 import type { PersonalNotification } from "./types";
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 
 export async function buildPersonalNotifications(
-  userId: string,
+  _userId: string,
   premiumStatus: PremiumStatus,
   premiumExpiryDate: string | null,
 ): Promise<PersonalNotification[]> {
   const now = Date.now();
   const items: PersonalNotification[] = [];
-  const billing = await getBillingPlansForUser(userId, "NGN");
 
   if (premiumStatus === "active" && premiumExpiryDate) {
     const expiry = new Date(premiumExpiryDate).getTime();
@@ -44,22 +44,11 @@ export async function buildPersonalNotifications(
         id: `prem-ended-${premiumExpiryDate.slice(0, 10)}`,
         kind: "premium_expired",
         title: "Premium has ended",
-        body: "Telegram downloads are paused. Continue from ₦1,000/month or save with a longer plan.",
+        body: "Premium downloads are paused. Continue from ₦1,000/month or save with a longer plan.",
         href: "/get-access",
         publishedAt: premiumExpiryDate,
       });
     }
-  }
-
-  if (billing.launchYearlyUpsell.show) {
-    items.push({
-      id: "prem-launch-biannual",
-      kind: "premium_upsell",
-      title: "Lock in 6 months",
-      body: billing.launchYearlyUpsell.message,
-      href: "/get-access",
-      publishedAt: new Date().toISOString(),
-    });
   }
 
   return items;
@@ -79,9 +68,26 @@ export async function getPersonalNotificationsForSession(): Promise<PersonalNoti
       ? "expired"
       : user.premiumStatus;
 
-  return buildPersonalNotifications(
-    user._id,
-    status,
-    user.premiumExpiryDate?.toISOString() ?? null,
-  );
+  const [items, billing, hasPaid] = await Promise.all([
+    buildPersonalNotifications(
+      user._id,
+      status,
+      user.premiumExpiryDate?.toISOString() ?? null,
+    ),
+    getBillingConfig(),
+    userHasSuccessfulPayment(user._id),
+  ]);
+
+  if (isUserEligibleForWelcomeTrial(billing, user, hasPaid)) {
+    items.unshift({
+      id: `trial-available-${billing.welcomeTrial.endsAt?.slice(0, 10) ?? "launch"}`,
+      kind: "trial_available",
+      title: billing.welcomeTrial.bannerTitle,
+      body: `Your account qualifies for ${billing.welcomeTrial.durationDays} days of Premium. Open a Premium title to activate it. No card required.`,
+      href: "/movies",
+      publishedAt: billing.updatedAt,
+    });
+  }
+
+  return items;
 }

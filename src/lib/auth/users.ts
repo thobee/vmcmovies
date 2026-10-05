@@ -1,6 +1,6 @@
 import { ObjectId, type Collection, type Document } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
-import type { AdminRole, PremiumStatus, User, UserRole } from "@/lib/auth/types";
+import type { AdminRole, PremiumSource, PremiumStatus, User, UserRole } from "@/lib/auth/types";
 import { isAdminRole } from "@/lib/admin/permissions";
 
 const COLLECTION = "users";
@@ -14,6 +14,9 @@ type UserDoc = Document & {
   premiumStatus: PremiumStatus;
   premiumStartDate?: Date | null;
   premiumExpiryDate?: Date | null;
+  premiumSource?: PremiumSource | null;
+  welcomeTrialStartedAt?: Date | null;
+  welcomeTrialExpiryDate?: Date | null;
   createdAt: Date;
   totpEnabled?: boolean;
   totpSecretEnc?: string;
@@ -46,6 +49,9 @@ function toUser(doc: UserDoc): User {
     premiumStatus: doc.premiumStatus,
     premiumStartDate: doc.premiumStartDate ?? null,
     premiumExpiryDate: doc.premiumExpiryDate ?? null,
+    premiumSource: doc.premiumSource ?? null,
+    welcomeTrialStartedAt: doc.welcomeTrialStartedAt ?? null,
+    welcomeTrialExpiryDate: doc.welcomeTrialExpiryDate ?? null,
     createdAt: doc.createdAt,
     totpEnabled: Boolean(doc.totpEnabled && doc.totpSecretEnc),
   };
@@ -163,6 +169,9 @@ export async function createUser(input: {
     premiumStatus: "none",
     premiumStartDate: null,
     premiumExpiryDate: null,
+    premiumSource: null,
+    welcomeTrialStartedAt: null,
+    welcomeTrialExpiryDate: null,
     createdAt: now,
   };
 
@@ -204,10 +213,45 @@ export async function activatePremium(
         premiumStatus: "active",
         premiumStartDate,
         premiumExpiryDate: expiry,
+        premiumSource: "paid",
       },
     }
   );
 
+  return expiry;
+}
+
+export async function activateWelcomeTrial(userId: string, durationDays: number): Promise<Date> {
+  if (!ObjectId.isValid(userId)) throw new Error("Invalid user id");
+  if (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 30) {
+    throw new Error("Invalid trial duration");
+  }
+
+  const now = new Date();
+  const expiry = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
+  const result = await (await users()).findOneAndUpdate(
+    {
+      _id: new ObjectId(userId),
+      premiumStatus: { $nin: ["active", "pending"] },
+      $or: [
+        { welcomeTrialStartedAt: { $exists: false } },
+        { welcomeTrialStartedAt: null },
+      ],
+    },
+    {
+      $set: {
+        premiumStatus: "active",
+        premiumSource: "trial",
+        premiumStartDate: now,
+        premiumExpiryDate: expiry,
+        welcomeTrialStartedAt: now,
+        welcomeTrialExpiryDate: expiry,
+      },
+    },
+    { returnDocument: "after" },
+  );
+
+  if (!result) throw new Error("Trial is no longer available");
   return expiry;
 }
 
@@ -217,6 +261,9 @@ export type PublicUser = Pick<
 > & {
   premiumStartDate: string | null;
   premiumExpiryDate: string | null;
+  premiumSource: PremiumSource | null;
+  welcomeTrialStartedAt: string | null;
+  welcomeTrialExpiryDate: string | null;
   createdAt: string;
 };
 
@@ -229,6 +276,9 @@ function toPublicUser(user: User): PublicUser {
     premiumStatus: effectivePremiumStatus(user),
     premiumStartDate: user.premiumStartDate?.toISOString() ?? null,
     premiumExpiryDate: user.premiumExpiryDate?.toISOString() ?? null,
+    premiumSource: user.premiumSource ?? null,
+    welcomeTrialStartedAt: user.welcomeTrialStartedAt?.toISOString() ?? null,
+    welcomeTrialExpiryDate: user.welcomeTrialExpiryDate?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
   };
 }
@@ -331,6 +381,9 @@ export async function setUserPremiumStatus(
   if (premiumStatus === "none" || premiumStatus === "pending") {
     update.premiumStartDate = null;
     update.premiumExpiryDate = null;
+    update.premiumSource = null;
+  } else if (premiumStatus === "active") {
+    update.premiumSource = "paid";
   }
 
   const result = await (await users()).findOneAndUpdate(

@@ -6,7 +6,13 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import RequestModal from "@/components/requests/RequestModal";
 import { cn } from "@/lib/cn";
 
-export default function RequestButton({ className }: { className?: string }) {
+export default function RequestButton({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -23,7 +29,7 @@ export default function RequestButton({ className }: { className?: string }) {
         )}
       >
         <FilmSlate className="h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
-        <span className="hidden min-[420px]:inline">Request</span>
+        <span className={compact ? "hidden xl:inline" : "inline"}>Request a movie</span>
       </button>
       <RequestModal open={open} onClose={() => setOpen(false)} />
     </>

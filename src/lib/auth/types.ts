@@ -1,4 +1,5 @@
 export type PremiumStatus = "none" | "active" | "expired" | "pending";
+export type PremiumSource = "paid" | "trial";
 export type AdminRole = "admin" | "content_admin";
 export type UserRole = "user" | AdminRole;
 
@@ -12,6 +13,9 @@ export interface User {
   premiumStatus: PremiumStatus;
   premiumStartDate?: Date | null;
   premiumExpiryDate?: Date | null;
+  premiumSource?: PremiumSource | null;
+  welcomeTrialStartedAt?: Date | null;
+  welcomeTrialExpiryDate?: Date | null;
   createdAt: Date;
   totpEnabled?: boolean;
 }
@@ -23,4 +27,7 @@ export interface SessionUser {
   role: UserRole;
   premiumStatus: PremiumStatus;
   premiumExpiryDate: string | null;
+  premiumSource: PremiumSource | null;
+  welcomeTrialStartedAt: string | null;
+  welcomeTrialExpiryDate: string | null;
 }

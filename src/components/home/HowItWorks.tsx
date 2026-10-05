@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { CreditCard, DownloadSimple, MonitorPlay } from "@phosphor-icons/react";
+import { ArrowRight, CreditCard, DownloadSimple, MonitorPlay } from "@phosphor-icons/react";
 
 const STEPS = [
   {
@@ -14,8 +14,8 @@ const STEPS = [
   {
     step: "2",
     icon: CreditCard,
-    title: "Get premium",
-    body: "Sign up once. That’s what unlocks downloads. Without it, you can still browse.",
+    title: "Check the access badge",
+    body: "Free titles open immediately. Premium titles need an active trial or a Premium plan.",
   },
   {
     step: "3",
@@ -40,15 +40,16 @@ export default function HowItWorks() {
             Browse here. Download on Telegram.
           </h2>
           <p className="mt-3 max-w-xl text-base leading-7 text-white/70">
-            VMC shows you movies and series. When you go premium and hit download, a Telegram bot
-            sends you the file.
+            Every title is clearly marked Free or Premium. Choose a download and the Telegram bot
+            handles the delivery.
           </p>
         </div>
         <Link
-          href="/get-access"
-          className="auth-btn mt-6 hidden shrink-0 px-7 py-3 text-sm lg:inline-flex"
+          href="/guide"
+          className="group mt-6 hidden shrink-0 items-center gap-2 text-sm font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200 lg:inline-flex"
         >
-          Get premium access
+          Read the download guide
+          <ArrowRight className="h-4 w-4 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1" weight="bold" />
         </Link>
       </div>
 
@@ -77,8 +78,8 @@ export default function HowItWorks() {
       </div>
 
       <div className="mt-8 text-center lg:hidden">
-        <Link href="/get-access" className="auth-btn px-8 py-3.5 text-sm">
-          Get premium access
+        <Link href="/guide" className="auth-btn px-8 py-3.5 text-sm">
+          Read the download guide
         </Link>
       </div>
     </section>

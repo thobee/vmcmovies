@@ -13,16 +13,17 @@ const patchSchema = z.object({
       monthly: priceSchema.optional(),
       quarterly: priceSchema.optional(),
       biannual: priceSchema.optional(),
+      yearly: priceSchema.optional(),
     })
     .optional(),
-  launchOffer: z
+  welcomeTrial: z
     .object({
       enabled: z.boolean().optional(),
+      startsAt: z.string().nullable().optional(),
       endsAt: z.string().nullable().optional(),
       bannerTitle: z.string().max(120).optional(),
       bannerBody: z.string().max(300).optional(),
-      monthlyPrice: priceSchema.optional(),
-      disclosure: z.object({ NGN: z.string().max(400), GHS: z.string().max(400) }).optional(),
+      durationDays: z.coerce.number().int().min(1).max(30).optional(),
     })
     .optional(),
   planPromos: z
@@ -51,12 +52,14 @@ const patchSchema = z.object({
           label: z.string().max(80),
         })
         .optional(),
-    })
-    .optional(),
-  launchYearlyUpsell: z
-    .object({
-      enabled: z.boolean().optional(),
-      message: z.object({ NGN: z.string().max(200), GHS: z.string().max(200) }).optional(),
+      yearly: z
+        .object({
+          enabled: z.boolean(),
+          endsAt: z.string().nullable(),
+          prices: priceSchema,
+          label: z.string().max(80),
+        })
+        .optional(),
     })
     .optional(),
   welcome: z
@@ -96,13 +99,29 @@ export async function PUT(request: Request) {
 
     const current = await getBillingConfig();
     const patch = parsed.data as Partial<BillingConfig>;
+    const nextTrial = { ...current.welcomeTrial, ...patch.welcomeTrial };
+    if (nextTrial.enabled) {
+      const startsAt = nextTrial.startsAt ? new Date(nextTrial.startsAt) : null;
+      const endsAt = nextTrial.endsAt ? new Date(nextTrial.endsAt) : null;
+      if (
+        !startsAt ||
+        !endsAt ||
+        Number.isNaN(startsAt.getTime()) ||
+        Number.isNaN(endsAt.getTime()) ||
+        endsAt <= startsAt
+      ) {
+        return NextResponse.json(
+          { error: "Set a valid campaign start and end time before enabling the trial" },
+          { status: 400 },
+        );
+      }
+    }
     const config = await saveBillingConfig({
       ...current,
       ...patch,
       plans: { ...current.plans, ...patch.plans },
-      launchOffer: { ...current.launchOffer, ...patch.launchOffer },
+      welcomeTrial: nextTrial,
       planPromos: { ...current.planPromos, ...patch.planPromos },
-      launchYearlyUpsell: { ...current.launchYearlyUpsell, ...patch.launchYearlyUpsell },
       welcome: { ...current.welcome, ...patch.welcome },
     });
 

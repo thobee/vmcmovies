@@ -54,6 +54,9 @@ export async function PATCH(request: Request) {
       role: updated.role,
       premiumStatus: effectivePremiumStatus(updated),
       premiumExpiryDate: updated.premiumExpiryDate?.toISOString() ?? null,
+      premiumSource: updated.premiumSource ?? null,
+      welcomeTrialStartedAt: updated.welcomeTrialStartedAt?.toISOString() ?? null,
+      welcomeTrialExpiryDate: updated.welcomeTrialExpiryDate?.toISOString() ?? null,
     };
 
     return NextResponse.json({ user });

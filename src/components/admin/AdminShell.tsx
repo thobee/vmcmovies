@@ -25,6 +25,7 @@ import type { AdminRole } from "@/lib/auth/types";
 import { adminRoleLabel, canAdmin, type AdminPermission } from "@/lib/admin/permissions";
 import VmcLogo from "@/components/brand/VmcLogo";
 import { AdminToastProvider } from "@/components/admin/toast";
+import { Arc } from "@/components/loading-ui/arc";
 
 type NavItem = {
   href: string;
@@ -133,10 +134,7 @@ export default function AdminShell({
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -152,6 +150,8 @@ export default function AdminShell({
   }, [menuOpen]);
 
   const logout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
     router.refresh();
@@ -182,10 +182,12 @@ export default function AdminShell({
         <button
           type="button"
           onClick={logout}
+          disabled={loggingOut}
+          aria-busy={loggingOut}
           title="Log out"
-          className="p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/6 transition-colors"
+          className="p-1.5 rounded-lg text-white/30 hover:text-white hover:bg-white/6 transition-colors disabled:cursor-wait disabled:opacity-60"
         >
-          <LogOut className="w-3.5 h-3.5" />
+          {loggingOut ? <Arc className="size-3.5 border-[1.5px]" /> : <LogOut className="w-3.5 h-3.5" />}
         </button>
       </div>
     </div>
@@ -275,10 +277,12 @@ export default function AdminShell({
           <button
             type="button"
             onClick={logout}
-            className="rounded-lg p-2 text-white/45 hover:text-white"
+            disabled={loggingOut}
+            aria-busy={loggingOut}
+            className="rounded-lg p-2 text-white/45 hover:text-white disabled:cursor-wait disabled:opacity-60"
             title="Log out"
           >
-            <LogOut className="h-4 w-4" />
+            {loggingOut ? <Arc className="size-4 border-[1.5px]" /> : <LogOut className="h-4 w-4" />}
           </button>
         </header>
 

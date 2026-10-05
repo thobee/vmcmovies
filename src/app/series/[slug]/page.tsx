@@ -5,6 +5,7 @@ import { canonicalSeriesPath } from "@/lib/catalog/resolve";
 import { titlePageMetadata } from "@/lib/catalog/title-metadata";
 import { getSession } from "@/lib/auth/session";
 import TitleView from "@/components/media/TitleView";
+import { getBillingPlansForUser } from "@/lib/payments/billing/resolve";
 
 export const revalidate = 120;
 
@@ -30,13 +31,19 @@ export default async function SeriesDetailPage({ params }: PageProps) {
   }
 
   const session = await getSession();
-  const recommended = await getRecommended(show);
+  const [recommended, billing] = await Promise.all([
+    getRecommended(show),
+    getBillingPlansForUser(session?.user.id ?? null, "NGN"),
+  ]);
 
   return (
     <TitleView
       item={show}
       recommended={recommended}
       premiumStatus={session?.user.premiumStatus ?? "none"}
+      premiumSource={session?.user.premiumSource ?? null}
+      trialEligible={billing.trial.eligible}
+      trialDays={billing.trial.durationDays}
       loggedIn={!!session}
     />
   );

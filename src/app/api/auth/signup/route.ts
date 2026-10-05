@@ -5,6 +5,8 @@ import { createUser, findUserByEmail } from "@/lib/auth/users";
 import { createSession } from "@/lib/auth/session";
 import { honeypotTripped } from "@/lib/security/honeypot";
 import { clientIp, rateLimited, RATE_LIMIT_MSG } from "@/lib/security/rate-limit";
+import { getBillingConfig } from "@/lib/payments/billing/db";
+import { isUserEligibleForWelcomeTrial } from "@/lib/payments/billing/resolve";
 
 export async function POST(request: Request) {
   try {
@@ -35,9 +37,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordHash = await hashPassword(password);
+    const [passwordHash, billing] = await Promise.all([
+      hashPassword(password),
+      getBillingConfig(),
+    ]);
     const user = await createUser({ email, passwordHash, telegramUsername });
     await createSession(user._id);
+    const welcomeTrialEligible = isUserEligibleForWelcomeTrial(
+      billing,
+      user,
+      false,
+    );
 
     return NextResponse.json({
       user: {
@@ -47,6 +57,14 @@ export async function POST(request: Request) {
         role: user.role,
         premiumStatus: user.premiumStatus,
         premiumExpiryDate: null,
+        premiumSource: null,
+        welcomeTrialStartedAt: null,
+        welcomeTrialExpiryDate: null,
+      },
+      welcomeTrial: {
+        eligible: welcomeTrialEligible,
+        durationDays: billing.welcomeTrial.durationDays,
+        title: billing.welcomeTrial.bannerTitle,
       },
     });
   } catch (err) {

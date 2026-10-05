@@ -37,7 +37,12 @@ function toContent(doc: ContentDoc): Content {
       ? normalizeSeries(withType as Content)
       : (withType as Content);
   const slug = base.slug || slugify(base.title) || base.id;
-  return { ...base, slug, featured: featured ?? false };
+  return {
+    ...base,
+    slug,
+    featured: featured ?? false,
+    accessTier: base.accessTier ?? "premium",
+  };
 }
 
 function buildFilter(options?: ContentListOptions): Document {
@@ -298,6 +303,11 @@ export async function dbUpdateContent(
 
   if ("seasons" in contentPatch) {
     update.$unset = { episodes: "" };
+  }
+
+  if ("freeUntil" in contentPatch && !contentPatch.freeUntil) {
+    delete update.$set.freeUntil;
+    update.$unset = { ...update.$unset, freeUntil: "" };
   }
 
   const result = await col.findOneAndUpdate({ id }, update, {

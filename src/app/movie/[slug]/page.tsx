@@ -5,6 +5,7 @@ import { canonicalMoviePath } from "@/lib/catalog/resolve";
 import { titlePageMetadata } from "@/lib/catalog/title-metadata";
 import { getSession } from "@/lib/auth/session";
 import TitleView from "@/components/media/TitleView";
+import { getBillingPlansForUser } from "@/lib/payments/billing/resolve";
 
 export const revalidate = 120;
 
@@ -30,13 +31,19 @@ export default async function MovieDetailPage({ params }: PageProps) {
   }
 
   const session = await getSession();
-  const recommended = await getRecommended(movie);
+  const [recommended, billing] = await Promise.all([
+    getRecommended(movie),
+    getBillingPlansForUser(session?.user.id ?? null, "NGN"),
+  ]);
 
   return (
     <TitleView
       item={movie}
       recommended={recommended}
       premiumStatus={session?.user.premiumStatus ?? "none"}
+      premiumSource={session?.user.premiumSource ?? null}
+      trialEligible={billing.trial.eligible}
+      trialDays={billing.trial.durationDays}
       loggedIn={!!session}
     />
   );

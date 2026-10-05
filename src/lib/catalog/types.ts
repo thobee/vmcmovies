@@ -2,6 +2,8 @@ import type { Quality } from "./quality";
 
 export type { Quality };
 export type ContentType = "movie" | "series";
+export type ContentAccessTier = "free" | "premium";
+export type ContentAccessKind = "free" | "temporary_free" | "premium";
 
 /** Series season — you paste the Telegram bot link; episodes live in the bot. */
 export interface Season {
@@ -28,6 +30,10 @@ export interface Content {
   createdAt: string;
   /** Editorial — homepage hero fallback when no custom slides */
   featured?: boolean;
+  /** Permanent access rule. Existing records default to premium. */
+  accessTier?: ContentAccessTier;
+  /** Premium content is temporarily free until this ISO timestamp. */
+  freeUntil?: string;
   /** Movie only — Telegram bot deep link */
   downloadUrl?: string;
   /** Series only — season buttons; bot serves episodes per season */

@@ -5,6 +5,7 @@ import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
 import GenrePageHero from "@/components/media/GenrePageHero";
 import GenreCatalogClient from "@/components/media/GenreCatalogClient";
+import { toPublicContent } from "@/lib/catalog/public";
 
 export const revalidate = 120;
 
@@ -50,8 +51,8 @@ export default async function GenrePage({ params }: PageProps) {
 
       <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
         <GenreCatalogClient
-          movies={filteredMovies}
-          series={filteredSeries}
+          movies={filteredMovies.map(toPublicContent)}
+          series={filteredSeries.map(toPublicContent)}
           genreName={genreName}
         />
       </div>

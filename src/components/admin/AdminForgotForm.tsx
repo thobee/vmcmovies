@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { Arc } from "@/components/loading-ui/arc";
 import AdminPasswordField from "@/components/admin/AdminPasswordField";
 
 export default function AdminForgotForm() {
+  const router = useRouter();
   const [step, setStep] = useState<"request" | "reset">("request");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -14,6 +17,8 @@ export default function AdminForgotForm() {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [loading, setLoading] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const busy = loading || navigating;
 
   const sendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +54,7 @@ export default function AdminForgotForm() {
       return;
     }
     setLoading(true);
+    let submitted = false;
     try {
       const res = await fetch("/api/admin/password-reset", {
         method: "POST",
@@ -60,11 +66,15 @@ export default function AdminForgotForm() {
         setError(data.error ?? "Couldn’t reset password");
         return;
       }
-      window.location.assign("/admin/login?reset=1");
+      submitted = true;
+      setNavigating(true);
+      router.push("/admin/login?reset=1");
     } catch {
       setError("Network error");
     } finally {
-      setLoading(false);
+      if (!submitted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -139,13 +149,17 @@ export default function AdminForgotForm() {
 
       <button
         type="submit"
-        disabled={loading}
-        className={cn("btn-pill btn-pill-primary w-full py-3.5", loading && "opacity-60 cursor-not-allowed")}
+        disabled={busy}
+        aria-busy={busy}
+        className={cn("btn-pill btn-pill-primary w-full gap-2 py-3.5", busy && "opacity-70 cursor-wait")}
       >
-        {loading
+        {busy && <Arc className="size-4 border-[2px]" />}
+        {navigating
+          ? "Opening sign in..."
+          : loading
           ? step === "request"
-            ? "Sending…"
-            : "Saving…"
+            ? "Sending..."
+            : "Saving..."
           : step === "request"
             ? "Send code"
             : "Update password"}

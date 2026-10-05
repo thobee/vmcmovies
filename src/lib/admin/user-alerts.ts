@@ -23,7 +23,6 @@ function planLabel(planId: string | null | undefined): {
   planId: PlanId | null;
   planName: string;
 } {
-  if (planId === "yearly") return { planId: null, planName: "12 Months" };
   if (planId && isPlanId(planId)) {
     return { planId, planName: PLANS[planId].name };
   }

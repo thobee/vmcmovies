@@ -1,23 +1,37 @@
 import Link from "next/link";
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import VmcLogo from "@/components/brand/VmcLogo";
 import { getTelegramChannelUrl } from "@/lib/catalog/telegram";
 
-const NAV = [
-  { label: "Movies", href: "/movies" },
-  { label: "TV Shows", href: "/series" },
-  { label: "Get premium", href: "/get-access" },
-  { label: "Account", href: "/account" },
-  { label: "Support", href: "/support" },
-  { label: "Terms", href: "/terms" },
-  { label: "Privacy", href: "/privacy" },
+const FOOTER_GROUPS = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Movies", href: "/movies" },
+      { label: "TV Shows", href: "/series" },
+      { label: "Search catalogue", href: "/search" },
+    ],
+  },
+  {
+    title: "Your VMC",
+    links: [
+      { label: "User dashboard", href: "/account" },
+      { label: "Premium plans", href: "/get-access" },
+      { label: "Download guide", href: "/guide" },
+      { label: "Support", href: "/support" },
+    ],
+  },
+  {
+    title: "Information",
+    links: [
+      { label: "Terms", href: "/terms" },
+      { label: "Privacy", href: "/privacy" },
+    ],
+  },
 ] as const;
 
 function getWhatsAppGroupUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_WHATSAPP_GROUP?.trim() ||
-    "https://chat.whatsapp.com/F1gdeQA8GHRK5HyZRCNaUz"
-  );
+  return process.env.NEXT_PUBLIC_WHATSAPP_GROUP?.trim() || "https://chat.whatsapp.com/F1gdeQA8GHRK5HyZRCNaUz";
 }
 
 function TelegramIcon({ className }: { className?: string }) {
@@ -37,128 +51,81 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 export default function Footer() {
-  const telegramUrl = getTelegramChannelUrl();
-  const whatsappUrl = getWhatsAppGroupUrl();
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-16 overflow-hidden">
-      {/* Bright premium strip — breaks the all-black page */}
-      <div className="relative border-y border-emerald-400/25 bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-300">
-        <div className="mx-auto flex max-w-screen-2xl flex-col items-start justify-between gap-4 px-4 py-5 sm:flex-row sm:items-center sm:px-6 lg:px-10">
+    <footer className="relative mt-16 overflow-hidden text-white">
+      <div className="relative border-y border-emerald-400/25 bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-300 text-black">
+        <div className="mx-auto flex max-w-screen-2xl flex-col items-start justify-between gap-5 px-4 py-6 sm:flex-row sm:items-center sm:px-6 lg:px-10">
           <div>
-            <p
-              className="text-lg font-extrabold leading-tight text-black sm:text-xl"
-              style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}
-            >
-              Ready to download on Telegram?
+            <p className="text-lg font-extrabold leading-tight sm:text-xl" style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}>
+              Ready to receive your next movie on Telegram?
             </p>
-            <p className="mt-0.5 text-sm font-medium text-black/70">
-              Premium unlocks the bot. Browse stays free.
-            </p>
+            <p className="mt-1 text-sm font-medium text-black/65">Browse free titles or unlock the full Premium catalogue.</p>
           </div>
-          <Link
-            href="/get-access"
-            className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-black pl-6 pr-1.5 py-1.5 text-sm font-bold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-lime-300 active:scale-[0.98]"
-          >
-            Get premium
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-[1px]">
-              <ArrowUpRight className="h-4 w-4" weight="bold" />
+          <Link href="/get-access" className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-black py-1.5 pl-6 pr-1.5 text-sm font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200 active:scale-[0.98]">
+            Compare plans
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
+              <ArrowRight className="h-4 w-4" weight="bold" />
             </span>
           </Link>
         </div>
       </div>
 
-      <div className="relative bg-[#0c1410] text-white">
+      <div className="relative bg-[#0c1410]">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-70"
           style={{
             backgroundImage:
-              "radial-gradient(rgba(132,204,22,0.22) 1px, transparent 1px)",
-            backgroundSize: "22px 22px",
+              "radial-gradient(rgba(132,204,22,0.18) 1px, transparent 1px), linear-gradient(115deg, #0c1410 0%, #07130c 62%, #152508 100%)",
+            backgroundSize: "22px 22px, 100% 100%",
           }}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -left-24 top-10 h-64 w-64 rounded-full bg-emerald-400/20 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-lime-400/15 blur-3xl"
-          aria-hidden
         />
 
-        <div className="relative mx-auto max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-10 lg:py-14">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-xl">
-              <VmcLogo href="/" height={64} />
-              <p className="mt-5 text-base leading-7 text-white/80">
-                Latest movies and series. No ads. Premium sends the file straight to Telegram.
-              </p>
-            </div>
-
-            <div className="grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-2">
-              <a
-                href={telegramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-2xl bg-[#2AABEE] px-4 py-4 text-white shadow-lg shadow-[#2AABEE]/25 transition hover:brightness-110"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20">
-                  <TelegramIcon className="h-6 w-6" />
-                </span>
-                <span className="min-w-0 text-left">
-                  <span className="block text-sm font-bold">Telegram</span>
-                  <span className="block text-xs text-white/85">Join updates</span>
-                </span>
-                <ArrowUpRight className="ml-auto h-4 w-4 opacity-70 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-4 text-black shadow-lg shadow-emerald-900/30 transition hover:brightness-110"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-black/10">
-                  <WhatsAppIcon className="h-6 w-6" />
-                </span>
-                <span className="min-w-0 text-left">
-                  <span className="block text-sm font-bold">WhatsApp</span>
-                  <span className="block text-xs text-black/70">Join the group</span>
-                </span>
-                <ArrowUpRight className="ml-auto h-4 w-4 opacity-70 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-            </div>
+        <div className="relative mx-auto grid max-w-screen-2xl gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(18rem,0.85fr)_minmax(32rem,1.15fr)] lg:px-10 lg:py-16">
+          <div className="max-w-md">
+          <VmcLogo href="/" height={58} />
+          <p className="mt-5 text-sm leading-7 text-white/58 sm:text-base">
+            A clean catalogue for movies and series, with verified downloads delivered directly through Telegram.
+          </p>
+          <div className="mt-7 flex flex-col gap-2 sm:flex-row">
+            <a href={getTelegramChannelUrl()} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-3 rounded-xl bg-[#2AABEE]/12 px-4 py-3 text-[#70cdff] ring-1 ring-[#2AABEE]/25 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#2AABEE]/18">
+              <TelegramIcon className="h-5 w-5" />
+              <span className="text-xs font-bold">Telegram updates</span>
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-60 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+            <a href={getWhatsAppGroupUrl()} target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-3 rounded-xl bg-[#25D366]/10 px-4 py-3 text-[#62e991] ring-1 ring-[#25D366]/20 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#25D366]/15">
+              <WhatsAppIcon className="h-5 w-5" />
+              <span className="text-xs font-bold">WhatsApp community</span>
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-60 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          </div>
           </div>
 
-          <nav className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2.5">
-            {NAV.map(({ label, href }, i) => (
-              <span key={href} className="inline-flex items-center gap-5">
-                {i > 0 && <span className="hidden h-1 w-1 rounded-full bg-emerald-400/50 sm:block" aria-hidden />}
-                <Link
-                  href={href}
-                  className="text-sm font-semibold text-white/75 transition hover:text-lime-300"
-                >
-                  {label}
-                </Link>
-              </span>
+          <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-8 gap-y-9 sm:grid-cols-3">
+            {FOOTER_GROUPS.map((group) => (
+              <div key={group.title}>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-300/75">{group.title}</p>
+                <ul className="mt-4 space-y-3.5">
+                  {group.links.map((link) => (
+                    <li key={link.label}>
+                      <Link href={link.href} className="text-sm font-medium text-white/55 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white">
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </nav>
+        </div>
 
-          <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-emerald-400/15 pt-6 sm:flex-row sm:items-center">
-            <p className="text-sm text-white/55">© {year} VMC — Vintage Movie Channel</p>
-            <p className="text-sm text-white/55">
-              Built by{" "}
-              <a
-                href="https://tobithedev.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-bold text-lime-300 underline decoration-lime-300/40 underline-offset-4 transition hover:text-lime-200"
-              >
-                tobithedev
-              </a>
-            </p>
-          </div>
+        <div className="relative mx-auto flex max-w-screen-2xl flex-col items-start justify-between gap-3 border-t border-emerald-300/[0.12] px-4 py-6 text-xs text-white/45 sm:flex-row sm:items-center sm:px-6 lg:px-10">
+          <p>© {year} VMC — Vintage Movie Channel</p>
+          <p>
+            Built by <a href="https://tobithedev.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-bold text-lime-300/80 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-lime-200">tobithedev</a>
+          </p>
         </div>
       </div>
     </footer>

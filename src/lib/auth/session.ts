@@ -68,6 +68,9 @@ export async function getSession(): Promise<{ user: SessionUser } | null> {
         role: user.role,
         premiumStatus,
         premiumExpiryDate: user.premiumExpiryDate?.toISOString() ?? null,
+        premiumSource: user.premiumSource ?? null,
+        welcomeTrialStartedAt: user.welcomeTrialStartedAt?.toISOString() ?? null,
+        welcomeTrialExpiryDate: user.welcomeTrialExpiryDate?.toISOString() ?? null,
       },
     };
   } catch {

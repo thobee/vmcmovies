@@ -3,25 +3,35 @@ import { ArrowLeft, Clock, FilmStrip, Star, Television } from "@phosphor-icons/r
 import CatalogImage from "@/components/ui/CatalogImage";
 import { resolvePosterImage } from "@/lib/catalog/image";
 import type { Content } from "@/lib/catalog/types";
-import type { PremiumStatus } from "@/lib/auth/types";
+import type { PremiumSource, PremiumStatus } from "@/lib/auth/types";
 import { genrePath } from "@/lib/catalog/genres";
 import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
 import DownloadPanel from "@/components/access/DownloadPanel";
+import TelegramDownloadTutorial from "@/components/access/TelegramDownloadTutorial";
 import RecommendedGrid from "@/components/media/RecommendedGrid";
 import QualityBadges from "@/components/media/QualityBadges";
 import PlotText from "@/components/media/PlotText";
 import ShareBar from "@/components/media/ShareBar";
+import { getTelegramBotUrl, getTelegramChannelUrl } from "@/lib/catalog/telegram";
+import { contentAccessKind } from "@/lib/catalog/access";
+import AccessBadge from "@/components/media/AccessBadge";
 
 export default function TitleView({
   item,
   recommended,
   premiumStatus,
+  premiumSource,
+  trialEligible,
+  trialDays,
   loggedIn,
 }: {
   item: Content;
   recommended: Content[];
   premiumStatus: PremiumStatus;
+  premiumSource: PremiumSource | null;
+  trialEligible: boolean;
+  trialDays: number;
   loggedIn: boolean;
 }) {
   const isSeries = item.type === "series";
@@ -29,6 +39,11 @@ export default function TitleView({
   const browseLabel = isSeries ? "TV Shows" : "Movies";
   const seasonCount = item.seasons?.filter((s) => s.downloadUrl.trim()).length ?? 0;
   const poster = resolvePosterImage(item.posterImageUrl, item.backdropImageUrl);
+  const channelUrl = getTelegramChannelUrl();
+  const botUrl = getTelegramBotUrl();
+  const accessKind = contentAccessKind(item);
+  const hasDownloadAccess =
+    loggedIn && (accessKind !== "premium" || premiumStatus === "active");
 
   return (
     <SitePage glow={false}>
@@ -76,6 +91,7 @@ export default function TitleView({
 
             <div className="min-w-0">
               <div className="mb-3 flex flex-wrap items-center gap-2">
+                <AccessBadge kind={accessKind} className="min-h-6 px-2.5 text-[9px]" />
                 <span className="rounded-full bg-emerald-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-black">
                   {isSeries ? "Series" : "Movie"}
                 </span>
@@ -135,13 +151,40 @@ export default function TitleView({
                 <div className="min-w-0 w-full max-w-xl">
                   <DownloadPanel
                     premiumStatus={premiumStatus}
+                    premiumSource={premiumSource}
+                    accessKind={accessKind}
+                    trialEligible={trialEligible}
+                    trialDays={trialDays}
                     loggedIn={loggedIn}
-                    movieDownloadUrl={premiumStatus === "active" ? item.downloadUrl : undefined}
-                    seasons={premiumStatus === "active" ? item.seasons : undefined}
+                    movieDownloadUrl={hasDownloadAccess ? item.downloadUrl : undefined}
+                    seasons={hasDownloadAccess ? item.seasons : undefined}
                   />
                 </div>
-                <div className="w-full max-w-xl xl:max-w-xs xl:shrink-0">
-                  <ShareBar item={item} />
+                <div className="w-full max-w-xl space-y-4 xl:max-w-xs xl:shrink-0">
+                  <aside className="rounded-[24px] bg-white/[0.035] p-1.5 ring-1 ring-inset ring-white/[0.08]">
+                    <div className="rounded-[18px] border border-white/[0.07] bg-black/25 p-4 sm:p-5">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#2AABEE]">
+                        Telegram help
+                      </p>
+                      <h2
+                        className="mt-1.5 text-lg font-bold text-white"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
+                        First download?
+                      </h2>
+                      <p className="mt-1.5 text-sm leading-6 text-white/55">
+                        Follow the steps for iPhone, iPad, or Android.
+                      </p>
+                      <TelegramDownloadTutorial
+                        channelUrl={channelUrl}
+                        botUrl={botUrl}
+                        className="mt-4 w-full sm:w-full"
+                      />
+                    </div>
+                  </aside>
+                  <ShareBar
+                    item={{ id: item.id, slug: item.slug, type: item.type, title: item.title }}
+                  />
                 </div>
               </div>
             </div>

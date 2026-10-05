@@ -29,7 +29,12 @@ type NotificationItem = {
 };
 
 function kindIcon(kind: string) {
-  if (kind === "premium_expiring" || kind === "premium_expired" || kind === "premium_upsell") {
+  if (
+    kind === "trial_available" ||
+    kind === "premium_expiring" ||
+    kind === "premium_expired" ||
+    kind === "premium_upsell"
+  ) {
     return Crown;
   }
   if (kind === "movie") return FilmStrip;
@@ -79,11 +84,16 @@ export default function NotificationBell() {
   }, []);
 
   useEffect(() => {
-    setReadSet(readIds());
-    setMounted(true);
-    load();
+    const readyTimer = window.setTimeout(() => {
+      setReadSet(readIds());
+      setMounted(true);
+      void load();
+    }, 0);
     const timer = window.setInterval(load, 5 * 60 * 1000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearTimeout(readyTimer);
+      window.clearInterval(timer);
+    };
   }, [load]);
 
   useEffect(() => {
@@ -144,7 +154,7 @@ export default function NotificationBell() {
 
       {open && (
         <div
-          className="absolute right-0 top-[calc(100%+10px)] z-[70] w-[min(100vw-2rem,22rem)] overflow-hidden rounded-2xl border border-white/10 bg-[#101214] shadow-[0_20px_60px_rgba(0,0,0,0.55)] sm:w-80"
+          className="fixed inset-x-3 top-[88px] z-[70] max-h-[calc(100dvh-104px)] overflow-hidden rounded-2xl border border-white/10 bg-[#101214] shadow-[0_20px_60px_rgba(0,0,0,0.55)] sm:absolute sm:inset-x-auto sm:right-0 sm:top-[calc(100%+10px)] sm:w-80 sm:max-h-none"
         >
           <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3.5">
             <div>
@@ -179,7 +189,7 @@ export default function NotificationBell() {
           )}
 
           {!loading && items.length > 0 && (
-            <ul className="max-h-[min(60vh,380px)] overflow-y-auto">
+            <ul className="max-h-[calc(100dvh-220px)] overflow-y-auto sm:max-h-[min(60vh,380px)]">
               {items.map((item) => {
                 const Icon = kindIcon(item.kind);
                 const isUnread = !readSet.has(item.id);

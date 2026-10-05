@@ -28,6 +28,8 @@ const baseContentSchema = z.object({
   runtime: z.string().optional(),
   qualities: z.array(z.enum(QUALITY_OPTIONS)).optional(),
   featured: z.boolean().optional(),
+  accessTier: z.enum(["free", "premium"]).optional(),
+  freeUntil: z.string().datetime().optional().or(z.literal("")),
 });
 
 export const movieInputSchema = baseContentSchema.extend({

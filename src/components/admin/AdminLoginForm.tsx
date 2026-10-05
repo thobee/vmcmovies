@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { Arc } from "@/components/loading-ui/arc";
 import AdminPasswordField from "@/components/admin/AdminPasswordField";
 
 type Step = "password" | "enroll" | "totp" | "recovery";
@@ -11,6 +14,7 @@ const fieldClass =
   "w-full rounded-xl field px-4 py-3 text-base sm:text-sm text-white placeholder:text-white/25 focus:border-[var(--amber)]/50 focus:outline-none";
 
 export default function AdminLoginForm() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +26,14 @@ export default function AdminLoginForm() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const busy = loading || navigating;
+
+  const openAdmin = () => {
+    setNavigating(true);
+    router.push("/admin");
+    router.refresh();
+  };
 
   const resetToPassword = () => {
     setStep("password");
@@ -43,6 +55,7 @@ export default function AdminLoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    let submitted = false;
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
@@ -65,11 +78,14 @@ export default function AdminLoginForm() {
         setStep("totp");
         return;
       }
-      window.location.assign("/admin");
+      submitted = true;
+      openAdmin();
     } catch {
       setError("Network error");
     } finally {
-      setLoading(false);
+      if (!submitted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -77,6 +93,7 @@ export default function AdminLoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    let submitted = false;
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
@@ -94,11 +111,14 @@ export default function AdminLoginForm() {
         setStep("recovery");
         return;
       }
-      window.location.assign("/admin");
+      submitted = true;
+      openAdmin();
     } catch {
       setError("Network error");
     } finally {
-      setLoading(false);
+      if (!submitted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -108,7 +128,7 @@ export default function AdminLoginForm() {
       setError("Tick the box after you save the codes.");
       return;
     }
-    window.location.assign("/admin");
+    openAdmin();
   };
 
   return (
@@ -161,10 +181,12 @@ export default function AdminLoginForm() {
           </div>
           <button
             type="submit"
-            disabled={loading}
-            className={cn("btn-pill btn-pill-primary w-full py-3.5", loading && "opacity-60 cursor-not-allowed")}
+            disabled={busy}
+            aria-busy={busy}
+            className={cn("btn-pill btn-pill-primary w-full gap-2 py-3.5", busy && "opacity-70 cursor-wait")}
           >
-            {loading ? "Checking…" : "Continue"}
+            {busy && <Arc className="size-4 border-[2px]" />}
+            {navigating ? "Opening admin..." : loading ? "Checking..." : "Continue"}
           </button>
         </>
       )}
@@ -176,12 +198,13 @@ export default function AdminLoginForm() {
             it shows.
           </p>
           {qrDataUrl && (
-            <img
+            <Image
               src={qrDataUrl}
               alt="Authenticator QR code"
               className="mx-auto rounded-xl bg-white p-2"
               width={220}
               height={220}
+              unoptimized
             />
           )}
           <div>
@@ -193,10 +216,12 @@ export default function AdminLoginForm() {
           <CodeField code={code} onChange={setCode} />
           <button
             type="submit"
-            disabled={loading}
-            className={cn("btn-pill btn-pill-primary w-full py-3.5", loading && "opacity-60 cursor-not-allowed")}
+            disabled={busy}
+            aria-busy={busy}
+            className={cn("btn-pill btn-pill-primary w-full gap-2 py-3.5", busy && "opacity-70 cursor-wait")}
           >
-            {loading ? "Verifying…" : "Verify and continue"}
+            {busy && <Arc className="size-4 border-[2px]" />}
+            {navigating ? "Opening admin..." : loading ? "Verifying..." : "Verify and continue"}
           </button>
           <button
             type="button"
@@ -244,10 +269,12 @@ export default function AdminLoginForm() {
           </button>
           <button
             type="submit"
-            disabled={loading}
-            className={cn("btn-pill btn-pill-primary w-full py-3.5", loading && "opacity-60 cursor-not-allowed")}
+            disabled={busy}
+            aria-busy={busy}
+            className={cn("btn-pill btn-pill-primary w-full gap-2 py-3.5", busy && "opacity-70 cursor-wait")}
           >
-            {loading ? "Verifying…" : "Sign in"}
+            {busy && <Arc className="size-4 border-[2px]" />}
+            {navigating ? "Opening admin..." : loading ? "Verifying..." : "Sign in"}
           </button>
           <button
             type="button"
@@ -283,13 +310,15 @@ export default function AdminLoginForm() {
           </label>
           <button
             type="submit"
-            disabled={loading || !saved}
+            disabled={busy || !saved}
+            aria-busy={busy}
             className={cn(
-              "btn-pill btn-pill-primary w-full py-3.5",
-              (loading || !saved) && "opacity-60 cursor-not-allowed",
+              "btn-pill btn-pill-primary w-full gap-2 py-3.5",
+              busy ? "opacity-70 cursor-wait" : !saved && "opacity-60 cursor-not-allowed",
             )}
           >
-            {loading ? "Opening…" : "Open dashboard"}
+            {busy && <Arc className="size-4 border-[2px]" />}
+            {busy ? "Opening admin..." : "Open dashboard"}
           </button>
         </>
       )}

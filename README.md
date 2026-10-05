@@ -1,4 +1,4 @@
-# VMC — Vintage Movie Channel
+# VMC Vintage Movie Channel
 
 VMC is a movie and series catalog app built for a premium media experience. It combines a browsable storefront, user accounts, premium access flows, and admin tooling for managing catalog content, homepage sections, and access requests without exposing the app internals to the public.
 

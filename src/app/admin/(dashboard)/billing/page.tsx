@@ -11,8 +11,8 @@ export default async function AdminBillingPage() {
   return (
     <div>
       <AdminPageHeader
-        title="Billing & promos"
-        subtitle="Change prices, launch offer, plan promos, and welcome copy — no deploy needed."
+        title="Billing & access"
+        subtitle="Manage plan prices, the launch trial window, discounts, and member welcome copy."
       />
       <BillingEditor />
     </div>

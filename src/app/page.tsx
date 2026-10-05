@@ -1,3 +1,6 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+import { ArrowRight, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import {
   getFeaturedContent,
   getMovies,
@@ -17,28 +20,93 @@ import ContentRail from "@/components/home/ContentRail";
 import PremiumBanner from "@/components/access/PremiumBanner";
 import VmcBrandBanner from "@/components/home/VmcBrandBanner";
 import WhyVmcSection from "@/components/home/WhyVmcSection";
+import { getBillingConfig } from "@/lib/payments/billing/db";
+import { buildResolvedPlans, isWelcomeTrialWindowActive } from "@/lib/payments/billing/resolve";
+import { toPublicContent } from "@/lib/catalog/public";
+import { getAppUrl } from "@/lib/payments/app-url";
+
+export const metadata: Metadata = {
+  title: "Download Movies & Series on Telegram | VMC",
+  description:
+    "Browse a clean catalogue of movies and TV series, see Free or Premium access upfront, and receive verified downloads directly through Telegram.",
+  keywords: [
+    "movie downloads",
+    "TV series downloads",
+    "Telegram movie downloads",
+    "VMC movies",
+    "Nigerian movie download service",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "VMC — Movies and Series Delivered on Telegram",
+    description:
+      "Browse without ads, choose Free or Premium, and receive verified movie and series downloads through Telegram.",
+    url: "/",
+    siteName: "VMC — Vintage Movie Channel",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "VMC — Movies and Series Delivered on Telegram",
+    description: "A clean catalogue with verified downloads delivered through Telegram.",
+  },
+};
 
 export const revalidate = 120;
 
 export default async function HomePage() {
-  const [featured, movies, series, homepage] = await Promise.all([
+  const [featured, movies, series, homepage, billing] = await Promise.all([
     getFeaturedContent(),
     getMovies(),
     getSeriesList(),
     getHomepageSettings(),
+    getBillingConfig(),
   ]);
 
   const titles = homepage.sectionTitles;
 
-  const trendingMovies = movies.slice(0, HOMEPAGE_RAIL_LIMIT);
-  const popularSeries = series.slice(0, HOMEPAGE_RAIL_LIMIT);
-  const recentlyAdded = sortByNewest([...movies, ...series]).slice(0, HOMEPAGE_RAIL_LIMIT);
-  const topRated = sortByRating(movies).slice(0, HOMEPAGE_RAIL_LIMIT);
-  const catalog = [...movies, ...series];
+  const publicMovies = movies.map(toPublicContent);
+  const publicSeries = series.map(toPublicContent);
+  const trendingMovies = publicMovies.slice(0, HOMEPAGE_RAIL_LIMIT);
+  const popularSeries = publicSeries.slice(0, HOMEPAGE_RAIL_LIMIT);
+  const recentlyAdded = sortByNewest([...publicMovies, ...publicSeries]).slice(0, HOMEPAGE_RAIL_LIMIT);
+  const topRated = sortByRating(publicMovies).slice(0, HOMEPAGE_RAIL_LIMIT);
+  const catalog = [...publicMovies, ...publicSeries];
   const heroFallback = featured ?? catalog[0] ?? null;
+  const trialActive = isWelcomeTrialWindowActive(billing);
+  const appUrl = getAppUrl();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${appUrl}/#organization`,
+        name: "VMC — Vintage Movie Channel",
+        url: appUrl,
+        logo: `${appUrl}/brand/icon-512.png`,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${appUrl}/#website`,
+        name: "VMC — Vintage Movie Channel",
+        url: appUrl,
+        description: "A movie and series catalogue with verified downloads delivered through Telegram.",
+        publisher: { "@id": `${appUrl}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${appUrl}/search?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
 
   return (
     <SitePage className="overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       {heroFallback ? (
         <FeaturedStrip
           slides={homepage.slides}
@@ -65,6 +133,31 @@ export default async function HomePage() {
         </section>
       )}
 
+      {trialActive && (
+        <section className="px-4 pt-5 sm:px-6 lg:px-10">
+          <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 border-y border-emerald-300/15 bg-emerald-400/[0.055] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="flex min-w-0 items-start gap-3">
+              <Sparkle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" weight="fill" />
+              <div>
+                <p className="text-sm font-bold text-emerald-200">
+                  {billing.welcomeTrial.bannerTitle}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/55 sm:text-sm">
+                  New members can activate {billing.welcomeTrial.durationDays} days of Premium from their first Premium download. No card required.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/signup"
+              className="group inline-flex shrink-0 items-center gap-2 text-sm font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
+            >
+              Create account
+              <ArrowRight className="h-4 w-4 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1" weight="bold" />
+            </Link>
+          </div>
+        </section>
+      )}
+
       <div className="flex flex-col gap-12 pt-10 pb-6 sm:gap-14 sm:pt-12">
         <ContentRail title={titles.trendingMovies} items={trendingMovies} viewAllHref="/movies" />
         <ContentRail title={titles.popularSeries} items={popularSeries} viewAllHref="/series" />
@@ -76,7 +169,18 @@ export default async function HomePage() {
 
       <HowItWorks />
       <VmcBrandBanner />
-      <PremiumBanner />
+      <PremiumBanner
+        plans={buildResolvedPlans(billing, "NGN")}
+        trial={
+          trialActive
+            ? {
+                title: billing.welcomeTrial.bannerTitle,
+                body: billing.welcomeTrial.bannerBody,
+                days: billing.welcomeTrial.durationDays,
+              }
+            : null
+        }
+      />
       <WhyVmcSection />
       <Footer />
     </SitePage>

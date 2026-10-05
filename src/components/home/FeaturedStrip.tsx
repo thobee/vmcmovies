@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
-import { DownloadSimple, Info } from "@phosphor-icons/react";
+import { AnimatePresence, motion } from "motion/react";
+import { CaretLeft, CaretRight, DownloadSimple, Info } from "@phosphor-icons/react";
 import type { Content } from "@/lib/catalog/types";
 import type { HeroSlide } from "@/lib/site/types";
 import { contentDetailPath } from "@/lib/catalog/paths";
@@ -25,6 +25,18 @@ type Featured = {
   rating?: string;
   qualities?: Content["qualities"];
   type?: Content["type"];
+};
+
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    opacity: 0.7,
+  }),
+  center: { x: 0, opacity: 1 },
+  exit: (direction: number) => ({
+    x: direction > 0 ? "-100%" : "100%",
+    opacity: 0.7,
+  }),
 };
 
 function fromContent(item: Content): Featured {
@@ -95,11 +107,24 @@ export default function FeaturedStrip({
       : [fromContent(fallback)];
 
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
   const active = items[index] ?? items[0];
 
   const next = useCallback(() => {
+    setDirection(1);
     setIndex((i) => (i + 1) % items.length);
   }, [items.length]);
+
+  const previous = useCallback(() => {
+    setDirection(-1);
+    setIndex((i) => (i - 1 + items.length) % items.length);
+  }, [items.length]);
+
+  const goTo = (nextIndex: number) => {
+    if (nextIndex === index) return;
+    setDirection(nextIndex > index ? 1 : -1);
+    setIndex(nextIndex);
+  };
 
   useEffect(() => {
     if (items.length <= 1) return;
@@ -116,27 +141,28 @@ export default function FeaturedStrip({
       <div className="bezel-outer relative mx-auto max-w-screen-2xl">
         <div className="bezel-inner relative overflow-hidden border border-white/[0.08] bg-[#0a0a0a] shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.06)]">
           <div className="relative isolate min-h-[clamp(300px,58vw,480px)] w-full">
-            {items.map((item, i) => (
-              <div
-                key={item.id}
-                className="absolute inset-0 z-0 transition-opacity duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
-                style={{
-                  opacity: i === index ? 1 : 0,
-                  pointerEvents: i === index ? "auto" : "none",
-                }}
-                aria-hidden={i !== index}
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={active.id}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.72, ease: [0.32, 0.72, 0, 1] }}
+                className="absolute inset-0 z-0"
               >
                 <CatalogImage
-                  src={item.heroSrc}
-                  fallback={item.heroFallback}
+                  src={active.heroSrc}
+                  fallback={active.heroFallback}
                   alt=""
                   fill
-                  priority={i === 0}
+                  priority
                   sizes="(max-width: 1536px) 100vw, 1536px"
                   className="object-cover object-[center_22%]"
                 />
-              </div>
-            ))}
+              </motion.div>
+            </AnimatePresence>
 
             <div
               className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-black/90 via-black/48 to-black/5"
@@ -155,8 +181,8 @@ export default function FeaturedStrip({
               <div className="grid w-full items-end gap-7 md:grid-cols-[minmax(0,1fr)_minmax(13rem,18rem)] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]">
                 <motion.div
                   key={`${active.id}-copy`}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: direction > 0 ? 22 : -22 }}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
                   className="min-w-0 max-w-2xl pb-0.5"
                 >
@@ -197,20 +223,43 @@ export default function FeaturedStrip({
                     </Link>
                   </div>
                   {items.length > 1 && (
-                    <div className="mt-5 flex items-center gap-1.5">
-                      {items.map((item, i) => (
+                    <div className="mt-5 flex items-center gap-3">
+                      <div className="flex items-center gap-1.5" aria-label="Featured titles">
+                        {items.map((item, i) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            aria-label={`Show ${item.title}`}
+                            aria-current={i === index ? "true" : undefined}
+                            onClick={() => goTo(i)}
+                            className={
+                              i === index
+                                ? "h-1.5 w-6 rounded-full bg-emerald-400 transition-all"
+                                : "h-1.5 w-1.5 rounded-full bg-white/25 transition-all hover:bg-white/50"
+                            }
+                          />
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1">
                         <button
-                          key={item.id}
                           type="button"
-                          aria-label={`Show ${item.title}`}
-                          onClick={() => setIndex(i)}
-                          className={
-                            i === index
-                              ? "h-1.5 w-6 rounded-full bg-emerald-400"
-                              : "h-1.5 w-1.5 rounded-full bg-white/25 hover:bg-white/50"
-                          }
-                        />
-                      ))}
+                          onClick={previous}
+                          aria-label="Previous featured title"
+                          title="Previous"
+                          className="grid h-8 w-8 place-items-center rounded-full border border-white/12 bg-black/30 text-white/65 backdrop-blur transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+                        >
+                          <CaretLeft className="h-4 w-4" weight="bold" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={next}
+                          aria-label="Next featured title"
+                          title="Next"
+                          className="grid h-8 w-8 place-items-center rounded-full border border-white/12 bg-black/30 text-white/65 backdrop-blur transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+                        >
+                          <CaretRight className="h-4 w-4" weight="bold" />
+                        </button>
+                      </div>
                     </div>
                   )}
                 </motion.div>
@@ -223,7 +272,17 @@ export default function FeaturedStrip({
                   className="hidden justify-end md:flex"
                 >
                   <div className="relative w-[min(28vw,17rem)] lg:w-[min(25vw,20rem)]">
-                    <div className="absolute -right-4 top-5 h-full w-full rotate-3 rounded-[2rem] border border-emerald-300/15 bg-emerald-400/[0.08] shadow-[0_28px_70px_rgba(16,185,129,0.18)]" />
+                    <div className="absolute -right-4 top-5 h-full w-full rotate-3 overflow-hidden rounded-[2rem] border border-emerald-300/20 bg-[#101714] shadow-[0_28px_70px_rgba(16,185,129,0.18)]">
+                      <CatalogImage
+                        src={active.posterSrc ?? active.heroFallback ?? active.heroSrc}
+                        fallback={active.heroSrc || active.heroFallback}
+                        alt=""
+                        fill
+                        sizes="(max-width: 1024px) 28vw, 20rem"
+                        className="object-cover opacity-45"
+                      />
+                      <div className="absolute inset-0 bg-emerald-950/35" aria-hidden />
+                    </div>
                     <div className="bezel-outer relative p-1.5">
                       <div className="bezel-inner relative aspect-[2/3] overflow-hidden border border-white/10 bg-black shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]">
                         <CatalogImage

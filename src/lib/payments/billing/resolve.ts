@@ -1,59 +1,69 @@
+import { findUserById } from "@/lib/auth/users";
+import type { User } from "@/lib/auth/types";
 import { formatMoney, type PaymentCurrency } from "@/lib/payments/currency";
 import { PLANS, type PlanId } from "@/lib/payments/plans";
+import { userHasSuccessfulPayment } from "@/lib/payments/records";
 import { getBillingConfig } from "./db";
 import type {
   BillingConfig,
   BillingPlansResponse,
-  PricingKind,
   ResolvedPlanOffer,
   ResolvedPlanPrice,
 } from "./types";
-import { userHasSuccessfulPayment } from "@/lib/payments/records";
 
-const PLAN_ORDER: PlanId[] = ["monthly", "quarterly", "biannual"];
+const PLAN_ORDER: PlanId[] = ["monthly", "quarterly", "biannual", "yearly"];
 
 function displayToMinor(display: number): number {
   return Math.round(display * 100);
 }
 
-function promoActive(promo: BillingConfig["planPromos"][PlanId], now: Date): boolean {
-  if (!promo.enabled) return false;
-  if (!promo.endsAt) return true;
-  const end = new Date(promo.endsAt);
-  return !Number.isNaN(end.getTime()) && end > now;
+function validDate(value: string | null): Date | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function isLaunchOfferWindowActive(config: BillingConfig, now = new Date()): boolean {
-  if (!config.launchOffer.enabled) return false;
-  if (!config.launchOffer.endsAt) return true;
-  const end = new Date(config.launchOffer.endsAt);
-  return !Number.isNaN(end.getTime()) && end > now;
+function promoActive(promo: BillingConfig["planPromos"][PlanId], now: Date): boolean {
+  if (!promo.enabled) return false;
+  const end = validDate(promo.endsAt);
+  return !promo.endsAt || (end !== null && end > now);
+}
+
+export function isWelcomeTrialWindowActive(config: BillingConfig, now = new Date()): boolean {
+  if (!config.welcomeTrial.enabled) return false;
+  const start = validDate(config.welcomeTrial.startsAt);
+  const end = validDate(config.welcomeTrial.endsAt);
+  if (!start || !end) return false;
+  return start <= now && end > now;
+}
+
+export function isUserEligibleForWelcomeTrial(
+  config: BillingConfig,
+  user: Pick<User, "createdAt" | "welcomeTrialStartedAt" | "premiumStatus">,
+  hasPaid: boolean,
+  now = new Date(),
+): boolean {
+  const start = validDate(config.welcomeTrial.startsAt);
+  return Boolean(
+    isWelcomeTrialWindowActive(config, now) &&
+      start &&
+      user.createdAt >= start &&
+      !user.welcomeTrialStartedAt &&
+      !hasPaid &&
+      user.premiumStatus !== "active" &&
+      user.premiumStatus !== "pending",
+  );
 }
 
 export function resolvePlanPrice(
   config: BillingConfig,
   planId: PlanId,
   currency: PaymentCurrency,
-  opts: { launchEligible: boolean; now?: Date },
+  opts: { now?: Date } = {},
 ): ResolvedPlanPrice {
   const now = opts.now ?? new Date();
-
-  if (
-    planId === "monthly" &&
-    opts.launchEligible &&
-    isLaunchOfferWindowActive(config, now)
-  ) {
-    const display = config.launchOffer.monthlyPrice[currency];
-    return {
-      planId,
-      display,
-      amountMinor: displayToMinor(display),
-      pricingKind: "launch",
-      isLaunchMonthly: true,
-    };
-  }
-
   const promo = config.planPromos[planId];
+
   if (promoActive(promo, now) && promo.prices[currency] > 0) {
     const display = promo.prices[currency];
     return {
@@ -74,35 +84,19 @@ export function resolvePlanPrice(
   };
 }
 
-function savingsLabel(
-  planId: PlanId,
-  currency: PaymentCurrency,
-  config: BillingConfig,
-): string | undefined {
-  const plan = PLANS[planId];
-  const monthly = config.plans.monthly[currency];
-  const price = config.plans[planId][currency];
-  const full = monthly * plan.months;
-  const saved = full - price;
-  if (saved <= 0) return undefined;
-  return `Save ${formatMoney(saved, currency)}`;
+function savingsLabel(planId: PlanId, currency: PaymentCurrency, config: BillingConfig) {
+  const full = config.plans.monthly[currency] * PLANS[planId].months;
+  const saved = full - config.plans[planId][currency];
+  return saved > 0 ? `Save ${formatMoney(saved, currency)}` : undefined;
 }
 
 export function buildResolvedPlans(
   config: BillingConfig,
   currency: PaymentCurrency,
-  launchEligible: boolean,
 ): ResolvedPlanOffer[] {
   return PLAN_ORDER.map((id) => {
     const plan = PLANS[id];
-    const resolved = resolvePlanPrice(config, id, currency, { launchEligible });
-    const badge = resolved.isLaunchMonthly ? "Launch price" : plan.badge;
-
-    let footnote: string | undefined;
-    if (resolved.isLaunchMonthly) {
-      footnote = config.launchOffer.disclosure[currency];
-    }
-
+    const resolved = resolvePlanPrice(config, id, currency);
     return {
       id,
       name: plan.name,
@@ -110,10 +104,9 @@ export function buildResolvedPlans(
       display: resolved.display,
       amountMinor: resolved.amountMinor,
       pricingKind: resolved.pricingKind,
-      badge,
+      badge: plan.badge,
       savings: id === "monthly" ? undefined : { [currency]: savingsLabel(id, currency, config) },
       promoLabel: resolved.promoLabel,
-      footnote,
     };
   });
 }
@@ -123,62 +116,37 @@ export async function getBillingPlansForUser(
   currency: PaymentCurrency,
 ): Promise<BillingPlansResponse> {
   const config = await getBillingConfig();
-  const launchEligible = userId
-    ? !(await userHasSuccessfulPayment(userId))
-    : false;
-  const launchActive = isLaunchOfferWindowActive(config);
+  const active = isWelcomeTrialWindowActive(config);
+  let eligible = false;
 
-  const usedLaunch =
-    userId && launchEligible === false
-      ? await userUsedLaunchOffer(userId)
-      : false;
+  if (userId && active) {
+    const [user, hasPaid] = await Promise.all([
+      findUserById(userId),
+      userHasSuccessfulPayment(userId),
+    ]);
+    eligible = Boolean(user && isUserEligibleForWelcomeTrial(config, user, hasPaid));
+  }
 
   return {
     currency,
-    plans: buildResolvedPlans(config, currency, launchEligible),
-    launch: {
-      active: launchActive,
-      eligible: launchEligible && launchActive,
-      endsAt: config.launchOffer.endsAt,
-      bannerTitle: config.launchOffer.bannerTitle,
-      bannerBody: config.launchOffer.bannerBody,
-      disclosure: config.launchOffer.disclosure[currency],
-    },
-    launchYearlyUpsell: {
-      show: usedLaunch && config.launchYearlyUpsell.enabled,
-      message: config.launchYearlyUpsell.message[currency],
+    plans: buildResolvedPlans(config, currency),
+    trial: {
+      active,
+      eligible,
+      startsAt: config.welcomeTrial.startsAt,
+      endsAt: config.welcomeTrial.endsAt,
+      durationDays: config.welcomeTrial.durationDays,
+      bannerTitle: config.welcomeTrial.bannerTitle,
+      bannerBody: config.welcomeTrial.bannerBody,
     },
     welcome: config.welcome,
   };
 }
 
-async function userUsedLaunchOffer(userId: string): Promise<boolean> {
-  const { getPaymentsForUser } = await import("@/lib/payments/records");
-  const payments = await getPaymentsForUser(userId);
-  return payments.some((p) => p.status === "success" && p.pricingKind === "launch");
-}
-
 export async function resolveChargeForUser(
-  userId: string,
+  _userId: string,
   planId: PlanId,
   currency: PaymentCurrency,
 ): Promise<ResolvedPlanPrice> {
-  const config = await getBillingConfig();
-  const launchEligible = !(await userHasSuccessfulPayment(userId));
-
-  if (planId === "monthly" && launchEligible && isLaunchOfferWindowActive(config)) {
-    return resolvePlanPrice(config, planId, currency, { launchEligible: true });
-  }
-
-  if (planId === "monthly" && launchEligible && !isLaunchOfferWindowActive(config)) {
-    // Launch ended — first purchase uses standard monthly, not launch
-    return resolvePlanPrice(config, planId, currency, { launchEligible: false });
-  }
-
-  if (planId !== "monthly" && launchEligible) {
-    // Launch is monthly-only; longer plans use standard/promo pricing
-    return resolvePlanPrice(config, planId, currency, { launchEligible: false });
-  }
-
-  return resolvePlanPrice(config, planId, currency, { launchEligible });
+  return resolvePlanPrice(await getBillingConfig(), planId, currency);
 }

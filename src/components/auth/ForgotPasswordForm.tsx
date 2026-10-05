@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { At } from "@phosphor-icons/react";
 import AuthField from "@/components/auth/AuthField";
 import PasswordField from "@/components/auth/PasswordField";
+import { Arc } from "@/components/loading-ui/arc";
 import { cn } from "@/lib/cn";
 import HoneypotField from "@/components/security/HoneypotField";
 import {
@@ -14,6 +16,7 @@ import {
 } from "@/lib/validation/password";
 
 export default function ForgotPasswordForm() {
+  const router = useRouter();
   const [step, setStep] = useState<"request" | "reset">("request");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -22,6 +25,8 @@ export default function ForgotPasswordForm() {
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [pending, setPending] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const busy = pending || navigating;
 
   const sendCode = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,6 +68,7 @@ export default function ForgotPasswordForm() {
       return;
     }
     setPending(true);
+    let submitted = false;
     const website = String(new FormData(e.currentTarget).get("website") ?? "");
     try {
       const res = await fetch("/api/auth/forgot-password", {
@@ -75,11 +81,15 @@ export default function ForgotPasswordForm() {
         setError(data.error ?? "Couldn’t reset password");
         return;
       }
-      window.location.assign("/login?reset=1");
+      submitted = true;
+      setNavigating(true);
+      router.push("/login?reset=1");
     } catch {
       setError("Network error");
     } finally {
-      setPending(false);
+      if (!submitted) {
+        setPending(false);
+      }
     }
   };
 
@@ -115,10 +125,12 @@ export default function ForgotPasswordForm() {
           />
           <button
             type="submit"
-            disabled={pending}
-            className={cn("auth-btn w-full py-3.5", pending && "cursor-not-allowed opacity-60")}
+            disabled={busy}
+            aria-busy={busy}
+            className={cn("auth-btn min-h-12 w-full gap-2.5 py-3.5", busy && "cursor-wait opacity-80")}
           >
-            {pending ? "Sending…" : "Send code"}
+            {busy && <Arc className="size-4 border-[2px]" />}
+            <span>{busy ? "Sending code..." : "Send code"}</span>
           </button>
         </>
       ) : (
@@ -156,10 +168,12 @@ export default function ForgotPasswordForm() {
           />
           <button
             type="submit"
-            disabled={pending}
-            className={cn("auth-btn w-full py-3.5", pending && "cursor-not-allowed opacity-60")}
+            disabled={busy}
+            aria-busy={busy}
+            className={cn("auth-btn min-h-12 w-full gap-2.5 py-3.5", busy && "cursor-wait opacity-80")}
           >
-            {pending ? "Saving…" : "Update password"}
+            {busy && <Arc className="size-4 border-[2px]" />}
+            <span>{navigating ? "Opening sign in..." : busy ? "Saving password..." : "Update password"}</span>
           </button>
         </>
       )}

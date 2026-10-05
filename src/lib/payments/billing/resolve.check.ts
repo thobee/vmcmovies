@@ -1,30 +1,30 @@
 import { DEFAULT_BILLING_CONFIG } from "./defaults";
-import { isLaunchOfferWindowActive, resolvePlanPrice } from "./resolve";
+import {
+  isUserEligibleForWelcomeTrial,
+  isWelcomeTrialWindowActive,
+  resolvePlanPrice,
+} from "./resolve";
 
-const config = DEFAULT_BILLING_CONFIG;
+const config = {
+  ...DEFAULT_BILLING_CONFIG,
+  welcomeTrial: {
+    ...DEFAULT_BILLING_CONFIG.welcomeTrial,
+    enabled: true,
+    startsAt: "2026-10-01T00:00:00.000Z",
+    endsAt: "2026-11-01T00:00:00.000Z",
+  },
+};
+const now = new Date("2026-10-04T12:00:00.000Z");
 
-const launch = resolvePlanPrice(config, "monthly", "NGN", { launchEligible: true });
-if (launch.display !== 700 || launch.pricingKind !== "launch") {
-  throw new Error("launch price mismatch");
-}
-
-const standard = resolvePlanPrice(config, "monthly", "NGN", { launchEligible: false });
-if (standard.display !== 1000) {
-  throw new Error("standard monthly mismatch");
-}
-
-const quarterly = resolvePlanPrice(config, "quarterly", "NGN", { launchEligible: false });
-if (quarterly.display !== 2500) {
-  throw new Error("quarterly price mismatch");
-}
-
-const biannual = resolvePlanPrice(config, "biannual", "NGN", { launchEligible: false });
-if (biannual.display !== 4500) {
-  throw new Error("biannual price mismatch");
-}
-
-if (!isLaunchOfferWindowActive(config)) {
-  throw new Error("launch should be active by default");
-}
+if (resolvePlanPrice(config, "monthly", "NGN").display !== 1000) throw new Error("monthly price mismatch");
+if (resolvePlanPrice(config, "quarterly", "NGN").display !== 2800) throw new Error("quarterly price mismatch");
+if (resolvePlanPrice(config, "biannual", "NGN").display !== 5200) throw new Error("biannual price mismatch");
+if (resolvePlanPrice(config, "yearly", "NGN").display !== 9600) throw new Error("yearly price mismatch");
+if (!isWelcomeTrialWindowActive(config, now)) throw new Error("trial window mismatch");
+if (!isUserEligibleForWelcomeTrial(config, {
+  createdAt: new Date("2026-10-02T00:00:00.000Z"),
+  welcomeTrialStartedAt: null,
+  premiumStatus: "none",
+}, false, now)) throw new Error("trial eligibility mismatch");
 
 console.log("billing.resolve.check ok");

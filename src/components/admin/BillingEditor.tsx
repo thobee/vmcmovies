@@ -44,6 +44,7 @@ export default function BillingEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
     void (async () => {
@@ -55,6 +56,7 @@ export default function BillingEditor() {
       } catch {
         setError("Network error");
       } finally {
+        setCurrentTime(Date.now());
         setLoading(false);
       }
     })();
@@ -77,6 +79,7 @@ export default function BillingEditor() {
         return;
       }
       setConfig(data.config);
+      setCurrentTime(Date.now());
       toast({ title: "Billing saved", message: "Prices and promos are live immediately." });
     } catch {
       setError("Network error");
@@ -97,9 +100,26 @@ export default function BillingEditor() {
     return <p className="text-sm text-red-300">{error || "Billing config unavailable"}</p>;
   }
 
+  const trialStart = config.welcomeTrial.startsAt
+    ? new Date(config.welcomeTrial.startsAt).getTime()
+    : Number.NaN;
+  const trialEnd = config.welcomeTrial.endsAt
+    ? new Date(config.welcomeTrial.endsAt).getTime()
+    : Number.NaN;
+  const now = currentTime;
+  const trialState = !config.welcomeTrial.enabled
+    ? { label: "Campaign off", detail: "Turn on the switch below and save to publish it.", live: false }
+    : Number.isNaN(trialStart) || Number.isNaN(trialEnd)
+      ? { label: "Dates required", detail: "Add a valid start and end date.", live: false }
+      : now < trialStart
+        ? { label: "Scheduled", detail: "The campaign will appear when the start time arrives.", live: false }
+        : now >= trialEnd
+          ? { label: "Campaign ended", detail: "Choose a future end date to reopen it.", live: false }
+          : { label: "Live now", detail: "Eligible new members can see and activate the offer.", live: true };
+
   return (
     <div className="space-y-6">
-      <FormSection title="Standard prices" hint="Used after launch offer ends. Changes apply instantly at checkout.">
+      <FormSection title="Premium prices" hint="One-time plans with no automatic renewal. Changes apply instantly at checkout.">
         <NgnPriceInput
           label="Monthly"
           value={config.plans.monthly}
@@ -115,31 +135,97 @@ export default function BillingEditor() {
           value={config.plans.biannual}
           onChange={(v) => setConfig({ ...config, plans: { ...config.plans, biannual: v } })}
         />
+        <NgnPriceInput
+          label="12 months"
+          value={config.plans.yearly}
+          onChange={(v) => setConfig({ ...config, plans: { ...config.plans, yearly: v } })}
+        />
       </FormSection>
 
       <FormSection
-        title="Launch offer"
-        hint="First paid plan only · monthly · one per account. Turn off or set an end date when the launch ends."
+        title="New-member launch trial"
+        hint="Only accounts created inside this date window can activate the trial. Their access continues for the full duration even after the campaign closes."
       >
-        <CheckRow
-          checked={config.launchOffer.enabled}
-          onChange={(checked) =>
-            setConfig({ ...config, launchOffer: { ...config.launchOffer, enabled: checked } })
+        <div
+          className={
+            trialState.live
+              ? "flex items-center justify-between gap-4 rounded-xl bg-emerald-400/[0.09] px-4 py-3 ring-1 ring-inset ring-emerald-300/20"
+              : "flex items-center justify-between gap-4 rounded-xl bg-amber-400/[0.07] px-4 py-3 ring-1 ring-inset ring-amber-300/15"
           }
         >
-          Launch offer enabled
+          <div>
+            <p className={trialState.live ? "text-sm font-bold text-emerald-200" : "text-sm font-bold text-amber-200"}>
+              {trialState.label}
+            </p>
+            <p className="mt-0.5 text-xs leading-5 text-white/50">{trialState.detail}</p>
+          </div>
+          <span
+            className={
+              trialState.live
+                ? "h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.7)]"
+                : "h-2.5 w-2.5 shrink-0 rounded-full bg-amber-300"
+            }
+            aria-hidden
+          />
+        </div>
+        <div className="rounded-xl bg-emerald-400/[0.07] px-4 py-3 text-sm leading-6 text-emerald-100 ring-1 ring-inset ring-emerald-300/15">
+          <span className="font-bold">Recommended launch setup:</span> offer 7 free days and keep the campaign open for 4–6 weeks. The trial begins when an eligible member opens their first Premium download.
+        </div>
+        <CheckRow
+          checked={config.welcomeTrial.enabled}
+          onChange={(checked) =>
+            setConfig({ ...config, welcomeTrial: { ...config.welcomeTrial, enabled: checked } })
+          }
+        >
+          Welcome trial enabled
         </CheckRow>
-        <FormField label="Offer ends (optional)">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField label="Campaign starts" required>
+            <input
+              className={inputClass}
+              type="datetime-local"
+              value={config.welcomeTrial.startsAt?.slice(0, 16) ?? ""}
+              onChange={(e) =>
+                setConfig({
+                  ...config,
+                  welcomeTrial: {
+                    ...config.welcomeTrial,
+                    startsAt: e.target.value ? new Date(e.target.value).toISOString() : null,
+                  },
+                })
+              }
+            />
+          </FormField>
+          <FormField label="Campaign ends" required>
+            <input
+              className={inputClass}
+              type="datetime-local"
+              value={config.welcomeTrial.endsAt?.slice(0, 16) ?? ""}
+              onChange={(e) =>
+                setConfig({
+                  ...config,
+                  welcomeTrial: {
+                    ...config.welcomeTrial,
+                    endsAt: e.target.value ? new Date(e.target.value).toISOString() : null,
+                  },
+                })
+              }
+            />
+          </FormField>
+        </div>
+        <FormField label="Free Premium duration (days)" hint="Seven days is recommended for launch.">
           <input
             className={inputClass}
-            type="datetime-local"
-            value={config.launchOffer.endsAt?.slice(0, 16) ?? ""}
+            type="number"
+            min={1}
+            max={30}
+            value={config.welcomeTrial.durationDays}
             onChange={(e) =>
               setConfig({
                 ...config,
-                launchOffer: {
-                  ...config.launchOffer,
-                  endsAt: e.target.value ? new Date(e.target.value).toISOString() : null,
+                welcomeTrial: {
+                  ...config.welcomeTrial,
+                  durationDays: Number(e.target.value),
                 },
               })
             }
@@ -148,54 +234,41 @@ export default function BillingEditor() {
         <FormField label="Banner title">
           <input
             className={inputClass}
-            value={config.launchOffer.bannerTitle}
+            value={config.welcomeTrial.bannerTitle}
             onChange={(e) =>
               setConfig({
                 ...config,
-                launchOffer: { ...config.launchOffer, bannerTitle: e.target.value },
+                welcomeTrial: { ...config.welcomeTrial, bannerTitle: e.target.value },
               })
             }
           />
         </FormField>
         <FormField label="Banner body">
-          <input
-            className={inputClass}
-            value={config.launchOffer.bannerBody}
-            onChange={(e) =>
-              setConfig({
-                ...config,
-                launchOffer: { ...config.launchOffer, bannerBody: e.target.value },
-              })
-            }
-          />
-        </FormField>
-        <NgnPriceInput
-          label="Launch monthly price"
-          value={config.launchOffer.monthlyPrice}
-          onChange={(v) =>
-            setConfig({ ...config, launchOffer: { ...config.launchOffer, monthlyPrice: v } })
-          }
-        />
-        <FormField label="Disclosure — use “continues at”, not “renews at”">
           <textarea
             className={inputClass}
             rows={2}
-            value={config.launchOffer.disclosure.NGN}
+            value={config.welcomeTrial.bannerBody}
             onChange={(e) =>
               setConfig({
                 ...config,
-                launchOffer: {
-                  ...config.launchOffer,
-                  disclosure: { ...config.launchOffer.disclosure, NGN: e.target.value, GHS: "" },
-                },
+                welcomeTrial: { ...config.welcomeTrial, bannerBody: e.target.value },
               })
             }
           />
         </FormField>
+        <button
+          type="button"
+          onClick={() => void save()}
+          disabled={saving}
+          className={primaryBtnClass}
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Save launch trial
+        </button>
       </FormSection>
 
       <FormSection title="Plan promos" hint="Optional time-boxed discounts on any plan (overrides standard price).">
-        {(["monthly", "quarterly", "biannual"] as const).map((planId) => (
+        {(["monthly", "quarterly", "biannual", "yearly"] as const).map((planId) => (
           <div key={planId} className="rounded-xl border border-white/10 p-4 space-y-3">
             <p className="text-xs font-bold uppercase tracking-wide text-white/45">{planId}</p>
             <CheckRow
@@ -261,35 +334,6 @@ export default function BillingEditor() {
             </FormField>
           </div>
         ))}
-      </FormSection>
-
-      <FormSection title="6-month upsell (launch users)">
-        <CheckRow
-          checked={config.launchYearlyUpsell.enabled}
-          onChange={(checked) =>
-            setConfig({
-              ...config,
-              launchYearlyUpsell: { ...config.launchYearlyUpsell, enabled: checked },
-            })
-          }
-        >
-          Show 6-month upsell to users who paid launch price
-        </CheckRow>
-        <FormField label="Upsell message">
-          <input
-            className={inputClass}
-            value={config.launchYearlyUpsell.message.NGN}
-            onChange={(e) =>
-              setConfig({
-                ...config,
-                launchYearlyUpsell: {
-                  ...config.launchYearlyUpsell,
-                  message: { ...config.launchYearlyUpsell.message, NGN: e.target.value, GHS: "" },
-                },
-              })
-            }
-          />
-        </FormField>
       </FormSection>
 
       <FormSection title="Welcome message" hint="Shown on account after first premium purchase.">

@@ -18,6 +18,8 @@ export function inputToContent(input: ContentInput): Content {
     rating: input.rating?.trim() || undefined,
     runtime: input.runtime?.trim() || undefined,
     qualities: parseQualities(input.qualities),
+    accessTier: input.accessTier ?? "premium",
+    freeUntil: input.accessTier === "premium" ? input.freeUntil?.trim() || undefined : undefined,
     createdAt: now,
   };
 

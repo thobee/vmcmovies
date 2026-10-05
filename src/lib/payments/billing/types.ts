@@ -15,20 +15,17 @@ export type BillingConfig = {
     monthly: CurrencyPrices;
     quarterly: CurrencyPrices;
     biannual: CurrencyPrices;
+    yearly: CurrencyPrices;
   };
-  launchOffer: {
+  welcomeTrial: {
     enabled: boolean;
+    startsAt: string | null;
     endsAt: string | null;
     bannerTitle: string;
     bannerBody: string;
-    monthlyPrice: CurrencyPrices;
-    disclosure: Record<PaymentCurrency, string>;
+    durationDays: number;
   };
   planPromos: Record<PlanId, PlanPromo>;
-  launchYearlyUpsell: {
-    enabled: boolean;
-    message: Record<PaymentCurrency, string>;
-  };
   welcome: {
     enabled: boolean;
     title: string;
@@ -48,7 +45,6 @@ export type ResolvedPlanPrice = {
   amountMinor: number;
   pricingKind: PricingKind;
   promoLabel?: string;
-  isLaunchMonthly?: boolean;
 };
 
 export type ResolvedPlanOffer = {
@@ -66,7 +62,7 @@ export type ResolvedPlanOffer = {
 
 export type PersonalNotification = {
   id: string;
-  kind: "premium_expiring" | "premium_expired" | "premium_upsell";
+  kind: "trial_available" | "premium_expiring" | "premium_expired";
   title: string;
   body: string;
   href?: string;
@@ -76,17 +72,14 @@ export type PersonalNotification = {
 export type BillingPlansResponse = {
   currency: PaymentCurrency;
   plans: ResolvedPlanOffer[];
-  launch: {
+  trial: {
     active: boolean;
     eligible: boolean;
+    startsAt: string | null;
     endsAt: string | null;
+    durationDays: number;
     bannerTitle: string;
     bannerBody: string;
-    disclosure: string;
-  };
-  launchYearlyUpsell: {
-    show: boolean;
-    message: string;
   };
   welcome: BillingConfig["welcome"];
 };

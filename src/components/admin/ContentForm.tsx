@@ -13,6 +13,7 @@ import ImageField from "@/components/admin/ImageField";
 import QualityPicker from "@/components/admin/QualityPicker";
 import CatalogImage from "@/components/ui/CatalogImage";
 import QualityBadges from "@/components/media/QualityBadges";
+import { Arc } from "@/components/loading-ui/arc";
 import {
   CheckRow,
   FormActions,
@@ -92,6 +93,8 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const busy = loading || navigating;
 
   const [id, setId] = useState(initial?.id ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
@@ -107,6 +110,8 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
   const [downloadUrl, setDownloadUrl] = useState(initial?.downloadUrl ?? "");
   const [qualities, setQualities] = useState<Quality[]>(initial?.qualities ?? ["720p", "1080p"]);
   const [featured, setFeatured] = useState(initial?.featured ?? false);
+  const [accessMode, setAccessMode] = useState<AccessMode>(() => initialAccessMode(initial));
+  const [freeUntil, setFreeUntil] = useState(initial?.freeUntil?.slice(0, 16) ?? "");
   const [notifyUsers, setNotifyUsers] = useState(true);
 
   const applyTmdb = (details: TmdbDetails) => {
@@ -139,6 +144,7 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
     e.preventDefault();
     setError("");
     setLoading(true);
+    let submitted = false;
 
     const payload = {
       type: "movie" as const,
@@ -154,6 +160,11 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
       runtime: runtime || undefined,
       qualities,
       downloadUrl: downloadUrl || undefined,
+      accessTier: accessMode === "free" ? "free" as const : "premium" as const,
+      freeUntil:
+        accessMode === "temporary_free" && freeUntil
+          ? new Date(freeUntil).toISOString()
+          : undefined,
       featured,
       ...(mode === "create" ? { notifyUsers } : {}),
     };
@@ -180,12 +191,16 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
             ? `${title.trim()} · users notified in the bell`
             : title.trim(),
       });
+      submitted = true;
+      setNavigating(true);
       router.push("/admin/movies");
       router.refresh();
     } catch {
       setError("Network error");
     } finally {
-      setLoading(false);
+      if (!submitted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -308,6 +323,12 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
               />
             </FormField>
             <LinkPreview href={previewDownloadUrl} />
+            <AccessFields
+              mode={accessMode}
+              freeUntil={freeUntil}
+              onModeChange={setAccessMode}
+              onFreeUntilChange={setFreeUntil}
+            />
             <CheckRow checked={featured} onChange={setFeatured}>
               Use as homepage hero when no custom slides are set
             </CheckRow>
@@ -334,8 +355,20 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
       </div>
 
       <FormActions>
-        <button type="submit" disabled={loading} className={primaryBtnClass}>
-          {loading ? "Saving…" : mode === "create" ? "Create movie" : "Save changes"}
+        <button
+          type="submit"
+          disabled={busy}
+          aria-busy={busy}
+          className={cn(primaryBtnClass, "gap-2", busy && "cursor-wait opacity-70")}
+        >
+          {busy && <Arc className="size-4 border-[2px]" />}
+          {navigating
+            ? "Opening movies..."
+            : loading
+              ? "Saving..."
+              : mode === "create"
+                ? "Create movie"
+                : "Save changes"}
         </button>
       </FormActions>
     </form>
@@ -351,6 +384,8 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const busy = loading || navigating;
 
   const [id, setId] = useState(initial?.id ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
@@ -365,6 +400,8 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
   const [runtime, setRuntime] = useState(initial?.runtime ?? "");
   const [qualities, setQualities] = useState<Quality[]>(initial?.qualities ?? ["720p", "1080p"]);
   const [featured, setFeatured] = useState(initial?.featured ?? false);
+  const [accessMode, setAccessMode] = useState<AccessMode>(() => initialAccessMode(initial));
+  const [freeUntil, setFreeUntil] = useState(initial?.freeUntil?.slice(0, 16) ?? "");
   const [notifyUsers, setNotifyUsers] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>(() => initialSeasons(initial));
 
@@ -413,6 +450,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
     e.preventDefault();
     setError("");
     setLoading(true);
+    let submitted = false;
 
     const payload = {
       type: "series" as const,
@@ -427,6 +465,11 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
       rating: rating || undefined,
       runtime: runtime || undefined,
       qualities,
+      accessTier: accessMode === "free" ? "free" as const : "premium" as const,
+      freeUntil:
+        accessMode === "temporary_free" && freeUntil
+          ? new Date(freeUntil).toISOString()
+          : undefined,
       featured,
       seasons,
       ...(mode === "create" ? { notifyUsers } : {}),
@@ -454,12 +497,16 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
             ? `${title.trim()} · users notified in the bell`
             : title.trim(),
       });
+      submitted = true;
+      setNavigating(true);
       router.push("/admin/series");
       router.refresh();
     } catch {
       setError("Network error");
     } finally {
-      setLoading(false);
+      if (!submitted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -633,6 +680,12 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
           </FormSection>
 
           <FormSection title="5. Publish options">
+            <AccessFields
+              mode={accessMode}
+              freeUntil={freeUntil}
+              onModeChange={setAccessMode}
+              onFreeUntilChange={setFreeUntil}
+            />
             <CheckRow checked={featured} onChange={setFeatured}>
               Use as homepage hero when no custom slides are set
             </CheckRow>
@@ -660,11 +713,77 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
       </div>
 
       <FormActions>
-        <button type="submit" disabled={loading} className={primaryBtnClass}>
-          {loading ? "Saving…" : mode === "create" ? "Create series" : "Save changes"}
+        <button
+          type="submit"
+          disabled={busy}
+          aria-busy={busy}
+          className={cn(primaryBtnClass, "gap-2", busy && "cursor-wait opacity-70")}
+        >
+          {busy && <Arc className="size-4 border-[2px]" />}
+          {navigating
+            ? "Opening series..."
+            : loading
+              ? "Saving..."
+              : mode === "create"
+                ? "Create series"
+                : "Save changes"}
         </button>
       </FormActions>
     </form>
+  );
+}
+
+type AccessMode = "free" | "premium" | "temporary_free";
+
+function initialAccessMode(initial?: Content): AccessMode {
+  if (initial?.accessTier === "free") return "free";
+  return initial?.freeUntil ? "temporary_free" : "premium";
+}
+
+function AccessFields({
+  mode,
+  freeUntil,
+  onModeChange,
+  onFreeUntilChange,
+}: {
+  mode: AccessMode;
+  freeUntil: string;
+  onModeChange: (mode: AccessMode) => void;
+  onFreeUntilChange: (value: string) => void;
+}) {
+  return (
+    <div className="rounded-xl border border-white/[0.08] bg-black/15 p-4 space-y-4">
+      <FormField
+        label="Download access"
+        hint="This controls the badge users see and whether Premium is required."
+        required
+      >
+        <select
+          value={mode}
+          onChange={(event) => onModeChange(event.target.value as AccessMode)}
+          className={inputClass}
+        >
+          <option value="premium">Premium</option>
+          <option value="free">Free</option>
+          <option value="temporary_free">Temporarily free</option>
+        </select>
+      </FormField>
+      {mode === "temporary_free" && (
+        <FormField
+          label="Free access ends"
+          hint="After this time, the title automatically returns to Premium."
+          required
+        >
+          <input
+            type="datetime-local"
+            value={freeUntil}
+            onChange={(event) => onFreeUntilChange(event.target.value)}
+            className={inputClass}
+            required
+          />
+        </FormField>
+      )}
+    </div>
   );
 }
 

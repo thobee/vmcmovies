@@ -32,6 +32,8 @@ import {
   type HeroSlide,
 } from "@/lib/site/types";
 import { cn } from "@/lib/cn";
+import type { Content } from "@/lib/catalog/types";
+import { contentDetailPath } from "@/lib/catalog/paths";
 
 const SECTION_META: {
   key: keyof HomepageSectionTitles;
@@ -83,7 +85,13 @@ function newSlide(): HeroSlide {
   };
 }
 
-export default function HomepageEditor({ initial }: { initial: HomepageSettings }) {
+export default function HomepageEditor({
+  initial,
+  catalog,
+}: {
+  initial: HomepageSettings;
+  catalog: Content[];
+}) {
   const router = useRouter();
   const { toast } = useAdminToast();
   const [slides, setSlides] = useState<HeroSlide[]>(initial.slides);
@@ -93,6 +101,7 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedContentId, setSelectedContentId] = useState("");
   const [openSlide, setOpenSlide] = useState<number | null>(
     initial.slides.length > 0 ? 0 : null,
   );
@@ -102,6 +111,32 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
     setSlides([...slides, newSlide()]);
     setOpenSlide(slides.length);
   };
+
+  const addCatalogSlide = () => {
+    if (!selectedContentId || slides.length >= MAX_HERO_SLIDES) return;
+    const item = catalog.find((entry) => entry.id === selectedContentId);
+    if (!item) return;
+
+    const slide: HeroSlide = {
+      id: `slide-${item.id}-${Date.now()}`,
+      eyebrow: item.type === "series" ? "Featured series" : "Featured movie",
+      title: item.title,
+      description: item.description,
+      imageUrl: item.backdropImageUrl || item.posterImageUrl,
+      ctaLabel: "View details",
+      ctaHref: contentDetailPath(item),
+      enabled: true,
+    };
+
+    setSlides((items) => [...items, slide]);
+    setOpenSlide(slides.length);
+    setSelectedContentId("");
+  };
+
+  const selectedPaths = new Set(slides.map((slide) => slide.ctaHref).filter(Boolean));
+  const availableCatalog = catalog.filter(
+    (item) => !selectedPaths.has(contentDetailPath(item)),
+  );
 
   const updateSlide = (index: number, patch: Partial<HeroSlide>) => {
     setSlides((items) => items.map((s, i) => (i === index ? { ...s, ...patch } : s)));
@@ -176,8 +211,9 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
             <p className="text-sm font-semibold text-white">How the homepage works</p>
             <ul className="mt-2 space-y-1.5 text-xs leading-5 text-white/50">
               <li>
-                <span className="font-semibold text-white/70">Hero carousel</span> — big banner at the
-                top. Add custom slides, or leave empty to use your starred featured movie/series.
+                <span className="font-semibold text-white/70">Hero carousel</span> — choose up to five
+                movies and series. Their artwork and details are filled in automatically, and you can
+                still edit them before saving.
               </li>
               <li>
                 <span className="font-semibold text-white/70">Section titles</span> — only rename the
@@ -191,8 +227,38 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
 
       <FormSection
         title="Hero carousel"
-        hint={`Up to ${MAX_HERO_SLIDES} slides. Wide backdrop images look best. Empty = featured catalog title.`}
+        hint={`Choose up to ${MAX_HERO_SLIDES} movies or series. They play in this order on the homepage.`}
       >
+        <div className="grid gap-3 rounded-xl border border-white/[0.07] bg-[#141414] p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-4">
+          <label className="min-w-0">
+            <span className="mb-2 block text-xs font-semibold text-white/65">
+              Add from your catalog
+            </span>
+            <select
+              value={selectedContentId}
+              onChange={(event) => setSelectedContentId(event.target.value)}
+              disabled={slides.length >= MAX_HERO_SLIDES || availableCatalog.length === 0}
+              className={cn(inputClass, "w-full")}
+            >
+              <option value="">Select a movie or series</option>
+              {availableCatalog.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.type === "series" ? "Series" : "Movie"} — {item.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            onClick={addCatalogSlide}
+            disabled={!selectedContentId || slides.length >= MAX_HERO_SLIDES}
+            className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--amber)] px-4 text-sm font-bold text-black transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 sm:self-end"
+          >
+            <Plus className="h-4 w-4" />
+            Add featured title
+          </button>
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-white/40">
             {slides.length} / {MAX_HERO_SLIDES} slides
@@ -203,10 +269,10 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
             type="button"
             onClick={addSlide}
             disabled={slides.length >= MAX_HERO_SLIDES}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-[var(--amber)]/35 bg-[var(--amber)]/15 px-4 text-sm font-bold text-[var(--amber-100)] hover:bg-[var(--amber)]/25 disabled:opacity-40 sm:w-auto"
+            className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/60 hover:bg-white/[0.08] hover:text-white disabled:opacity-40 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
-            Add slide
+            Add custom slide
           </button>
         </div>
 
@@ -215,8 +281,8 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
             <ImageIcon className="mx-auto mb-3 h-8 w-8 text-white/20" />
             <p className="text-sm font-medium text-white/50">No custom slides yet</p>
             <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-white/35">
-              The public homepage shows your starred featured movie/series until you add slides
-              here.
+              Choose a movie or series above. If you leave this empty, the homepage uses your
+              starred featured title.
             </p>
           </div>
         )}
@@ -224,6 +290,9 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
         <div className="space-y-3">
           {slides.map((slide, index) => {
             const open = openSlide === index;
+            const linkedItem = catalog.find(
+              (item) => contentDetailPath(item) === slide.ctaHref,
+            );
             return (
               <div
                 key={slide.id}
@@ -241,6 +310,11 @@ export default function HomepageEditor({ initial }: { initial: HomepageSettings 
                     <span className="min-w-0 truncate text-sm font-semibold text-white">
                       {slide.title.trim() || `Slide ${index + 1}`}
                     </span>
+                    {linkedItem && (
+                      <span className="shrink-0 rounded-full bg-white/[0.07] px-2 py-0.5 text-[10px] font-bold uppercase text-white/45">
+                        {linkedItem.type === "series" ? "Series" : "Movie"}
+                      </span>
+                    )}
                     {!slide.enabled && (
                       <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/40">
                         Hidden

@@ -9,7 +9,7 @@ export default function CatalogBrowseTabs({ active }: { active: "movies" | "seri
   ];
 
   return (
-    <div className="bezel-outer inline-flex">
+    <div className="bezel-outer inline-flex w-fit self-start lg:self-auto">
       <div className="bezel-inner inline-flex rounded-full p-1">
         {tabs.map(({ id, label, href, icon: Icon }) => {
           const on = active === id;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CircleNotch } from "@phosphor-icons/react";
+import { Arc } from "@/components/loading-ui/arc";
 import { cn } from "@/lib/cn";
 
 function isPublicGoogleConfigured(): boolean {
@@ -23,7 +23,9 @@ export default function GoogleButton({
   const go = () => {
     if (!enabled || disabled || loading) return;
     setLoading(true);
-    window.location.assign(`/api/auth/google?mode=${mode}`);
+    // OAuth should use a full document navigation so Google receives the browser redirect.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = `/api/auth/google?mode=${mode}`;
   };
 
   if (!enabled) return null;
@@ -35,13 +37,9 @@ export default function GoogleButton({
       disabled={disabled || loading}
       className={cn("auth-social-btn", (disabled || loading) && "cursor-not-allowed opacity-60")}
     >
-      {loading ? (
-        <CircleNotch className="h-4.5 w-4.5 animate-spin text-white/70" weight="bold" aria-hidden />
-      ) : (
-        <GoogleIcon />
-      )}
+      {loading ? <Arc className="size-4 text-neutral-700" /> : <GoogleIcon />}
       {loading
-        ? "Redirecting…"
+        ? "Redirecting..."
         : mode === "signup"
           ? "Sign up with Google"
           : "Continue with Google"}

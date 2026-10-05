@@ -8,6 +8,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import AuthField from "@/components/auth/AuthField";
 import GoogleButton from "@/components/auth/GoogleButton";
 import PasswordField from "@/components/auth/PasswordField";
+import { Arc } from "@/components/loading-ui/arc";
 import { cn } from "@/lib/cn";
 import HoneypotField from "@/components/security/HoneypotField";
 import {
@@ -37,8 +38,18 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState(errorCode ? (GOOGLE_ERRORS[errorCode] ?? "") : "");
   const [pending, setPending] = useState(false);
+  const [navigating, setNavigating] = useState(false);
 
   const isSignup = mode === "signup";
+  const busy = pending || navigating;
+  const actionLabel = isSignup ? "Create account" : "Log in";
+  const loadingLabel = navigating
+    ? isSignup
+      ? "Opening your account..."
+      : "Opening dashboard..."
+    : isSignup
+      ? "Creating account..."
+      : "Signing in...";
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim() ?? "";
   const googleEnabled =
     Boolean(googleClientId) &&
@@ -63,6 +74,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
 
     const website = String(new FormData(e.currentTarget).get("website") ?? "");
     setPending(true);
+    let submitted = false;
     try {
       const res = await fetch(`/api/auth/${mode}`, {
         method: "POST",
@@ -79,12 +91,20 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         return;
       }
       setUser(data.user);
-      router.push("/account");
+      submitted = true;
+      setNavigating(true);
+      router.push(
+        isSignup && data.welcomeTrial?.eligible
+          ? "/account?welcome=trial"
+          : "/account",
+      );
       router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
-      setPending(false);
+      if (!submitted) {
+        setPending(false);
+      }
     }
   };
 
@@ -99,7 +119,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
 
       {googleEnabled && (
         <>
-          <GoogleButton mode={mode} disabled={pending} />
+          <GoogleButton mode={mode} disabled={busy} />
           <div className="flex items-center gap-4 py-1">
             <span className="h-px flex-1 bg-white/10" />
             <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/35">
@@ -185,10 +205,12 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
 
       <button
         type="submit"
-        disabled={pending}
-        className={cn("auth-btn w-full py-3.5", pending && "cursor-not-allowed opacity-60")}
+        disabled={busy}
+        aria-busy={busy}
+        className={cn("auth-btn min-h-12 w-full gap-2.5 py-3.5", busy && "cursor-wait opacity-80")}
       >
-        {pending ? "Please wait…" : isSignup ? "Create account" : "Log in"}
+        {busy && <Arc className="size-4 border-[2px]" />}
+        <span>{busy ? loadingLabel : actionLabel}</span>
       </button>
 
       <p className="pt-1 text-center text-sm text-white/50">

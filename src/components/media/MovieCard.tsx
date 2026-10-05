@@ -6,6 +6,8 @@ import CatalogImage from "@/components/ui/CatalogImage";
 import { resolveCatalogImage, resolvePosterImage } from "@/lib/catalog/image";
 import QualityBadges from "@/components/media/QualityBadges";
 import { cn } from "@/lib/cn";
+import { contentAccessKind } from "@/lib/catalog/access";
+import AccessBadge from "@/components/media/AccessBadge";
 
 interface MovieCardProps {
   item: Content;
@@ -25,6 +27,7 @@ export default function MovieCard({
   const imageSrc = landscape
     ? resolveCatalogImage(item.backdropImageUrl, item.posterImageUrl)
     : resolvePosterImage(item.posterImageUrl, item.backdropImageUrl);
+  const accessKind = contentAccessKind(item);
 
   return (
     <Link
@@ -53,14 +56,17 @@ export default function MovieCard({
             className="transition-transform duration-500 group-hover:scale-[1.04]"
           />
 
-          {!simple && (
-            <div className="absolute top-2 left-2 right-2 z-10 flex flex-wrap items-start gap-1">
-              <QualityBadges qualities={item.qualities} size="sm" hd />
-              <span className="rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none text-black">
-                {item.type === "series" ? "Series" : "Movie"}
-              </span>
-            </div>
-          )}
+          <div className="absolute inset-x-2 top-2 z-10 flex items-start justify-between gap-2">
+            {!simple ? (
+              <div className="flex min-w-0 flex-wrap items-start gap-1">
+                <QualityBadges qualities={item.qualities} size="sm" hd />
+                <span className="rounded bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none text-black">
+                  {item.type === "series" ? "Series" : "Movie"}
+                </span>
+              </div>
+            ) : <span />}
+            <AccessBadge kind={accessKind} />
+          </div>
 
           {!simple && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/35">
