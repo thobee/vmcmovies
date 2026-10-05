@@ -47,5 +47,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# local AI/editor state
+.cursor/
+AGENTS.md
+CLAUDE.md
+AGENT_HANDOFF.md
+
 # local tooling / generated
 graphify-out/
