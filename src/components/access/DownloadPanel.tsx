@@ -227,76 +227,7 @@ export default function DownloadPanel({
         </section>
       )}
 
-      <StickyCta
-        premiumStatus={premiumStatus}
-        accessKind={accessKind}
-        unlocked={unlocked}
-        trialEligible={trialEligible}
-        trialDays={trialDays}
-        loggedIn={loggedIn}
-        movieDownloadUrl={movieDownloadUrl}
-        hasSeasons={seasonLinks.length > 0}
-      />
     </>
-  );
-}
-
-function StickyCta({
-  premiumStatus,
-  accessKind,
-  unlocked,
-  trialEligible,
-  trialDays,
-  loggedIn,
-  movieDownloadUrl,
-  hasSeasons,
-}: {
-  premiumStatus: DownloadPanelProps["premiumStatus"];
-  accessKind: ContentAccessKind;
-  unlocked: boolean;
-  trialEligible: boolean;
-  trialDays: number;
-  loggedIn: boolean;
-  movieDownloadUrl?: string;
-  hasSeasons: boolean;
-}) {
-  const href =
-    !loggedIn
-      ? "/signup"
-      : unlocked && (movieDownloadUrl || hasSeasons)
-        ? "#download"
-        : trialEligible
-          ? "#download"
-          : "/get-access";
-
-  const label =
-    !loggedIn
-      ? "Sign up to download"
-      : unlocked && movieDownloadUrl
-      ? accessKind === "premium" ? "Download" : "Download free"
-      : unlocked && hasSeasons
-        ? accessKind === "premium" ? "Download a season" : "Download free"
-        : premiumStatus === "pending"
-          ? "Payment pending"
-          : trialEligible
-            ? `Start ${trialDays}-day free access`
-            : loggedIn
-            ? "Get premium"
-            : "Get premium";
-
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/90 px-4 pt-3 backdrop-blur-xl lg:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-      <a
-        href={href}
-        className={cn(
-          "auth-btn w-full gap-2 py-3.5 text-sm",
-          premiumStatus === "pending" && "pointer-events-none opacity-50",
-        )}
-      >
-        {unlocked ? <DownloadSimple className="h-4 w-4" weight="bold" /> : <Lock className="h-4 w-4" weight="bold" />}
-        {label}
-      </a>
-    </div>
   );
 }
 

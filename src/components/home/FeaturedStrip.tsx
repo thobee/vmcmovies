@@ -272,30 +272,24 @@ export default function FeaturedStrip({
                   className="hidden justify-end md:flex"
                 >
                   <div className="relative w-[min(28vw,17rem)] lg:w-[min(25vw,20rem)]">
-                    <div className="absolute -right-4 top-5 h-full w-full rotate-3 overflow-hidden rounded-[2rem] border border-emerald-300/20 bg-[#101714] shadow-[0_28px_70px_rgba(16,185,129,0.18)]">
+                    <div
+                      className="pointer-events-none absolute inset-x-[12%] bottom-0 h-2/5 bg-black/80 blur-3xl"
+                      aria-hidden
+                    />
+                    <div className="relative aspect-[2/3] overflow-hidden rounded-[1.5rem] bg-black shadow-[0_32px_90px_rgba(0,0,0,0.78)] ring-1 ring-white/12">
                       <CatalogImage
                         src={active.posterSrc ?? active.heroFallback ?? active.heroSrc}
                         fallback={active.heroSrc || active.heroFallback}
-                        alt=""
+                        alt={active.title}
                         fill
+                        priority
                         sizes="(max-width: 1024px) 28vw, 20rem"
-                        className="object-cover opacity-45"
+                        className="object-cover"
                       />
-                      <div className="absolute inset-0 bg-emerald-950/35" aria-hidden />
-                    </div>
-                    <div className="bezel-outer relative p-1.5">
-                      <div className="bezel-inner relative aspect-[2/3] overflow-hidden border border-white/10 bg-black shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]">
-                        <CatalogImage
-                          src={active.posterSrc ?? active.heroFallback ?? active.heroSrc}
-                          fallback={active.heroSrc || active.heroFallback}
-                          alt={active.title}
-                          fill
-                          priority
-                          sizes="(max-width: 1024px) 28vw, 20rem"
-                          className="object-cover"
-                        />
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 to-transparent" />
-                      </div>
+                      <div
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/5"
+                        aria-hidden
+                      />
                     </div>
                     <div className="mt-3 flex justify-center gap-1.5">
                       {items.slice(0, 5).map((item, i) => (

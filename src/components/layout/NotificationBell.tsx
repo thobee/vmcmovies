@@ -137,14 +137,14 @@ export default function NotificationBell() {
         aria-expanded={open}
         suppressHydrationWarning
         className={cn(
-          "relative flex items-center gap-2 rounded-xl px-2.5 py-2 transition sm:px-3",
+          "relative flex min-h-11 items-center gap-2 rounded-full px-2.5 py-2 transition sm:px-3",
           open
             ? "bg-emerald-500/15 text-emerald-300"
             : "text-white/50 hover:bg-white/5 hover:text-white",
         )}
       >
         <Bell className="h-4.5 w-4.5 shrink-0" weight="bold" />
-        <span className="hidden text-xs font-semibold sm:inline">Updates</span>
+        <span className="text-xs font-semibold">Updates</span>
         {unread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-black shadow-sm shadow-emerald-500/40">
             {unread > 9 ? "9+" : unread}

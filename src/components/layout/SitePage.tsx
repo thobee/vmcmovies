@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Navbar from "@/components/layout/Navbar";
+import MobileDock from "@/components/layout/MobileDock";
 import { cn } from "@/lib/cn";
 
 export default function SitePage({
@@ -13,7 +14,12 @@ export default function SitePage({
   glow?: boolean;
 }) {
   return (
-    <div className={cn("relative min-h-screen bg-[#060809] text-white", className)}>
+    <div
+      className={cn(
+        "relative min-h-screen bg-[#060809] pb-[calc(5.75rem+env(safe-area-inset-bottom))] text-white md:pb-0",
+        className,
+      )}
+    >
       <Navbar />
       <div
         className="pointer-events-none absolute inset-x-0 top-20 z-[1] h-px bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent"
@@ -26,6 +32,7 @@ export default function SitePage({
         />
       )}
       <div className="relative z-[2]">{children}</div>
+      <MobileDock />
     </div>
   );
 }

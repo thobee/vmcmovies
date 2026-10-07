@@ -165,6 +165,172 @@ input[type="search"]::-webkit-search-results-button {
   animation: vmcLoadingText 1.25s cubic-bezier(0.32,0.72,0,1) infinite;
 }
 
+/* Recording -> device -> download transition used by the root route fallback. */
+.cinema-loader {
+  --loader-color: #34d399;
+  position: relative;
+  width: 11rem;
+  height: 8rem;
+  color: var(--loader-color);
+  font-size: 0.8rem;
+  isolation: isolate;
+}
+.cinema-loader-recording {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transform: translate(-50%, -50%);
+  animation: cinemaRecording 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+  clip-path: polygon(-4em -1em, 4em -1em, 4em 1em, -4em 1em);
+}
+.cinema-loader-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2em;
+  height: 2em;
+  border-radius: 999px;
+  background: var(--loader-color);
+  transform: translate(-3.5em, -50%);
+  animation: cinemaBlink 1s step-end infinite;
+}
+.cinema-loader-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2em;
+  color: var(--loader-color);
+  font-size: 2.2em;
+  font-weight: 800;
+  transform: translate(-0.5em, -50%);
+}
+.cinema-loader-device {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11em;
+  height: 7em;
+  perspective: 150px;
+  perspective-origin: 50% 0;
+  transform: translate(-50%, -4em);
+  transform-style: preserve-3d;
+  animation: cinemaDevice 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+}
+.cinema-loader-base {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 0.5em;
+  border-radius: 0 0 2em 2em;
+  background: var(--loader-color);
+  animation: cinemaBase 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+}
+.cinema-loader-screen {
+  width: calc(100% - 2.5em);
+  margin-inline: 1.25em;
+  color: var(--loader-color);
+  transform-origin: 50% 100%;
+  animation: cinemaScreen 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+}
+.cinema-loader-action {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4em;
+  height: 4em;
+  border: 0 solid var(--loader-color);
+  border-radius: 999px;
+  background: var(--loader-color);
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  animation: cinemaAction 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+  z-index: -1;
+}
+.cinema-loader-action::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  border: 0.8em solid #050606;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  transform: translate(-50%, 2.5em) rotate(-45deg);
+  transform-origin: center;
+  animation: cinemaActionHead 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+  z-index: -1;
+}
+.cinema-loader-action::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1em;
+  height: 2em;
+  background: #050606;
+  animation: cinemaActionStem 3s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+}
+@keyframes cinemaBlink {
+  50% { opacity: 0; }
+  75% { opacity: 1; }
+}
+@keyframes cinemaRecording {
+  25.5% { translate: 0 0; clip-path: polygon(-4em -1em, 4em -1em, 4em 1em, -4em 1em); }
+  30%, 92.4% { translate: 0 3em; opacity: 1; clip-path: polygon(-4em 1em, 4em 1em, 4em 1em, -4em 1em); }
+  30.1%, 92.4% { opacity: 0; }
+  92.5% { translate: 0 0; opacity: 1; clip-path: polygon(-4em -1em, -0.5em -1em, -0.5em 1em, -4em 1em); }
+  100% { translate: 0 0; opacity: 1; clip-path: polygon(-4em -1em, 4em -1em, 4em 1em, -4em 1em); }
+}
+@keyframes cinemaDevice {
+  0%, 15% { translate: 0 4em; }
+  0%, 29% { opacity: 0; }
+  30% { opacity: 1; }
+  40% { translate: 0 0; }
+  50% { translate: 0 0.5em; opacity: 1; }
+  50.1%, 100% { opacity: 0; }
+}
+@keyframes cinemaScreen {
+  0%, 29% { transform: rotateX(-10deg); }
+  0%, 41.9% { stroke-dasharray: 100 0; }
+  42% { transform: rotateX(4deg); stroke-dasharray: 0 0 100; }
+  50% { transform: rotateX(-20deg); stroke-dasharray: 0 50 0 100; }
+}
+@keyframes cinemaBase {
+  42% { transform: scaleX(1); }
+  50%, 100% { transform: scaleX(0); }
+}
+@keyframes cinemaAction {
+  0%, 15% { translate: 0 4.5em; transform: translate(-50%, -50%) scale(0); }
+  0%, 29% { opacity: 0; }
+  30% { opacity: 1; }
+  40% { translate: 0 -0.75em; transform: translate(-50%, -50%) scale(1); }
+  50% { translate: 0 0; opacity: 1; background: var(--loader-color); }
+  50.1% { border-width: 2em; background: #050606; }
+  65% { transform: translate(-50%, -50%) scale(1); border-width: 4px; }
+  80%, 100% { translate: -3.5em 0; transform: translate(-50%, -50%) scale(0.5); border-width: 1em; background: var(--loader-color); }
+  85%, 100% { opacity: 0; }
+}
+@keyframes cinemaActionHead {
+  20% { transform: translate(-50%, 2.5em) rotate(-45deg); }
+  50% { transform: translate(-50%, -25%) rotate(-45deg); }
+  65%, 84.9% { transform: translate(-60%, -50%) rotate(45deg) scaleX(1.5); border-color: var(--loader-color); }
+  85%, 100% { transform: translate(-75%, -50%) rotate(45deg) scale(0, 1.5); border-color: var(--loader-color); }
+}
+@keyframes cinemaActionStem {
+  20% { transform: translate(-50%, 2.5em); }
+  50% { transform: translate(-50%, 0.4em); }
+  65%, 100% { transform: translate(-50%, 2.5em); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinema-loader-recording,
+  .cinema-loader-dot { animation: none; }
+  .cinema-loader-device,
+  .cinema-loader-action { display: none; }
+}
+
 /* Gradient overlays */
 .hero-left {
   background: linear-gradient(

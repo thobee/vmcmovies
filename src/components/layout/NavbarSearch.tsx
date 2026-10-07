@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { CircleNotch, FilmStrip, MagnifyingGlass, Television, X } from "@phosphor-icons/react";
 import { contentDetailPath } from "@/lib/catalog/paths";
-import type { Content } from "@/lib/catalog/types";
 import { useCatalogSearch } from "@/hooks/useCatalogSearch";
 import { cn } from "@/lib/cn";
 
@@ -19,6 +18,7 @@ export default function NavbarSearch({
   className?: string;
 }) {
   const router = useRouter();
+  const resultsId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
@@ -28,10 +28,6 @@ export default function NavbarSearch({
 
   const trimmed = query.trim();
   const showPanel = open && trimmed.length >= 2;
-
-  useEffect(() => {
-    setActive(0);
-  }, [results, trimmed]);
 
   useEffect(() => {
     if (!showPanel) return;
@@ -69,7 +65,7 @@ export default function NavbarSearch({
     }
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActive((i) => Math.min(i + 1, results.length - 1));
+      setActive((i) => Math.min(i + 1, Math.min(results.length, 6) - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActive((i) => Math.max(i - 1, 0));
@@ -89,9 +85,9 @@ export default function NavbarSearch({
           submitAll();
         }}
         className={cn(
-          "flex items-center gap-2.5 border border-white/10 bg-[#101214] transition duration-200 focus-within:border-emerald-400/50",
+          "flex items-center gap-2.5 border border-white/[0.08] bg-black/25 transition-colors duration-200 focus-within:border-emerald-400/50 focus-within:bg-black/40",
           variant === "desktop"
-            ? "h-11 w-52 rounded-full px-4 lg:w-72 focus-within:w-60 lg:focus-within:w-80"
+            ? "h-11 w-full rounded-full px-4"
             : "h-11 rounded-2xl px-4",
         )}
       >
@@ -104,6 +100,7 @@ export default function NavbarSearch({
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
+            setActive(0);
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
@@ -112,8 +109,9 @@ export default function NavbarSearch({
           className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-white shadow-none outline-none ring-0 placeholder:text-white/35 focus:outline-none focus:ring-0"
           autoComplete="off"
           role="combobox"
+          aria-label="Search movies and TV shows"
           aria-expanded={showPanel}
-          aria-controls="navbar-search-results"
+          aria-controls={showPanel ? resultsId : undefined}
         />
         {query && (
           <button
@@ -133,7 +131,7 @@ export default function NavbarSearch({
 
       {showPanel && (
         <div
-          id="navbar-search-results"
+          id={resultsId}
           role="listbox"
           className={cn(
             "absolute z-[60] overflow-hidden rounded-2xl border border-white/10 bg-[#101214] shadow-[0_20px_60px_rgba(0,0,0,0.55)]",

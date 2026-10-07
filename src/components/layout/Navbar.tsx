@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CaretDown, List, SignOut, SquaresFour, User, X } from "@phosphor-icons/react";
+import { BookOpen, CaretDown, Crown, FilmSlate, House, List, Question, SignOut, SquaresFour, Television, User, X } from "@phosphor-icons/react";
 import VmcLogo from "@/components/brand/VmcLogo";
 import NavbarSearch from "@/components/layout/NavbarSearch";
 import NotificationBell from "@/components/layout/NotificationBell";
@@ -13,9 +13,15 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Arc } from "@/components/loading-ui/arc";
 
 const NAV = [
-  { href: "/", label: "Home" },
-  { href: "/movies", label: "Movies" },
-  { href: "/series", label: "TV Shows" },
+  { href: "/", label: "Home", icon: House },
+  { href: "/movies", label: "Movies", icon: FilmSlate },
+  { href: "/series", label: "TV Shows", icon: Television },
+];
+
+const MORE_LINKS = [
+  { href: "/get-access", label: "Premium plans", icon: Crown },
+  { href: "/guide", label: "Download guide", icon: BookOpen },
+  { href: "/support", label: "Help & support", icon: Question },
 ];
 
 export default function Navbar() {
@@ -26,6 +32,20 @@ export default function Navbar() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen && !accountOpen) return;
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (mobileOpen) menuButtonRef.current?.focus();
+      else accountRef.current?.querySelector("button")?.focus();
+      setMobileOpen(false);
+      setAccountOpen(false);
+    };
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, [mobileOpen, accountOpen]);
 
   useEffect(() => {
     if (!accountOpen) return;
@@ -64,37 +84,38 @@ export default function Navbar() {
     <>
       <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
         <div
-          className="mx-auto flex h-[68px] max-w-screen-2xl items-center gap-4 rounded-full border border-white/10 bg-[#101214]/85 px-4 shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur-2xl supports-backdrop-filter:bg-[#101214]/70 sm:px-6 lg:gap-8 lg:px-8"
+          className="mx-auto flex h-[68px] max-w-screen-2xl items-center gap-3 rounded-[24px] border border-white/10 bg-[#101214]/95 px-4 shadow-[0_8px_32px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl sm:rounded-full sm:px-5 xl:gap-6 xl:px-7"
         >
           <VmcLogo
             href="/"
             height={44}
             priority
-            className="transition-transform hover:scale-[1.02]"
+            className="shrink-0 transition-transform hover:scale-[1.02]"
           />
 
-          <NavbarSearch variant="desktop" className="hidden md:block" />
+          <NavbarSearch variant="desktop" className="hidden min-w-0 md:block md:flex-1 md:max-w-72 lg:max-w-56 xl:max-w-72" />
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav aria-label="Main navigation" className="hidden shrink-0 items-center gap-1 lg:flex">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "relative px-4 py-2.5 text-[15px] font-semibold transition-colors duration-200",
-                  isActive(item.href) ? "text-white" : "text-white/50 hover:text-white",
+                  "relative inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-emerald-300",
+                  isActive(item.href) ? "bg-white/[0.07] text-white" : "text-white/55 hover:bg-white/[0.04] hover:text-white",
                 )}
               >
                 {item.label}
                 {isActive(item.href) && (
-                  <span className="absolute inset-x-4 -bottom-px h-0.5 rounded-full bg-emerald-400" />
+                  <span className="absolute inset-x-5 bottom-1 h-0.5 rounded-full bg-emerald-400" />
                 )}
               </Link>
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <RequestButton compact className="hidden md:inline-flex" />
             <NotificationBell />
 
@@ -113,7 +134,7 @@ export default function Navbar() {
                   onClick={() => setAccountOpen((open) => !open)}
                   aria-label="Open account menu"
                   aria-expanded={accountOpen}
-                  className="inline-flex items-center gap-2 rounded-full bg-emerald-500 py-2 pl-3 pr-2.5 shadow-sm shadow-emerald-500/25 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-emerald-400"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-400 py-2 pl-4 pr-3 transition duration-300 hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
                 >
                   <User className="h-4.5 w-4.5 shrink-0 text-black" weight="bold" />
                   <span className="text-xs font-bold text-black">Account</span>
@@ -162,7 +183,7 @@ export default function Navbar() {
               <Link
                 href="/login"
                 aria-label="Log in"
-                className="hidden items-center gap-2 rounded-full bg-emerald-500 px-3 py-2 shadow-sm shadow-emerald-500/25 transition hover:bg-emerald-400 md:inline-flex"
+                className="hidden min-h-11 items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 transition hover:bg-emerald-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 md:inline-flex"
               >
                 <User className="h-4.5 w-4.5 shrink-0 text-black" weight="bold" />
                 <span className="text-xs font-bold text-black">Log in</span>
@@ -170,19 +191,26 @@ export default function Navbar() {
             )}
 
             <button
+              ref={menuButtonRef}
               type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-white/55 transition hover:bg-white/5 hover:text-white lg:hidden"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-white/[0.06] px-3 text-white/75 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-emerald-300 lg:hidden"
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
+              aria-controls="public-mobile-menu"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
+              <span className="text-xs font-semibold">{mobileOpen ? "Close" : "Menu"}</span>
             </button>
           </div>
         </div>
       </header>
 
+      {mobileOpen && (
+        <button type="button" tabIndex={-1} aria-label="Close navigation" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-30 bg-black/55 lg:hidden" />
+      )}
       <div
+        id="public-mobile-menu"
         aria-hidden={!mobileOpen}
         inert={!mobileOpen}
         className={cn(
@@ -192,32 +220,31 @@ export default function Navbar() {
             : "pointer-events-none -translate-y-2 opacity-0",
         )}
       >
-        <div className="mx-auto max-w-screen-2xl overflow-hidden rounded-3xl border border-white/10 bg-[#101214]/98 shadow-[0_24px_60px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+        <div className="mx-auto max-h-[calc(100dvh-188px-env(safe-area-inset-bottom))] max-w-screen-2xl overflow-y-auto overscroll-contain rounded-3xl border border-white/10 bg-[#101214] shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
           <div className="px-4 pt-4">
             <NavbarSearch variant="mobile" onNavigate={() => setMobileOpen(false)} />
           </div>
 
-          <nav className="flex flex-col gap-0.5 px-3 py-3">
-            {NAV.map((item) => (
+          <nav aria-label="Mobile menu" className="grid grid-cols-2 gap-1 px-3 py-3">
+            {[...NAV, ...MORE_LINKS].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive(item.href) ? "page" : undefined}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors",
+                  "flex min-h-12 items-center gap-2.5 rounded-xl px-3 py-3 text-sm font-medium transition-colors",
                   isActive(item.href)
                     ? "bg-emerald-500/10 text-emerald-300"
                     : "text-white/60 hover:bg-white/5 hover:text-white",
                 )}
               >
-                {isActive(item.href) && (
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
-                )}
+                <item.icon className="h-5 w-5 shrink-0" weight={isActive(item.href) ? "fill" : "regular"} />
                 {item.label}
               </Link>
             ))}
             {user?.premiumStatus === "active" && (
-              <div className="px-3 pt-1">
+              <div className="col-span-2 px-3 pt-1">
                 <RequestButton className="w-full justify-center py-3" />
               </div>
             )}

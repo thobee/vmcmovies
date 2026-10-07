@@ -69,10 +69,10 @@ export default function TitleView({
         <div className="relative z-10 mx-auto max-w-screen-2xl px-4 pb-10 pt-[104px] sm:px-6 sm:pb-12 lg:px-10 lg:pb-14">
           <Link
             href={browseHref}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-white/55 transition hover:text-white"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-black/35 px-4 text-sm font-semibold text-white/70 ring-1 ring-inset ring-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08] hover:text-white active:scale-[0.97]"
           >
             <ArrowLeft className="h-4 w-4" />
-            {browseLabel}
+            Back to {browseLabel}
           </Link>
 
           <div className="mt-6 grid items-start gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-12">

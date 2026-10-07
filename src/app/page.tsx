@@ -24,6 +24,7 @@ import { getBillingConfig } from "@/lib/payments/billing/db";
 import { buildResolvedPlans, isWelcomeTrialWindowActive } from "@/lib/payments/billing/resolve";
 import { toPublicContent } from "@/lib/catalog/public";
 import { getAppUrl } from "@/lib/payments/app-url";
+import { getSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Download Movies & Series on Telegram | VMC",
@@ -55,12 +56,13 @@ export const metadata: Metadata = {
 export const revalidate = 120;
 
 export default async function HomePage() {
-  const [featured, movies, series, homepage, billing] = await Promise.all([
+  const [featured, movies, series, homepage, billing, session] = await Promise.all([
     getFeaturedContent(),
     getMovies(),
     getSeriesList(),
     getHomepageSettings(),
     getBillingConfig(),
+    getSession(),
   ]);
 
   const titles = homepage.sectionTitles;
@@ -135,25 +137,30 @@ export default async function HomePage() {
 
       {trialActive && (
         <section className="px-4 pt-5 sm:px-6 lg:px-10">
-          <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 border-y border-emerald-300/15 bg-emerald-400/[0.055] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div className="flex min-w-0 items-start gap-3">
-              <Sparkle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" weight="fill" />
-              <div>
-                <p className="text-sm font-bold text-emerald-200">
-                  {billing.welcomeTrial.bannerTitle}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-white/55 sm:text-sm">
-                  New members can activate {billing.welcomeTrial.durationDays} days of Premium from their first Premium download. No card required.
-                </p>
+          <div className="mx-auto max-w-screen-2xl">
+            <div className="flex w-full flex-col gap-3 rounded-xl border border-emerald-300/12 bg-emerald-400/[0.045] px-4 py-3 sm:w-fit sm:max-w-4xl sm:flex-row sm:items-center sm:gap-5">
+              <div className="flex min-w-0 items-start gap-2.5">
+                <Sparkle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" weight="fill" />
+                <div>
+                  <p className="text-[13px] font-bold text-emerald-200">
+                    {billing.welcomeTrial.bannerTitle}
+                  </p>
+                  <p className="mt-0.5 text-xs leading-5 text-white/52">
+                    New members can activate {billing.welcomeTrial.durationDays} days of Premium
+                    from their first Premium download. No card required.
+                  </p>
+                </div>
               </div>
+              {!session && (
+                <Link
+                  href="/signup"
+                  className="group inline-flex w-fit shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
+                >
+                  Create account
+                  <ArrowRight className="h-3.5 w-3.5 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" weight="bold" />
+                </Link>
+              )}
             </div>
-            <Link
-              href="/signup"
-              className="group inline-flex shrink-0 items-center gap-2 text-sm font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
-            >
-              Create account
-              <ArrowRight className="h-4 w-4 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1" weight="bold" />
-            </Link>
           </div>
         </section>
       )}

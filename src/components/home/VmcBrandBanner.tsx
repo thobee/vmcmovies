@@ -57,8 +57,8 @@ export default function VmcBrandBanner() {
                 From “what should I watch?” to the file in your Telegram.
               </h2>
               <p className="mt-4 max-w-lg text-sm leading-7 text-white/58 sm:text-base">
-                VMC keeps discovery simple and delivery direct. Browse first, see the access type,
-                then receive the movie or series through Telegram without fake buttons or detours.
+                Find a movie, check if it is Free or Premium, then download it through Telegram.
+                No aggressive ads, fake buttons, or confusing pages.
               </p>
               <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
                 {TRUST.map((item) => (
@@ -95,7 +95,7 @@ export default function VmcBrandBanner() {
                 ))}
               </div>
 
-              <div className="mt-3 flex items-center gap-3 rounded-2xl bg-emerald-400 px-4 py-3.5 text-black">
+              <div className="mt-3 inline-flex max-w-full items-center gap-3 rounded-xl bg-emerald-400 px-4 py-3 text-black shadow-[0_12px_35px_rgba(16,185,129,0.14)]">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-black/10">
                   <DownloadSimple className="h-5 w-5" weight="bold" />
                 </span>
