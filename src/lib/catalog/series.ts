@@ -14,6 +14,8 @@ export function normalizeSeries(content: Content): Content {
       ...legacy,
       seasons: sortSeasons(
         legacy.seasons.map((season) => ({
+          ...season,
+          episodes: season.episodes ? [...season.episodes].sort((a, b) => a.episodeNumber - b.episodeNumber) : undefined,
           seasonNumber: season.seasonNumber,
           downloadUrl: season.downloadUrl?.trim() ?? "",
         }))
@@ -25,7 +27,8 @@ export function normalizeSeries(content: Content): Content {
     const seasonNumbers = [
       ...new Set(legacy.episodes.map((ep) => ep.seasonNumber)),
     ].sort((a, b) => a - b);
-    const { episodes: _removed, ...rest } = legacy;
+    const rest = { ...legacy };
+    delete rest.episodes;
     return {
       ...rest,
       seasons: seasonNumbers.map((seasonNumber) => ({

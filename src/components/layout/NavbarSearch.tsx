@@ -24,7 +24,7 @@ export default function NavbarSearch({
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const { results, loading } = useCatalogSearch(query);
+  const { results, loading, error } = useCatalogSearch(query);
 
   const trimmed = query.trim();
   const showPanel = open && trimmed.length >= 2;
@@ -145,10 +145,16 @@ export default function NavbarSearch({
             </div>
           )}
 
-          {!loading && results.length === 0 && (
+          {!loading && error && (
+            <p role="alert" className="px-4 py-5 text-sm text-white/65">Search is unavailable. Please try again shortly.</p>
+          )}
+          {!loading && !error && results.length === 0 && (
             <div className="px-4 py-5 text-center">
               <p className="text-sm font-semibold text-white/80">No matches</p>
-              <p className="mt-1 text-xs text-white/45">Try another title or genre</p>
+              <p className="mt-1 text-sm leading-6 text-white/60">This title may not be available yet. Check the spelling or request it.</p>
+              <button type="button" onClick={submitAll} className="mt-2 min-h-11 rounded-lg px-3 text-sm font-bold text-emerald-300 underline underline-offset-4 hover:bg-emerald-400/10 focus-visible:outline-2 focus-visible:outline-emerald-300">
+                Request this title
+              </button>
             </div>
           )}
 

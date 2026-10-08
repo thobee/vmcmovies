@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowSquareOut,
-  Broadcast,
   Check,
   DownloadSimple,
   EyeSlash,
@@ -13,10 +12,10 @@ import {
   Robot,
   Sparkle,
 } from "@phosphor-icons/react";
-import type { ContentAccessKind, Season } from "@/lib/catalog/types";
+import type { ContentAccessKind, DownloadFile, Season } from "@/lib/catalog/types";
 import type { PremiumSource } from "@/lib/auth/types";
 import { seasonLabel } from "@/lib/catalog/series";
-import { getTelegramBotUrl, getTelegramChannelUrl } from "@/lib/catalog/telegram";
+import { getTelegramBotUrl } from "@/lib/catalog/telegram";
 import { cn } from "@/lib/cn";
 import { Arc } from "@/components/loading-ui/arc";
 import TelegramIcon from "@/components/brand/TelegramIcon";
@@ -70,6 +69,7 @@ interface DownloadPanelProps {
   loggedIn?: boolean;
   movieDownloadUrl?: string;
   seasons?: Season[];
+  additionalFiles?: DownloadFile[];
 }
 
 export default function DownloadPanel({
@@ -81,13 +81,13 @@ export default function DownloadPanel({
   loggedIn = false,
   movieDownloadUrl,
   seasons,
+  additionalFiles,
 }: DownloadPanelProps) {
   const router = useRouter();
   const [activatingTrial, setActivatingTrial] = useState(false);
   const [trialError, setTrialError] = useState("");
-  const channelUrl = getTelegramChannelUrl();
   const botUrl = getTelegramBotUrl();
-  const seasonLinks = seasons?.filter((s) => s.downloadUrl.trim()) ?? [];
+  const seasonLinks = seasons?.filter((s) => s.downloadUrl.trim() || s.zipUrl || s.episodes?.length) ?? [];
   const unlocked =
     loggedIn && (accessKind !== "premium" || premiumStatus === "active");
 
@@ -145,10 +145,10 @@ export default function DownloadPanel({
         <PremiumDownloadPanel
           accessKind={accessKind}
           premiumSource={premiumSource}
-          channelUrl={channelUrl}
           botUrl={botUrl}
           movieDownloadUrl={movieDownloadUrl}
           seasons={seasonLinks}
+          additionalFiles={additionalFiles}
         />
       ) : premiumStatus === "pending" ? (
         <section id="download" className={PANEL_SHELL}>
@@ -162,18 +162,18 @@ export default function DownloadPanel({
               </h2>
               <p className="mt-2 text-sm leading-6 text-white/70">
                 Your premium download opens as soon as Paystack confirms the payment.
-                Join the Telegram channel now so the file can arrive smoothly.
+                Open the bot and tap Start. Then return here to download once your payment is confirmed.
               </p>
             </div>
           </div>
           <a
-            href={channelUrl}
+            href={botUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/35 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200"
           >
-            <Broadcast className="h-3.5 w-3.5" weight="bold" />
-            Join channel
+            <Robot className="h-4 w-4" weight="duotone" />
+            Open bot
           </a>
           <button
             disabled
@@ -230,53 +230,36 @@ export default function DownloadPanel({
     </>
   );
 }
-
 function PremiumDownloadPanel({
   accessKind,
   premiumSource,
-  channelUrl,
   botUrl,
   movieDownloadUrl,
   seasons,
+  additionalFiles = [],
 }: {
   accessKind: ContentAccessKind;
   premiumSource: PremiumSource | null;
-  channelUrl: string;
   botUrl: string;
   movieDownloadUrl?: string;
   seasons: Season[];
+  additionalFiles?: DownloadFile[];
 }) {
-  const [channelOpened, setChannelOpened] = useState(false);
+  const [localSetup, setLocalSetup] = useState<TelegramSetupState | null>(null);
   const [botOpened, setBotOpened] = useState(false);
-  const setupState = useSyncExternalStore(
+  const savedSetup = useSyncExternalStore(
     subscribeTelegramSetup,
     readTelegramSetup,
     serverTelegramSetup,
   );
+  const setupState = localSetup ?? savedSetup;
   const setupHidden = setupState === "hidden";
-  const setupComplete = setupState === "complete";
-  const channelDone = channelOpened || setupComplete;
-  const botDone = botOpened || setupComplete;
-
-  const markSetupStep = (step: "channel" | "bot") => {
-    const nextChannel = channelDone || step === "channel";
-    const nextBot = botDone || step === "bot";
-    setChannelOpened(nextChannel);
-    setBotOpened(nextBot);
-    if (nextChannel && nextBot) {
-      saveTelegramSetup("complete");
-    }
+  const downloadsReady = setupState !== "new";
+  const updateSetup = (value: "complete" | "hidden") => {
+    setLocalSetup(value);
+    saveTelegramSetup(value);
   };
 
-  const hideSetup = () => {
-    saveTelegramSetup("hidden");
-  };
-
-  const showSetup = () => {
-    saveTelegramSetup("complete");
-  };
-
-  const downloadsReady = setupHidden || setupComplete || (channelOpened && botOpened);
   const heading =
     accessKind === "free" || accessKind === "temporary_free"
       ? "Free download"
@@ -285,150 +268,102 @@ function PremiumDownloadPanel({
           : "Download unlocked";
 
   return (
-    <section id="download" className={cn(PANEL_SHELL, "ring-1 ring-emerald-400/20")}>
-      <div>
-        <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-400">
+    <section id="download" className={cn(PANEL_SHELL, "relative overflow-hidden ring-1 ring-emerald-400/15")}>
+      <div aria-hidden className="absolute inset-x-6 top-0 h-px bg-emerald-300/50" />
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-300">
+          <DownloadSimple className="size-5" weight="duotone" />
+        </span>
+        <div className="min-w-0">
+        <h2 className="text-base font-bold text-white">
           {heading}
         </h2>
-        <p className="mt-1.5 text-sm text-white/60">
-          Choose your file below. Telegram will open in a new tab.
+        <p className="mt-1 text-sm leading-5 text-white/60">
+          Your next watch, delivered on Telegram.
         </p>
+        </div>
       </div>
 
-      {!setupHidden && (
-        <div
-          id="telegram-setup"
-          className="mt-5 rounded-[26px] bg-[#2AABEE]/[0.06] p-1.5 ring-1 ring-inset ring-[#2AABEE]/20"
-        >
-          <div className="rounded-[20px] bg-[#0b1114] p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] sm:p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#67c8f5]">
-                  Required first-time setup
-                </p>
-                <h3 className="mt-1.5 text-base font-bold text-white">Prepare Telegram once</h3>
-                <p className="mt-1 text-xs leading-5 text-white/45">
-                  Open both steps before your download can begin.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={hideSetup}
-                className="group inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[10px] font-semibold text-white/42 ring-1 ring-inset ring-white/[0.08] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.06] hover:text-white/75"
-                aria-label="Hide Telegram setup because it is already complete"
-              >
-                <EyeSlash className="h-3.5 w-3.5" weight="bold" />
-                Already set up? Hide
-              </button>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <a
-                href={channelUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => markSetupStep("channel")}
-                className={cn(
-                  "group flex min-h-[76px] items-center gap-3 rounded-2xl p-3.5 ring-1 ring-inset transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.985]",
-                  channelDone
-                    ? "bg-[#2AABEE]/14 ring-[#2AABEE]/30"
-                    : "bg-white/[0.035] ring-white/[0.08] hover:bg-[#2AABEE]/10 hover:ring-[#2AABEE]/25",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-                    channelDone ? "bg-emerald-400 text-black" : "bg-[#2AABEE] text-white",
-                  )}
-                >
-                  {channelDone ? <Check className="h-4 w-4" weight="bold" /> : "1"}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 text-sm font-bold text-white">
-                    <TelegramIcon className="h-5 w-5 text-[#2AABEE]" />
-                    Join channel
-                  </span>
-                  <span className="mt-1 block text-[11px] text-white/38">
-                    {channelDone ? "Channel opened" : "Get access to VMC updates"}
-                  </span>
-                </span>
-                <ArrowSquareOut className="h-4 w-4 shrink-0 text-white/28 transition group-hover:text-[#67c8f5]" weight="bold" />
-              </a>
-
-              <a
-                href={botUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => markSetupStep("bot")}
-                className={cn(
-                  "group flex min-h-[76px] items-center gap-3 rounded-2xl p-3.5 ring-1 ring-inset transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.985]",
-                  botDone
-                    ? "bg-emerald-400/[0.09] ring-emerald-300/25"
-                    : "bg-white/[0.035] ring-white/[0.08] hover:bg-emerald-400/[0.07] hover:ring-emerald-300/20",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-                    botDone ? "bg-emerald-400 text-black" : "bg-white/[0.07] text-white",
-                  )}
-                >
-                  {botDone ? <Check className="h-4 w-4" weight="bold" /> : "2"}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 text-sm font-bold text-white">
-                    <Robot className="h-5 w-5 text-emerald-300" weight="duotone" />
-                    Open bot
-                  </span>
-                  <span className="mt-1 block text-[11px] text-white/38">
-                    {botDone ? "Bot opened" : "Tap Start inside Telegram"}
-                  </span>
-                </span>
-                <ArrowSquareOut className="h-4 w-4 shrink-0 text-white/28 transition group-hover:text-emerald-300" weight="bold" />
-              </a>
-            </div>
-
-            <div className="mt-4 flex items-center gap-3 border-t border-white/[0.07] pt-4">
-              <span
-                className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold",
-                  downloadsReady ? "bg-emerald-400 text-black" : "bg-white/[0.05] text-white/35",
-                )}
-              >
-                {downloadsReady ? <Check className="h-4 w-4" weight="bold" /> : "3"}
+      {!setupHidden ? (
+        <div id="telegram-setup" className="mt-6 scroll-mt-28 border-t border-white/10 pt-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-sky-400/15 text-sky-300">
+                <Robot className="size-6" weight="duotone" />
               </span>
               <div>
-                <p className={cn("text-xs font-bold", downloadsReady ? "text-emerald-300" : "text-white/55") }>
-                  {downloadsReady ? "Telegram is ready" : "Download unlocks after steps 1 and 2"}
-                </p>
-                <p className="mt-0.5 text-[11px] text-white/32">You only need to complete this setup once.</p>
+                <p className="text-xs font-semibold text-sky-300">One-time setup</p>
+                <h3 className="mt-1 text-lg font-bold text-white">Start with the VMC bot</h3>
               </div>
             </div>
+            {downloadsReady && (
+              <button type="button" onClick={() => updateSetup("hidden")}
+                className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/60 hover:text-white">
+                <EyeSlash className="size-4" /> Hide steps
+              </button>
+            )}
           </div>
-        </div>
-      )}
 
-      {setupHidden && (
-        <div className="mt-5 flex items-center gap-3 rounded-2xl bg-[#2AABEE]/[0.07] px-3.5 py-3 ring-1 ring-inset ring-[#2AABEE]/18">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#2AABEE]/15 text-[#67c8f5]">
-            <TelegramIcon className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-white">Telegram ready</p>
-            <p className="mt-0.5 text-[11px] text-white/38">First-time setup is already complete.</p>
+          <ol className="mt-6">
+            <li className="relative flex gap-4 pb-6">
+              <span aria-hidden className="absolute bottom-0 left-[15px] top-9 w-px bg-sky-300/20" />
+              <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-sky-400/15 text-sm font-bold text-sky-300 ring-1 ring-sky-300/25">1</span>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-white">Open the bot and tap Start</h4>
+                <p className="mt-1 text-sm leading-6 text-white/65">Tap Start inside Telegram so the bot can send you files.</p>
+                <a href={botUrl} target="_blank" rel="noopener noreferrer"
+                  onClick={() => setBotOpened(true)}
+                  className="group mt-4 flex min-h-12 w-full items-center gap-3 rounded-full bg-[#2AABEE] py-2 pl-5 pr-2 text-sm font-bold text-black transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 active:scale-[0.99]">
+                  <TelegramIcon className="size-5 shrink-0" /> Open VMC bot
+                  <span className="ml-auto flex size-9 shrink-0 items-center justify-center rounded-full bg-black/10">
+                    <ArrowSquareOut className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none" weight="bold" />
+                  </span>
+                </a>
+                <p className="mt-2 text-xs text-white/45">Opens Telegram. Keep this page open.</p>
+              </div>
+            </li>
+            <li className="flex gap-4">
+              <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ring-1", downloadsReady ? "bg-emerald-400/15 text-emerald-300 ring-emerald-300/30" : "bg-white/5 text-white/70 ring-white/15")}>
+                {downloadsReady ? <Check className="size-4" weight="bold" /> : "2"}
+              </span>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-white">Come back here to download</h4>
+                <p className="mt-1 text-sm leading-6 text-white/65">Confirm you tapped Start, then choose your movie or season below.</p>
+              </div>
+            </li>
+          </ol>
+
+          <div className="mt-5 border-t border-white/10 pt-4">
+            {downloadsReady ? (
+              <p role="status" className="flex items-center gap-2 py-2 text-sm text-emerald-300">
+                <Check className="size-4" weight="bold" /> Setup saved. Choose your download below.
+              </p>
+            ) : (
+              <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg bg-white/[0.04] px-3 py-3 text-sm font-medium text-white/85 transition hover:bg-white/[0.07] focus-within:ring-2 focus-within:ring-sky-300">
+                <input type="checkbox" checked={false} onChange={() => updateSetup("complete")}
+                  className="size-5 shrink-0 accent-emerald-400" />
+                I have tapped Start in the VMC bot
+              </label>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={showSetup}
-            className="shrink-0 rounded-full px-3 py-2 text-[11px] font-semibold text-[#67c8f5] ring-1 ring-inset ring-[#2AABEE]/20 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#2AABEE]/10 hover:text-white"
-          >
-            Show steps
+          {botOpened && !downloadsReady && (
+            <p role="status" className="mt-3 text-sm leading-6 text-sky-200">Back from Telegram? Tick the box above after tapping Start.</p>
+          )}
+        </div>
+      ) : (
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4">
+          <p className="flex items-center gap-2 text-sm text-white/70">
+            <TelegramIcon className="size-5 text-sky-300" /> Download with Telegram
+          </p>
+          <button type="button" onClick={() => updateSetup("complete")}
+            className="min-h-11 text-sm font-semibold text-sky-300 hover:text-sky-200">
+            Show setup steps
           </button>
         </div>
       )}
 
       {movieDownloadUrl && (
-        <div className="mt-4 rounded-3xl border border-emerald-400/18 bg-emerald-500/[0.06] p-3">
+        <div className="mt-5">
           {downloadsReady ? (
             <a
               href={movieDownloadUrl}
@@ -452,37 +387,42 @@ function PremiumDownloadPanel({
       )}
 
       {seasons.length > 0 && (
-        <div className="mt-5 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
-            Available seasons
-          </p>
-          <div className="grid gap-2">
-            {seasons.map((season) =>
-              downloadsReady ? (
-                <a
-                  key={season.seasonNumber}
-                  href={season.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm font-bold text-white transition hover:border-emerald-400/40 hover:bg-emerald-500/10"
-                >
-                  <span>{seasonLabel(season)}</span>
-                  <DownloadSimple className="h-4 w-4 shrink-0 text-emerald-400" weight="bold" />
-                </a>
-              ) : (
-                <a
-                  key={season.seasonNumber}
-                  href="#telegram-setup"
-                  className="inline-flex items-center justify-between gap-3 rounded-2xl border border-white/[0.07] bg-black/20 px-4 py-3.5 text-sm font-bold text-white/38"
-                >
-                  <span>{seasonLabel(season)}</span>
-                  <Lock className="h-4 w-4 shrink-0" weight="bold" />
-                </a>
-              ),
-            )}
-          </div>
+        <div className="mt-6 space-y-3">
+          <h3 className="text-sm font-semibold text-white/70">Choose a season</h3>
+          {seasons.map(season => (
+            <details key={season.seasonNumber} open={seasons.length === 1} className="border-b border-white/10 pb-3">
+              <summary className="cursor-pointer py-3 text-sm font-bold text-white focus-visible:outline-2 focus-visible:outline-emerald-300">
+                {seasonLabel(season)}{season.episodes?.length ? ` · ${season.episodes.length} episodes available` : ""}
+              </summary>
+              <div className="grid gap-2 pt-2">
+                {season.downloadUrl && <FileLink label="Open season in Telegram" url={season.downloadUrl} ready={downloadsReady} />}
+                {season.zipUrl && <FileLink label="Download full season ZIP" url={season.zipUrl} ready={downloadsReady} />}
+                {[...(season.episodes ?? [])].sort((a, b) => a.episodeNumber - b.episodeNumber).map(ep => (
+                  <FileLink key={ep.episodeNumber} label={`Episode ${ep.episodeNumber}${ep.title ? ` - ${ep.title}` : ""}`} url={ep.downloadUrl} ready={downloadsReady} />
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      )}
+      {additionalFiles.length > 0 && (
+        <div className="mt-6 space-y-2">
+          <h3 className="mb-3 text-sm font-semibold text-white/70">Additional files</h3>
+          {additionalFiles.map((file, index) => (
+            <FileLink key={index} label={file.label} detail={[file.quality, file.fileSize].filter(Boolean).join(" / ")} url={file.downloadUrl} ready={downloadsReady} />
+          ))}
         </div>
       )}
     </section>
+  );
+}
+
+function FileLink({ label, detail, url, ready }: { label: string; detail?: string; url: string; ready: boolean }) {
+  return (
+    <a href={ready ? url : "#telegram-setup"} target={ready ? "_blank" : undefined} rel={ready ? "noopener noreferrer" : undefined}
+      className="flex min-h-12 items-center justify-between gap-3 rounded-lg bg-white/[0.04] px-4 py-3 text-sm text-white/85 transition hover:bg-emerald-400/10 focus-visible:outline-2 focus-visible:outline-emerald-300">
+      <span className="min-w-0 break-words"><span className="font-semibold">{label}</span>{detail && <span className="mt-1 block text-xs text-white/55">{detail}</span>}{!ready && <span className="mt-1 block text-xs text-white/55">Complete Telegram setup</span>}</span>
+      {ready ? <DownloadSimple className="size-5 shrink-0 text-emerald-300" /> : <Lock className="size-4 shrink-0 text-white/50" />}
+    </a>
   );
 }

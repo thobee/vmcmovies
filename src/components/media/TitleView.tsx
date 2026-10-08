@@ -13,7 +13,7 @@ import RecommendedGrid from "@/components/media/RecommendedGrid";
 import QualityBadges from "@/components/media/QualityBadges";
 import PlotText from "@/components/media/PlotText";
 import ShareBar from "@/components/media/ShareBar";
-import { getTelegramBotUrl, getTelegramChannelUrl } from "@/lib/catalog/telegram";
+import { getTelegramBotUrl } from "@/lib/catalog/telegram";
 import { contentAccessKind } from "@/lib/catalog/access";
 import AccessBadge from "@/components/media/AccessBadge";
 
@@ -37,9 +37,8 @@ export default function TitleView({
   const isSeries = item.type === "series";
   const browseHref = isSeries ? "/series" : "/movies";
   const browseLabel = isSeries ? "TV Shows" : "Movies";
-  const seasonCount = item.seasons?.filter((s) => s.downloadUrl.trim()).length ?? 0;
+  const seasonCount = item.seasons?.length ?? 0;
   const poster = resolvePosterImage(item.posterImageUrl, item.backdropImageUrl);
-  const channelUrl = getTelegramChannelUrl();
   const botUrl = getTelegramBotUrl();
   const accessKind = contentAccessKind(item);
   const hasDownloadAccess =
@@ -115,6 +114,9 @@ export default function TitleView({
 
               <div className="mt-4 flex flex-wrap items-center gap-2.5 text-sm text-white/60">
                 <QualityBadges qualities={item.qualities} />
+                {isSeries && item.seriesStatus && (
+                  <span className="text-sm font-semibold text-emerald-300">{item.seriesStatus === "ongoing" ? "Ongoing series" : "Completed series"}</span>
+                )}
                 {item.rating && (
                   <span className="inline-flex items-center gap-1 font-semibold text-amber-300">
                     <Star className="h-3.5 w-3.5" weight="fill" />
@@ -158,29 +160,27 @@ export default function TitleView({
                     loggedIn={loggedIn}
                     movieDownloadUrl={hasDownloadAccess ? item.downloadUrl : undefined}
                     seasons={hasDownloadAccess ? item.seasons : undefined}
+                    additionalFiles={hasDownloadAccess ? item.additionalFiles : undefined}
                   />
                 </div>
                 <div className="w-full max-w-xl space-y-4 xl:max-w-xs xl:shrink-0">
-                  <aside className="rounded-[24px] bg-white/[0.035] p-1.5 ring-1 ring-inset ring-white/[0.08]">
-                    <div className="rounded-[18px] border border-white/[0.07] bg-black/25 p-4 sm:p-5">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#2AABEE]">
+                  <aside className="rounded-[24px] border border-sky-300/15 bg-[#101619] p-5 sm:p-6">
+                      <p className="text-xs font-semibold text-sky-300">
                         Telegram help
                       </p>
                       <h2
                         className="mt-1.5 text-lg font-bold text-white"
                         style={{ fontFamily: "var(--font-display)" }}
                       >
-                        First download?
+                        A little help, if you need it.
                       </h2>
-                      <p className="mt-1.5 text-sm leading-6 text-white/55">
-                        Follow the steps for iPhone, iPad, or Android.
+                      <p className="mt-2 text-sm leading-6 text-white/65">
+                        From starting the bot to saving your file on iPhone or Android.
                       </p>
                       <TelegramDownloadTutorial
-                        channelUrl={channelUrl}
                         botUrl={botUrl}
                         className="mt-4 w-full sm:w-full"
                       />
-                    </div>
                   </aside>
                   <ShareBar
                     item={{ id: item.id, slug: item.slug, type: item.type, title: item.title }}

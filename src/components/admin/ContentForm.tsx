@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, CheckCircle2, Eye, ImageIcon, Link2, Plus, Trash2 } from "lucide-react";
 import { genresToInput, parseGenresInput } from "@/lib/admin/content";
-import type { Content, Season } from "@/lib/catalog/types";
+import { AdditionalFilesFields, SeasonFilesFields } from "@/components/admin/DownloadFields";
+import type { Content, DownloadFile, Season } from "@/lib/catalog/types";
 import { buildTelegramDownloadUrl } from "@/lib/catalog/telegram";
 import { normalizeSeries, sortSeasons } from "@/lib/catalog/series";
 import { slugify } from "@/lib/slug";
@@ -83,8 +84,8 @@ function buildReadiness(input: {
         }
       : {
           label: "Season links ready",
-          ok: seasonLinks.length > 0 && seasonLinks.every((season) => validTelegramUrl(season.downloadUrl)),
-          hint: "Each season needs its own Telegram deep link.",
+          ok: seasonLinks.length > 0 && seasonLinks.every((season) => Boolean(season.downloadUrl || season.zipUrl || season.episodes?.length) && (!season.downloadUrl || validTelegramUrl(season.downloadUrl)) && (!season.zipUrl || validTelegramUrl(season.zipUrl)) && (season.episodes ?? []).every(ep => validTelegramUrl(ep.downloadUrl))),
+          hint: "Each season needs a season link, ZIP, or episode links.",
         },
   ];
 }
@@ -108,6 +109,7 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
   const [rating, setRating] = useState(initial?.rating ?? "");
   const [runtime, setRuntime] = useState(initial?.runtime ?? "");
   const [downloadUrl, setDownloadUrl] = useState(initial?.downloadUrl ?? "");
+  const [additionalFiles, setAdditionalFiles] = useState<DownloadFile[]>(initial?.additionalFiles ?? []);
   const [qualities, setQualities] = useState<Quality[]>(initial?.qualities ?? ["720p", "1080p"]);
   const [featured, setFeatured] = useState(initial?.featured ?? false);
   const [accessMode, setAccessMode] = useState<AccessMode>(() => initialAccessMode(initial));
@@ -159,6 +161,7 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
       rating: rating || undefined,
       runtime: runtime || undefined,
       qualities,
+      additionalFiles,
       downloadUrl: downloadUrl || undefined,
       accessTier: accessMode === "free" ? "free" as const : "premium" as const,
       freeUntil:
@@ -313,6 +316,9 @@ export function MovieForm({ initial, mode }: MovieFormProps) {
             <QualityPicker value={qualities} onChange={setQualities} />
           </FormSection>
 
+          <FormSection title="Additional files" hint="Optional Telegram links for ZIP archives, subtitles, or other versions.">
+            <AdditionalFilesFields files={additionalFiles} onChange={setAdditionalFiles} />
+          </FormSection>
           <FormSection title="4. Download & publish">
             <FormField label="Download URL" hint="Optional — if empty, VMC generates a Telegram bot link from the internal ID.">
               <input
@@ -398,11 +404,13 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
   const [year, setYear] = useState(initial?.year ?? "");
   const [rating, setRating] = useState(initial?.rating ?? "");
   const [runtime, setRuntime] = useState(initial?.runtime ?? "");
+  const [additionalFiles, setAdditionalFiles] = useState<DownloadFile[]>(initial?.additionalFiles ?? []);
   const [qualities, setQualities] = useState<Quality[]>(initial?.qualities ?? ["720p", "1080p"]);
   const [featured, setFeatured] = useState(initial?.featured ?? false);
   const [accessMode, setAccessMode] = useState<AccessMode>(() => initialAccessMode(initial));
   const [freeUntil, setFreeUntil] = useState(initial?.freeUntil?.slice(0, 16) ?? "");
   const [notifyUsers, setNotifyUsers] = useState(true);
+  const [seriesStatus, setSeriesStatus] = useState<"ongoing" | "completed" | "">(initial?.seriesStatus ?? "");
   const [seasons, setSeasons] = useState<Season[]>(() => initialSeasons(initial));
 
   const addSeason = () => {
@@ -465,12 +473,14 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
       rating: rating || undefined,
       runtime: runtime || undefined,
       qualities,
+      additionalFiles,
       accessTier: accessMode === "free" ? "free" as const : "premium" as const,
       freeUntil:
         accessMode === "temporary_free" && freeUntil
           ? new Date(freeUntil).toISOString()
           : undefined,
       featured,
+      seriesStatus: seriesStatus || undefined,
       seasons,
       ...(mode === "create" ? { notifyUsers } : {}),
     };
@@ -518,7 +528,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
         type="series"
         mode={mode}
         readiness={readiness}
-        primaryAction="Search TMDB, confirm artwork, then add one Telegram link per season."
+        primaryAction="Search TMDB, confirm artwork, then add season or episode links."
       />
 
       {mode === "create" && <TmdbSearch type="series" onSelect={applyTmdb} />}
@@ -613,7 +623,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
 
           <FormSection
             title="4. Seasons"
-            hint='One row per season. Each "Season N" button on the site opens the Telegram link you paste here.'
+            hint="Add a season link, a ZIP archive, or individual episode links as they become available."
           >
             <button
               type="button"
@@ -624,6 +634,11 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
               Add season
             </button>
 
+            <FormField label="Series status">
+              <select className={inputClass} value={seriesStatus} onChange={e => setSeriesStatus(e.target.value as typeof seriesStatus)}>
+                <option value="">Not specified</option><option value="ongoing">Ongoing</option><option value="completed">Completed</option>
+              </select>
+            </FormField>
             {seasons.length === 0 && (
               <p className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-white/40">
                 No seasons yet. Add at least Season 1.
@@ -632,11 +647,11 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
 
             {seasons.map((season, index) => (
               <div
-                key={`${season.seasonNumber}-${index}`}
+                key={index}
                 className="rounded-xl border border-white/[0.06] bg-[#141414] p-4 space-y-4"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold text-white">Season {index + 1}</span>
+                  <span className="text-sm font-semibold text-white">Season {season.seasonNumber}</span>
                   <button
                     type="button"
                     onClick={() => removeSeason(index)}
@@ -661,8 +676,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
                     />
                   </FormField>
                   <FormField
-                    label="Telegram bot link"
-                    required
+                    label="Season Telegram link (optional)"
                     hint="Full link, e.g. https://t.me/yourbot?start=..."
                   >
                     <input
@@ -671,14 +685,17 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
                       onChange={(e) => updateSeason(index, { downloadUrl: e.target.value })}
                       placeholder="https://t.me/vmcmovies_bot?start=..."
                       className={inputClass}
-                      required
                     />
                   </FormField>
                 </div>
+                <SeasonFilesFields season={season} onChange={patch => updateSeason(index, patch)} />
               </div>
             ))}
           </FormSection>
 
+          <FormSection title="Additional files" hint="Optional Telegram links for ZIP archives, subtitles, or other versions.">
+            <AdditionalFilesFields files={additionalFiles} onChange={setAdditionalFiles} />
+          </FormSection>
           <FormSection title="5. Publish options">
             <AccessFields
               mode={accessMode}
@@ -904,7 +921,7 @@ function ContentPreview({
   seasons?: Season[];
 }) {
   const displayTitle = title.trim() || `Untitled ${type}`;
-  const seasonCount = seasons?.filter((season) => season.downloadUrl.trim()).length ?? 0;
+  const seasonCount = seasons?.filter((season) => season.downloadUrl.trim() || season.zipUrl || season.episodes?.length).length ?? 0;
 
   return (
     <div className="rounded-2xl panel overflow-hidden">

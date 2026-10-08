@@ -5,11 +5,25 @@ export type ContentType = "movie" | "series";
 export type ContentAccessTier = "free" | "premium";
 export type ContentAccessKind = "free" | "temporary_free" | "premium";
 
-/** Series season — you paste the Telegram bot link; episodes live in the bot. */
+export interface DownloadFile {
+  label: string;
+  downloadUrl: string;
+  quality?: string;
+  fileSize?: string;
+}
+
+export interface Episode {
+  episodeNumber: number;
+  title?: string;
+  downloadUrl: string;
+}
+
 export interface Season {
   seasonNumber: number;
   /** Your Telegram deep link for this season (from the bot). */
   downloadUrl: string;
+  zipUrl?: string;
+  episodes?: Episode[];
 }
 
 export interface Content {
@@ -36,8 +50,10 @@ export interface Content {
   freeUntil?: string;
   /** Movie only — Telegram bot deep link */
   downloadUrl?: string;
-  /** Series only — season buttons; bot serves episodes per season */
+  /** Series only: season links, ZIP archives, and individual episode links. */
   seasons?: Season[];
+  additionalFiles?: DownloadFile[];
+  seriesStatus?: "ongoing" | "completed";
 }
 
 export interface ContentListOptions {

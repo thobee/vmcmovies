@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, CaretDown, Crown, FilmSlate, House, List, Question, SignOut, SquaresFour, Television, User, X } from "@phosphor-icons/react";
+import { BookOpen, CaretDown, Crown, FilmSlate, House, List, MagnifyingGlass, Question, SignOut, SquaresFour, Television, User, X } from "@phosphor-icons/react";
 import VmcLogo from "@/components/brand/VmcLogo";
 import NavbarSearch from "@/components/layout/NavbarSearch";
 import NotificationBell from "@/components/layout/NotificationBell";
@@ -84,7 +84,7 @@ export default function Navbar() {
     <>
       <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
         <div
-          className="mx-auto flex h-[68px] max-w-screen-2xl items-center gap-3 rounded-[24px] border border-white/10 bg-[#101214]/95 px-4 shadow-[0_8px_32px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl sm:rounded-full sm:px-5 xl:gap-6 xl:px-7"
+          className="mx-auto flex h-[68px] max-w-screen-2xl items-center gap-1.5 rounded-[24px] border border-white/10 bg-[#101214]/95 px-3 shadow-[0_8px_32px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl sm:gap-3 sm:rounded-full sm:px-5 xl:gap-6 xl:px-7"
         >
           <VmcLogo
             href="/"
@@ -116,6 +116,19 @@ export default function Navbar() {
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <Link
+              href="/search"
+              aria-label="Search movies and TV shows"
+              title="Search movies and TV shows"
+              aria-current={pathname === "/search" ? "page" : undefined}
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                "flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 md:hidden",
+                pathname === "/search" ? "bg-emerald-400/15 text-emerald-300" : "bg-white/[0.06] text-white/85 hover:bg-white/10 hover:text-white",
+              )}
+            >
+              <MagnifyingGlass className="size-5" weight="bold" />
+            </Link>
             <RequestButton compact className="hidden md:inline-flex" />
             <NotificationBell />
 
@@ -200,7 +213,7 @@ export default function Navbar() {
               aria-controls="public-mobile-menu"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
-              <span className="text-xs font-semibold">{mobileOpen ? "Close" : "Menu"}</span>
+              <span className="hidden text-xs font-semibold min-[360px]:inline">{mobileOpen ? "Close" : "Menu"}</span>
             </button>
           </div>
         </div>

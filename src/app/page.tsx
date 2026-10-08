@@ -18,8 +18,6 @@ import FeaturedStrip from "@/components/home/FeaturedStrip";
 import HowItWorks from "@/components/home/HowItWorks";
 import ContentRail from "@/components/home/ContentRail";
 import PremiumBanner from "@/components/access/PremiumBanner";
-import VmcBrandBanner from "@/components/home/VmcBrandBanner";
-import WhyVmcSection from "@/components/home/WhyVmcSection";
 import { getBillingConfig } from "@/lib/payments/billing/db";
 import { buildResolvedPlans, isWelcomeTrialWindowActive } from "@/lib/payments/billing/resolve";
 import { toPublicContent } from "@/lib/catalog/public";
@@ -175,7 +173,6 @@ export default async function HomePage() {
       </div>
 
       <HowItWorks />
-      <VmcBrandBanner />
       <PremiumBanner
         plans={buildResolvedPlans(billing, "NGN")}
         trial={
@@ -188,7 +185,6 @@ export default async function HomePage() {
             : null
         }
       />
-      <WhyVmcSection />
       <Footer />
     </SitePage>
   );

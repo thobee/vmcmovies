@@ -144,7 +144,7 @@ export default function NotificationBell() {
         )}
       >
         <Bell className="h-4.5 w-4.5 shrink-0" weight="bold" />
-        <span className="text-xs font-semibold">Updates</span>
+          <span className="hidden text-xs font-semibold min-[360px]:inline">Updates</span>
         {unread > 0 && (
           <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-black shadow-sm shadow-emerald-500/40">
             {unread > 9 ? "9+" : unread}

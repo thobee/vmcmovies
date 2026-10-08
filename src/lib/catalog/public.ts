@@ -5,6 +5,10 @@ export function toPublicContent(item: Content): Content {
   return {
     ...item,
     downloadUrl: undefined,
-    seasons: item.seasons?.map((s) => ({ ...s, downloadUrl: "" })),
+    additionalFiles: item.additionalFiles?.map(f => ({ ...f, downloadUrl: "" })),
+    seasons: item.seasons?.map((s) => ({
+      ...s, downloadUrl: "", zipUrl: undefined,
+      episodes: s.episodes?.map(e => ({ ...e, downloadUrl: "" })),
+    })),
   };
 }

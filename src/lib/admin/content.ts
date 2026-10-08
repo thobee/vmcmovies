@@ -21,6 +21,7 @@ export function inputToContent(input: ContentInput): Content {
     accessTier: input.accessTier ?? "premium",
     freeUntil: input.accessTier === "premium" ? input.freeUntil?.trim() || undefined : undefined,
     createdAt: now,
+    additionalFiles: input.additionalFiles ?? [],
   };
 
   if (input.type === "movie") {
@@ -35,8 +36,10 @@ export function inputToContent(input: ContentInput): Content {
   return {
     ...base,
     type: "series",
+    seriesStatus: input.seriesStatus,
     seasons: sortSeasons(
       input.seasons.map((season) => ({
+        ...season,
         seasonNumber: season.seasonNumber,
         downloadUrl: season.downloadUrl.trim(),
       }))

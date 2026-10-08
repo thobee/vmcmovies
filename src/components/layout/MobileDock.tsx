@@ -44,13 +44,13 @@ export default function MobileDock() {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[10px] font-semibold transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.96]",
+                "flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-xs font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300",
                 active
                   ? "bg-emerald-400 text-black"
-                  : "text-white/48 hover:bg-white/[0.06] hover:text-white",
+                  : "text-white/70 hover:bg-white/[0.06] hover:text-white",
               )}
             >
-              <Icon className="h-[19px] w-[19px]" weight={active ? "fill" : "light"} />
+              <Icon className="size-5" weight={active ? "fill" : "regular"} />
               <span>{item.label}</span>
             </Link>
           );

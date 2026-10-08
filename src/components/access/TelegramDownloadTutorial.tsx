@@ -20,7 +20,6 @@ const GUIDES: Record<Platform, { title: string; steps: string[] }> = {
   iphone: {
     title: "Download on iPhone or iPad",
     steps: [
-      "Join the VMC Telegram channel with the same account you use for VMC.",
       "Open the VMC bot and tap Start once to activate it.",
       "Return to VMC, choose a movie or season, then tap Download.",
       "When Telegram opens, tap the download arrow on the file. You can watch there or save it to Files.",
@@ -29,7 +28,6 @@ const GUIDES: Record<Platform, { title: string; steps: string[] }> = {
   android: {
     title: "Download on Android",
     steps: [
-      "Join the VMC Telegram channel with the same account you use for VMC.",
       "Open the VMC bot and tap Start once to activate it.",
       "Return to VMC, choose a movie or season, then tap Download.",
       "Telegram opens with the file. Tap the download arrow, then watch it or find it in Telegram downloads.",
@@ -38,11 +36,9 @@ const GUIDES: Record<Platform, { title: string; steps: string[] }> = {
 };
 
 export default function TelegramDownloadTutorial({
-  channelUrl,
   botUrl,
   className,
 }: {
-  channelUrl: string;
   botUrl: string;
   className?: string;
 }) {
@@ -183,20 +179,7 @@ export default function TelegramDownloadTutorial({
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
-                  <a
-                    href={channelUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex min-h-12 items-center justify-between rounded-full bg-[#2AABEE] py-2 pl-5 pr-2 text-sm font-bold text-white transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#45b8ee] active:scale-[0.98]"
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <TelegramIcon className="h-5 w-5" /> Join channel
-                    </span>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/10">
-                      <ArrowSquareOut className="h-4 w-4" weight="bold" />
-                    </span>
-                  </a>
+                <div className="mt-5 grid gap-2.5">
                   <a
                     href={botUrl}
                     target="_blank"
@@ -214,7 +197,7 @@ export default function TelegramDownloadTutorial({
 
                 <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-white/38">
                   <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" weight="bold" />
-                  You only need to join the channel and start the bot once. Future downloads open directly in Telegram.
+                  Tap Start in the bot once, then return to the movie or series page and tap Download.
                 </p>
               </div>
             </div>

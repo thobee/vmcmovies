@@ -9,12 +9,14 @@ import type { TitleRequestType } from "@/lib/requests/types";
 export default function RequestModal({
   open,
   onClose,
+  initialTitle = "",
 }: {
   open: boolean;
   onClose: () => void;
+  initialTitle?: string;
 }) {
   const toast = useSiteToast();
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(initialTitle);
   const [type, setType] = useState<TitleRequestType>("movie");
   const [year, setYear] = useState("");
   const [error, setError] = useState("");

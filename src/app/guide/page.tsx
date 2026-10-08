@@ -23,7 +23,7 @@ const GUIDE_SECTIONS = [
   {
     title: "Add Telegram",
     icon: TelegramLogo,
-    body: "Add the same Telegram username you use in the Telegram app. This makes downloads easier to route after you unlock premium.",
+    body: "Add your Telegram username in your dashboard. Open the VMC bot and tap Start once. Then return to the movie or series page, confirm you have tapped Start, and choose your download. You can hide the setup steps after that.",
   },
   {
     title: "Browse movies and series",
@@ -33,17 +33,17 @@ const GUIDE_SECTIONS = [
   {
     title: "Unlock premium",
     icon: Crown,
-    body: "Premium is handled through Paystack checkout. Plans are manual, so there is no automatic renewal unless that is added later.",
+    body: "Every download requires an account. Free titles need no paid plan. Premium titles require an active trial or a paid plan. When a launch trial is available, eligible new members can activate it from a Premium title. Your dashboard shows your expiry date and days remaining.",
   },
   {
     title: "Download through Telegram",
     icon: DownloadSimple,
-    body: "After payment confirms, open a title and use the download button. VMC sends you toward the Telegram delivery flow for that movie or episode.",
+    body: "Open a title, complete the Telegram setup, and choose the available file or season. Telegram opens so you can receive and save your download. Use How to download on the title page for iPhone, iPad, and Android instructions.",
   },
   {
     title: "Ask for help",
     icon: ChatCircle,
-    body: "Use Support if payment does not confirm, a download link is missing, or you want to request a movie that is not in the catalog.",
+    body: "Use Support for payment, account, or download problems. Active Premium members can use Request a movie from the navigation menu to suggest a missing title.",
   },
 ] as const;
 
@@ -51,7 +51,7 @@ const QUICK_TIPS = [
   "Use the same email whenever you log in.",
   "Keep your Telegram username updated before requesting downloads.",
   "If payment says pending, check your account dashboard before paying again.",
-  "Use Support for movie requests, account problems, or download issues.",
+  "Use Request a movie to suggest a title, or Support to report a problem.",
 ] as const;
 
 export default function GuidePage() {
@@ -143,6 +143,24 @@ export default function GuidePage() {
               <p className="mt-3 text-sm leading-6 text-white/58">{body}</p>
             </article>
           ))}
+        </section>
+
+        <section aria-labelledby="vmc-difference" className="mt-10 border-y border-white/10 py-8">
+          <h2 id="vmc-difference" className="text-2xl font-semibold text-white">What makes VMC different?</h2>
+          <dl className="mt-6 grid gap-6 sm:grid-cols-3">
+            <div>
+              <dt className="text-base font-semibold text-emerald-300">No aggressive ads</dt>
+              <dd className="mt-2 text-sm leading-6 text-white/60">Browse titles without pop-ups or ad pages between you and your download. Each title shows its story, rating, and access badge before you choose.</dd>
+            </div>
+            <div>
+              <dt className="text-base font-semibold text-emerald-300">Downloads through Telegram</dt>
+              <dd className="mt-2 text-sm leading-6 text-white/60">VMC helps you find movies and series. The Telegram bot delivers the files. You need a VMC account and Telegram to download, including Free titles.</dd>
+            </div>
+            <div>
+              <dt className="text-base font-semibold text-emerald-300">You choose when to renew</dt>
+              <dd className="mt-2 text-sm leading-6 text-white/60">Paid plans use Paystack checkout. There is no automatic renewal. Check your remaining access in your dashboard and choose another plan when you need it.</dd>
+            </div>
+          </dl>
         </section>
 
         <section className="mt-5 rounded-[2rem] border border-white/10 bg-white/[0.035] p-1.5 shadow-[0_18px_54px_rgba(0,0,0,0.18)]">

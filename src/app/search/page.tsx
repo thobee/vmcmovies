@@ -3,28 +3,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { CircleNotch, FilmStrip, MagnifyingGlass, MagnifyingGlassMinus, Television } from "@phosphor-icons/react";
 import MovieCard from "@/components/media/MovieCard";
 import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
 import { contentDetailPath } from "@/lib/catalog/paths";
-import type { Content } from "@/lib/catalog/types";
 import { useCatalogSearch } from "@/hooks/useCatalogSearch";
 import { cn } from "@/lib/cn";
+import SearchRequestAction from "@/components/requests/SearchRequestAction";
 
 function SearchInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") ?? "";
   const [query, setQuery] = useState(initialQ);
-  const { results, loading } = useCatalogSearch(query, 320);
+  const [previousQ, setPreviousQ] = useState(initialQ);
+  const { results, loading, error } = useCatalogSearch(query, 320);
   const trimmed = query.trim();
   const searched = trimmed.length >= 2;
 
-  useEffect(() => {
+  if (previousQ !== initialQ) {
+    setPreviousQ(initialQ);
     setQuery(initialQ);
-  }, [initialQ]);
+  }
 
   const syncUrl = (q: string) => {
     const next = q.trim();
@@ -110,15 +112,22 @@ function SearchInner() {
           </div>
         )}
 
-        {!loading && searched && results.length === 0 && (
+        {!loading && searched && error && (
+          <p role="alert" className="py-12 text-center text-sm text-white/70">
+            Search is unavailable right now. Please try again shortly.
+          </p>
+        )}
+
+        {!loading && !error && searched && results.length === 0 && (
           <div className="rounded-[28px] border border-white/10 bg-[#101214] px-6 py-16 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04]">
               <MagnifyingGlassMinus className="h-6 w-6 text-white/30" weight="light" />
             </div>
-            <p className="text-lg font-semibold text-white">No results for &ldquo;{trimmed}&rdquo;</p>
+            <p className="break-words text-lg font-semibold text-white">No matches for &ldquo;{trimmed}&rdquo;</p>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-white/55">
-              Try a different title, genre, or spelling.
+              This title may not be available yet. Check the spelling or request it below.
             </p>
+            <SearchRequestAction key={trimmed} query={trimmed} />
           </div>
         )}
 

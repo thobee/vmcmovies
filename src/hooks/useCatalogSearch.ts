@@ -4,28 +4,24 @@ import { useEffect, useState } from "react";
 import type { Content } from "@/lib/catalog/types";
 
 export function useCatalogSearch(query: string, debounceMs = 280) {
-  const [results, setResults] = useState<Content[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState<{ query: string; results: Content[]; error: boolean } | null>(null);
+  const trimmed = query.trim();
 
   useEffect(() => {
-    const q = query.trim();
-    if (q.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+    const q = trimmed;
+    if (q.length < 2) return;
 
-    setLoading(true);
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       try {
         const res = await fetch(`/api/catalog/search?q=${encodeURIComponent(q)}`);
-        const data = res.ok ? await res.json() : { items: [] };
-        if (!cancelled) setResults((data.items as Content[]) ?? []);
+        if (!res.ok) throw new Error("Search failed");
+        const data = await res.json();
+        if (!cancelled) setResponse({ query: q, results: (data.items as Content[]) ?? [], error: false });
       } catch {
-        if (!cancelled) setResults([]);
-      } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setResponse({ query: q, results: [], error: true });
+        }
       }
     }, debounceMs);
 
@@ -33,7 +29,12 @@ export function useCatalogSearch(query: string, debounceMs = 280) {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [query, debounceMs]);
+  }, [trimmed, debounceMs]);
 
-  return { results, loading };
+  const current = trimmed.length >= 2 && response?.query === trimmed;
+  return {
+    results: current ? response.results : [],
+    loading: trimmed.length >= 2 && !current,
+    error: current ? response.error : false,
+  };
 }
