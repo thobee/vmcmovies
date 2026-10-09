@@ -27,12 +27,13 @@ const GOOGLE_ERRORS: Record<string, string> = {
 interface AuthFormProps {
   mode: "login" | "signup";
   errorCode?: string;
+  nextDestination?: string;
 }
 
 type FieldName = "email" | "telegram" | "password" | "confirm";
 type FieldErrors = Partial<Record<FieldName, string>>;
 
-export default function AuthForm({ mode, errorCode }: AuthFormProps) {
+export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormProps) {
   const router = useRouter();
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
@@ -138,9 +139,9 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
       submitted = true;
       setNavigating(true);
       router.push(
-        isSignup && data.welcomeTrial?.eligible
+        nextDestination ?? (isSignup && data.welcomeTrial?.eligible
           ? "/account?welcome=trial"
-          : "/account",
+          : "/account"),
       );
       router.refresh();
     } catch {
@@ -163,7 +164,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
 
       {googleEnabled && (
         <>
-          <GoogleButton mode={mode} disabled={busy} />
+          <GoogleButton mode={mode} disabled={busy} nextDestination={nextDestination} />
           <div className="flex items-center gap-4 py-1">
             <span className="h-px flex-1 bg-white/10" />
             <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/35">
@@ -281,7 +282,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
       <p className="pt-1 text-center text-sm text-white/50">
         {isSignup ? "Already have an account?" : "Don’t have an account?"}{" "}
         <Link
-          href={isSignup ? "/login" : "/signup"}
+          href={`${isSignup ? "/login" : "/signup"}${nextDestination ? `?next=${encodeURIComponent(nextDestination)}` : ""}`}
           className="font-semibold text-emerald-300 hover:underline"
         >
           {isSignup ? "Log in" : "Create an account"}

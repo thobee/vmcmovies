@@ -8,6 +8,6 @@ export async function GET(request: NextRequest) {
   }
 
   const mode = request.nextUrl.searchParams.get("mode") === "signup" ? "signup" : "login";
-  const state = await signGoogleState(mode);
+  const state = await signGoogleState(mode, request.nextUrl.searchParams.get("next") ?? undefined);
   return NextResponse.redirect(googleAuthUrl(state));
 }

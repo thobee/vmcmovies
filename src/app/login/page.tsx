@@ -1,5 +1,6 @@
 import AuthForm from "@/components/auth/AuthForm";
 import AuthShell from "@/components/auth/AuthShell";
+import { getPlanDestination } from "@/lib/payments/plan-destination";
 
 const ASIDE = {
   eyebrow: "VMC",
@@ -16,9 +17,9 @@ const ASIDE = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; reset?: string }>;
+  searchParams: Promise<{ error?: string; reset?: string; next?: string }>;
 }) {
-  const { error, reset } = await searchParams;
+  const { error, reset, next } = await searchParams;
 
   return (
     <AuthShell
@@ -31,7 +32,7 @@ export default async function LoginPage({
           Password updated. Sign in with your new password.
         </p>
       )}
-      <AuthForm mode="login" errorCode={error} />
+      <AuthForm mode="login" errorCode={error} nextDestination={getPlanDestination(next)} />
     </AuthShell>
   );
 }

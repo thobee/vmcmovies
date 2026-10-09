@@ -3,8 +3,11 @@ import AuthForm from "@/components/auth/AuthForm";
 import AuthShell from "@/components/auth/AuthShell";
 import { getBillingConfig } from "@/lib/payments/billing/db";
 import { isWelcomeTrialWindowActive } from "@/lib/payments/billing/resolve";
+import { getPlanDestination } from "@/lib/payments/plan-destination";
 
-export default async function SignupPage() {
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
+  const destination = getPlanDestination(next);
   const billing = await getBillingConfig();
   const trialActive = isWelcomeTrialWindowActive(billing);
   const trialDays = billing.welcomeTrial.durationDays;
@@ -17,7 +20,7 @@ export default async function SignupPage() {
           ? `Create your account and unlock ${trialDays} days of Premium free.`
           : "Free to join. Premium unlocks downloads."
       }
-      backHref="/login"
+      backHref={destination ? `/login?next=${encodeURIComponent(destination)}` : "/login"}
       aside={{
         eyebrow: "VMC",
         headline: "Movies without the noise.",
@@ -45,7 +48,7 @@ export default async function SignupPage() {
           </div>
         </div>
       )}
-      <AuthForm mode="signup" />
+      <AuthForm mode="signup" nextDestination={destination} />
     </AuthShell>
   );
 }

@@ -13,7 +13,7 @@ import Footer from "@/components/layout/Footer";
 import PricingGrid from "@/components/access/PricingGrid";
 import TelegramIcon from "@/components/brand/TelegramIcon";
 import { getSession } from "@/lib/auth/session";
-import { PREMIUM_FEATURES } from "@/lib/payments/plans";
+import { PREMIUM_FEATURES, isPlanId } from "@/lib/payments/plans";
 import { formatMoney } from "@/lib/payments/currency";
 import { getBillingConfig } from "@/lib/payments/billing/db";
 import { daysUntil } from "@/lib/date";
@@ -24,7 +24,10 @@ const STEPS = [
   { icon: DownloadSimple, number: "03", title: "Get it on Telegram", text: "Tap download and the bot sends your file." },
 ];
 
-export default async function GetAccessPage() {
+export default async function GetAccessPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
+  const { plan } = await searchParams;
+  const initialPlan = plan && isPlanId(plan) ? plan : undefined;
+  const destination = initialPlan ? `/get-access?plan=${initialPlan}` : "/get-access";
   const session = await getSession();
   const billing = await getBillingConfig();
   const isActive = session?.user.premiumStatus === "active";
@@ -130,7 +133,7 @@ export default async function GetAccessPage() {
               />
               <div className="relative p-5 sm:p-7 lg:p-8">
                 {session ? (
-                  <PricingGrid isActive={isActive} expiry={expiry} daysRemaining={daysRemaining} />
+                  <PricingGrid key={initialPlan ?? "default"} initialPlan={initialPlan} isActive={isActive} expiry={expiry} daysRemaining={daysRemaining} />
                 ) : (
                   <div className="py-2 sm:py-4">
                     <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400 text-black shadow-[0_12px_30px_rgba(52,211,153,0.18)]">
@@ -165,7 +168,7 @@ export default async function GetAccessPage() {
 
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                       <Link
-                        href="/signup"
+                        href={`/signup?next=${encodeURIComponent(destination)}`}
                         className="group inline-flex min-h-13 flex-1 items-center justify-between rounded-full bg-emerald-400 py-2 pl-6 pr-2 text-sm font-bold text-black transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-emerald-300 active:scale-[0.98]"
                       >
                         Create free account
@@ -174,7 +177,7 @@ export default async function GetAccessPage() {
                         </span>
                       </Link>
                       <Link
-                        href="/login?next=/get-access"
+                        href={`/login?next=${encodeURIComponent(destination)}`}
                         className="inline-flex min-h-13 items-center justify-center rounded-full bg-white/[0.05] px-7 text-sm font-semibold text-white ring-1 ring-inset ring-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.09] active:scale-[0.98]"
                       >
                         Log in

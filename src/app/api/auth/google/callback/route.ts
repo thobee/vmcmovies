@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const { user, isNew } = await loginOrCreateGoogleUser(profile);
     await createSession(user._id);
 
-    const dest = isNew || parsed.mode === "signup" ? "/account?welcome=1" : "/account";
+    const dest = parsed.next ?? (isNew || parsed.mode === "signup" ? "/account?welcome=1" : "/account");
     return NextResponse.redirect(`${appUrl()}${dest}`);
   } catch (err) {
     console.error("[auth/google/callback]", err);

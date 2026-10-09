@@ -21,16 +21,18 @@ function formatPrice(display: number) {
 }
 
 export default function PricingGrid({
+  initialPlan = "quarterly",
   isActive = false,
   expiry = null,
   daysRemaining = null,
 }: {
+  initialPlan?: PlanId;
   isActive?: boolean;
   expiry?: string | null;
   daysRemaining?: number | null;
 }) {
   const { refresh } = useAuth();
-  const [selected, setSelected] = useState<PlanId>("quarterly");
+  const [selected, setSelected] = useState<PlanId>(initialPlan);
   const [billing, setBilling] = useState<BillingPlansResponse | null>(null);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [loading, setLoading] = useState(false);

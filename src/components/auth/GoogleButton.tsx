@@ -13,9 +13,11 @@ function isPublicGoogleConfigured(): boolean {
 export default function GoogleButton({
   mode,
   disabled,
+  nextDestination,
 }: {
   mode: "login" | "signup";
   disabled?: boolean;
+  nextDestination?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const enabled = isPublicGoogleConfigured();
@@ -25,7 +27,7 @@ export default function GoogleButton({
     setLoading(true);
     // OAuth should use a full document navigation so Google receives the browser redirect.
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = `/api/auth/google?mode=${mode}`;
+    window.location.href = `/api/auth/google?mode=${mode}${nextDestination ? `&next=${encodeURIComponent(nextDestination)}` : ""}`;
   };
 
   if (!enabled) return null;

@@ -1,5 +1,6 @@
 import { OAuth2Client } from "google-auth-library";
 import { SignJWT, jwtVerify } from "jose";
+import { getPlanDestination } from "@/lib/payments/plan-destination";
 
 function appUrl(): string {
   return (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
@@ -32,8 +33,8 @@ export function getGoogleClient(): OAuth2Client | null {
   return new OAuth2Client(clientId, clientSecret, `${appUrl()}/api/auth/google/callback`);
 }
 
-export async function signGoogleState(mode: "login" | "signup"): Promise<string> {
-  return new SignJWT({ mode })
+export async function signGoogleState(mode: "login" | "signup", next?: string): Promise<string> {
+  return new SignJWT({ mode, next: getPlanDestination(next) })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("10m")
@@ -42,10 +43,10 @@ export async function signGoogleState(mode: "login" | "signup"): Promise<string>
 
 export async function verifyGoogleState(
   state: string,
-): Promise<{ mode: "login" | "signup" } | null> {
+): Promise<{ mode: "login" | "signup"; next?: string } | null> {
   try {
     const { payload } = await jwtVerify(state, authSecret());
-    return { mode: payload.mode === "signup" ? "signup" : "login" };
+    return { mode: payload.mode === "signup" ? "signup" : "login", next: getPlanDestination(payload.next) };
   } catch {
     return null;
   }
