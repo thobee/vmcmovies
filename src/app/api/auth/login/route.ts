@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     const ip = clientIp(request);
-    if (rateLimited(`login:${ip}`, 8)) {
+    if (await rateLimited(`login:${ip}`, 8)) {
       return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
     }
 

@@ -7,17 +7,29 @@ const telegramLink = z.string().trim().url().refine((value) => {
   return url.protocol === "https:" && ["t.me", "telegram.me"].includes(url.hostname) && !url.username && !url.password;
 }, "Use an HTTPS Telegram link (https://t.me/...)");
 const episodeSchema = z.object({
+  isFinal: z.boolean().optional(),
   episodeNumber: z.coerce.number().int().min(1),
   title: z.string().trim().max(200).optional(),
   downloadUrl: telegramLink,
 });
 const seasonSchema = z.object({
+  status: z.enum(["ongoing", "completed"]).optional(),
   seasonNumber: z.coerce.number().int().min(1),
   downloadUrl: z.string().url("Paste a valid season link").or(z.literal("")).default(""),
   zipUrl: telegramLink.or(z.literal("")).optional(),
   episodes: z.array(episodeSchema).max(500).optional(),
 }).refine(s => Boolean(s.downloadUrl || s.zipUrl || s.episodes?.length), "Add a season link, ZIP link, or at least one episode")
-  .refine(s => new Set(s.episodes?.map(e => e.episodeNumber)).size === (s.episodes?.length ?? 0), "Episode numbers must be unique within a season");
+  .refine(s => new Set(s.episodes?.map(e => e.episodeNumber)).size === (s.episodes?.length ?? 0), "Episode numbers must be unique within a season")
+  .refine(s => {
+    const episodes = s.episodes ?? [];
+    const finals = episodes.filter(e => e.isFinal);
+    return finals.length === 0 || (finals.length === 1 &&
+      finals[0].episodeNumber === Math.max(...episodes.map(e => e.episodeNumber)));
+  }, "Only the highest-numbered episode can be marked as the season finale")
+  .refine(s => {
+    const finale = s.episodes?.find(e => e.isFinal);
+    return !finale || Boolean(s.downloadUrl || s.zipUrl) || s.episodes?.length === finale.episodeNumber;
+  }, "Add all episodes through the finale, or a full-season link, before marking the season completed");
 
 const baseContentSchema = z.object({
   id: z

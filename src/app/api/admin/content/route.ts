@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { CATALOG_CACHE_TAG } from "@/lib/catalog/cache";
 import { getAdminSession } from "@/lib/admin/session";
 import { inputToContent } from "@/lib/admin/content";
 import { notifyNewContent } from "@/lib/admin/notify-content";
@@ -63,6 +65,7 @@ export async function POST(request: Request) {
 
     const content = inputToContent(parsed.data);
     await dbCreateContent(content, { featured: parsed.data.featured });
+    revalidateTag(CATALOG_CACHE_TAG, { expire: 0 });
 
     if (notifyUsers) {
       await notifyNewContent(content);

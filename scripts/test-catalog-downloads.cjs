@@ -67,3 +67,35 @@ assert.ok(seasonMarkup.includes("Full season ZIP"));
 assert.ok(seasonMarkup.includes("Episode 2"));
 assert.ok(seasonMarkup.includes("Add episode"));
 console.log("Admin download field rendering checks passed.");
+const completedSeason = {
+  seasonNumber: 1, status: "ongoing", downloadUrl: "",
+  episodes: [
+    { episodeNumber: 1, downloadUrl: link },
+    { episodeNumber: 2, downloadUrl: link, isFinal: true },
+  ],
+};
+const savedFinale = normalizeSeries(inputToContent(contentInputSchema.parse({
+  ...input, seasons: [completedSeason, { seasonNumber: 2, status: "ongoing", downloadUrl: link }],
+})));
+assert.equal(savedFinale.seasons[0].status, "completed");
+assert.equal(savedFinale.seasons[1].status, "ongoing");
+assert.equal(savedFinale.seriesStatus, "ongoing");
+assert.equal(toPublicContent(savedFinale).seasons[0].status, "completed");
+assert.equal(savedFinale.seasons[0].episodes[1].isFinal, true);
+assert.ok(!contentInputSchema.safeParse({ ...input, seasons: [{
+  ...completedSeason, episodes: [{ episodeNumber: 2, downloadUrl: link, isFinal: true }],
+}] }).success, "A missing episode must prevent auto-completion");
+assert.ok(!contentInputSchema.safeParse({ ...input, seasons: [{
+  ...completedSeason, episodes: [
+    { episodeNumber: 1, downloadUrl: link, isFinal: true }, { episodeNumber: 2, downloadUrl: link },
+  ],
+}] }).success, "Finale must be last episode");
+assert.ok(!contentInputSchema.safeParse({ ...input, seasons: [{
+  ...completedSeason, episodes: completedSeason.episodes.map(ep => ({ ...ep, isFinal: true })),
+}] }).success, "Only one finale is allowed");
+assert.ok(contentInputSchema.safeParse({ ...input, seasons: [{ ...completedSeason, zipUrl: link, episodes: [{ episodeNumber: 2, downloadUrl: link, isFinal: true }] }] }).success);
+assert.equal(inputToContent(contentInputSchema.parse({
+  ...input, seasons: [{ seasonNumber: 1, status: "completed", downloadUrl: link }],
+})).seasons[0].status, "completed");
+assert.ok(renderToStaticMarkup(React.createElement(SeasonFilesFields, { season: completedSeason, onChange() {} })).includes("This is the final episode"));
+console.log("Per-season completion checks passed: finale validation, manual status, persistence, and independent series status.");

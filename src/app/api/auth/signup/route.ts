@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     if (honeypotTripped(body)) {
       return NextResponse.json({ error: "Could not create account" }, { status: 400 });
     }
-    if (rateLimited(`signup:${clientIp(request)}`, 5)) {
+    if (await rateLimited(`signup:${clientIp(request)}`, 5)) {
       return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
     }
 

@@ -85,20 +85,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (body?.ack === true) {
-      if (rateLimited(`admin-mfa:${ip}`, 8)) {
+      if (await rateLimited(`admin-mfa:${ip}`, 8)) {
         return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
       }
       return ackRecovery(request);
     }
 
     if (typeof body?.code === "string") {
-      if (rateLimited(`admin-mfa:${ip}`, 8)) {
+      if (await rateLimited(`admin-mfa:${ip}`, 8)) {
         return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
       }
       return verifyCode(request, body);
     }
 
-    if (rateLimited(`admin-pw:${ip}`, 8)) {
+    if (await rateLimited(`admin-pw:${ip}`, 8)) {
       return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
     }
     return verifyPasswordStep(body);

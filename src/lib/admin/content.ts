@@ -40,6 +40,7 @@ export function inputToContent(input: ContentInput): Content {
     seasons: sortSeasons(
       input.seasons.map((season) => ({
         ...season,
+        status: season.episodes?.some(episode => episode.isFinal) ? "completed" : season.status,
         seasonNumber: season.seasonNumber,
         downloadUrl: season.downloadUrl.trim(),
       }))

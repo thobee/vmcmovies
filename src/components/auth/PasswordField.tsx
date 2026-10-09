@@ -20,6 +20,8 @@ export default function PasswordField({
   maxLength,
   placeholder,
   showPolicyHint = false,
+  error,
+  onBlur,
 }: {
   id?: string;
   label: string;
@@ -31,6 +33,8 @@ export default function PasswordField({
   placeholder?: string;
   /** Show 8–12 character guidance (signup / reset). */
   showPolicyHint?: boolean;
+  error?: string;
+  onBlur?: () => void;
 }) {
   const autoId = useId();
   const id = idProp ?? autoId;
@@ -54,8 +58,13 @@ export default function PasswordField({
           autoComplete={autoComplete}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
-          className="auth-field w-full rounded-2xl py-3.5 pl-11 pr-12 text-sm text-white placeholder:text-white/30 focus:outline-none"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : showPolicyHint ? `${id}-hint` : undefined}
+          className={`auth-field w-full rounded-2xl py-3.5 pl-11 pr-12 text-sm text-white placeholder:text-white/30 focus:outline-none ${
+            error ? "border-red-400/70 bg-red-500/[0.08] focus:border-red-300" : ""
+          }`}
         />
         <button
           type="button"
@@ -66,8 +75,13 @@ export default function PasswordField({
           {visible ? <EyeSlash className="h-[18px] w-[18px]" weight="light" /> : <Eye className="h-[18px] w-[18px]" weight="light" />}
         </button>
       </div>
-      {showPolicyHint && (
+      {error ? (
+        <p id={`${id}-error`} role="alert" className="mt-1.5 text-xs font-medium text-red-300">
+          {error}
+        </p>
+      ) : showPolicyHint && (
         <p
+          id={`${id}-hint`}
           className={
             policyOk
               ? "mt-1.5 text-xs text-emerald-400/80"

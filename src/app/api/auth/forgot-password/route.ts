@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       if (!parsed.success) {
         return NextResponse.json({ error: "Enter a valid email" }, { status: 400 });
       }
-      if (rateLimited(`pwreq:${ip}:${parsed.data.email.toLowerCase()}`, 5)) {
+      if (await rateLimited(`pwreq:${ip}:${parsed.data.email.toLowerCase()}`, 5)) {
         return NextResponse.json(
           { error: "Too many requests. Try again in 15 minutes." },
           { status: 429 },
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    if (rateLimited(`pwrst:${ip}:${parsed.data.email.toLowerCase()}`, 5)) {
+    if (await rateLimited(`pwrst:${ip}:${parsed.data.email.toLowerCase()}`, 5)) {
       return NextResponse.json(
         { error: "Too many attempts. Try again in 15 minutes." },
         { status: 429 },

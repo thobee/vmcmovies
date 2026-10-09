@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Log in to continue" }, { status: 401 });
     }
 
-    if (rateLimited(`pay:${session.user.id}:${clientIp(request)}`, 8)) {
+    if (await rateLimited(`pay:${session.user.id}:${clientIp(request)}`, 8)) {
       return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
     }
 

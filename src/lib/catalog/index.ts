@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+import { CATALOG_CACHE_TAG } from "./cache";
 import {
   ALL_CONTENT,
   FEATURED,
@@ -16,7 +18,15 @@ import {
 import { contentSlug } from "@/lib/catalog/resolve";
 import type { Content, ContentListOptions } from "./types";
 
-function useDatabase(): boolean {
+// Cache catalogue reads only, never sessions, entitlements or download authorization.
+const cacheOptions = { revalidate: 30, tags: [CATALOG_CACHE_TAG] };
+const cachedFeatured = unstable_cache(dbGetFeaturedContent, ["catalog-featured"], cacheOptions);
+const cachedMovies = unstable_cache(dbGetMovies, ["catalog-movies"], cacheOptions);
+const cachedSeries = unstable_cache(dbGetSeriesList, ["catalog-series"], cacheOptions);
+const cachedAll = unstable_cache(dbGetAllContent, ["catalog-all"], cacheOptions);
+const cachedSearch = unstable_cache(dbSearchContent, ["catalog-search"], cacheOptions);
+
+function hasDatabase(): boolean {
   return Boolean(process.env.MONGODB_URI?.trim());
 }
 
@@ -30,7 +40,7 @@ function allowMockCatalog(): boolean {
  * one guard here covers every caller instead of a try/catch per page.
  */
 async function safeDb<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
-  if (!useDatabase()) return fallback;
+  if (!hasDatabase()) return fallback;
   try {
     return await fn();
   } catch (err) {
@@ -40,24 +50,24 @@ async function safeDb<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
 }
 
 export async function getFeaturedContent(): Promise<Content | null> {
-  const item = await safeDb(dbGetFeaturedContent, null);
+  const item = await safeDb(cachedFeatured, null);
   return item ?? (allowMockCatalog() ? FEATURED : null);
 }
 
 export async function getMovies(options?: ContentListOptions): Promise<Content[]> {
-  const items = await safeDb(() => dbGetMovies(options), []);
+  const items = await safeDb(() => cachedMovies(options), []);
   if (items.length > 0 || options?.search || options?.genre) return items;
   return allowMockCatalog() ? filterMock(MOVIES, options) : [];
 }
 
 export async function getSeriesList(options?: ContentListOptions): Promise<Content[]> {
-  const items = await safeDb(() => dbGetSeriesList(options), []);
+  const items = await safeDb(() => cachedSeries(options), []);
   if (items.length > 0 || options?.search || options?.genre) return items;
   return allowMockCatalog() ? filterMock(SERIES, options) : [];
 }
 
 export async function getAllContent(options?: ContentListOptions): Promise<Content[]> {
-  const items = await safeDb(() => dbGetAllContent(options), []);
+  const items = await safeDb(() => cachedAll(options), []);
   if (items.length > 0 || options?.search || options?.genre) return items;
   return allowMockCatalog() ? filterMock(ALL_CONTENT, options) : [];
 }
@@ -67,7 +77,7 @@ export async function getMovieBySlugOrId(key: string): Promise<Content | null> {
   const item = await safeDb(() => dbGetMovieBySlugOrId(decoded), null);
   if (item) return item;
 
-  if (useDatabase()) {
+  if (hasDatabase()) {
     const movies = await safeDb(() => dbGetMovies(), []);
     const fromDb = movies.find(
       (m) => contentSlug(m) === decoded || m.slug === decoded || m.id === decoded
@@ -89,7 +99,7 @@ export async function getSeriesBySlugOrId(key: string): Promise<Content | null> 
   const item = await safeDb(() => dbGetSeriesBySlugOrId(decoded), null);
   if (item) return item;
 
-  if (useDatabase()) {
+  if (hasDatabase()) {
     const series = await safeDb(() => dbGetSeriesList(), []);
     const fromDb = series.find(
       (s) => contentSlug(s) === decoded || s.slug === decoded || s.id === decoded
@@ -124,8 +134,9 @@ export async function getRecommended(item: Content, limit = 12): Promise<Content
 }
 
 export async function searchContent(query: string): Promise<Content[]> {
-  const items = await safeDb(() => dbSearchContent(query), []);
-  if (items.length > 0) return items;
+  // A database outage is not a successful search with zero matches.
+  if (hasDatabase()) return cachedSearch(query.trim().toLowerCase());
+  if (!allowMockCatalog()) throw new Error("Catalogue unavailable");
   return allowMockCatalog() ? filterMock(ALL_CONTENT, { search: query }) : [];
 }
 

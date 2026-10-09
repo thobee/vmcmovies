@@ -416,7 +416,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
   const addSeason = () => {
     const nextNumber =
       seasons.length > 0 ? Math.max(...seasons.map((s) => s.seasonNumber)) + 1 : 1;
-    setSeasons(sortSeasons([...seasons, { seasonNumber: nextNumber, downloadUrl: "" }]));
+    setSeasons(sortSeasons([...seasons, { seasonNumber: nextNumber, downloadUrl: "", status: "ongoing" }]));
   };
 
   const updateSeason = (index: number, patch: Partial<Season>) => {
@@ -806,12 +806,12 @@ function AccessFields({
 
 function initialSeasons(initial?: Content): Season[] {
   if (!initial || initial.type !== "series") {
-    return [{ seasonNumber: 1, downloadUrl: "" }];
+    return [{ seasonNumber: 1, downloadUrl: "", status: "ongoing" }];
   }
   const normalized = normalizeSeries(initial);
   return normalized.seasons?.length
     ? normalized.seasons
-    : [{ seasonNumber: 1, downloadUrl: "" }];
+    : [{ seasonNumber: 1, downloadUrl: "", status: "ongoing" }];
 }
 
 function EditorGuide({

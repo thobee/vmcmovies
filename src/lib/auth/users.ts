@@ -1,4 +1,4 @@
-import { ObjectId, type Collection, type Document } from "mongodb";
+import { ObjectId, type ClientSession, type Collection, type Document } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
 import type { AdminRole, PremiumSource, PremiumStatus, User, UserRole } from "@/lib/auth/types";
 import { isAdminRole } from "@/lib/admin/permissions";
@@ -75,9 +75,9 @@ export async function findUserByEmail(email: string): Promise<User | null> {
   return doc ? toUser(doc) : null;
 }
 
-export async function findUserById(id: string): Promise<User | null> {
+export async function findUserById(id: string, session?: ClientSession): Promise<User | null> {
   if (!ObjectId.isValid(id)) return null;
-  const doc = await (await users()).findOne({ _id: new ObjectId(id) });
+  const doc = await (await users()).findOne({ _id: new ObjectId(id) }, { session });
   return doc ? toUser(doc) : null;
 }
 
@@ -181,13 +181,14 @@ export async function createUser(input: {
 
 export async function activatePremium(
   userId: string,
-  months: number
+  months: number,
+  session?: ClientSession,
 ): Promise<Date> {
   if (!ObjectId.isValid(userId)) {
     throw new Error("Invalid user id");
   }
 
-  const user = await findUserById(userId);
+  const user = await findUserById(userId, session);
   if (!user) throw new Error("User not found");
 
   const now = new Date();
@@ -215,7 +216,8 @@ export async function activatePremium(
         premiumExpiryDate: expiry,
         premiumSource: "paid",
       },
-    }
+    },
+    { session },
   );
 
   return expiry;

@@ -1,4 +1,4 @@
-import { ObjectId, type Collection, type Document } from "mongodb";
+import { ObjectId, type ClientSession, type Collection, type Document } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
 import type { PaymentCurrency } from "@/lib/payments/currency";
 import type { PlanId } from "@/lib/payments/plans";
@@ -132,15 +132,17 @@ export async function findPaymentByCheckoutId(checkoutId: string): Promise<Payme
 }
 
 export async function findPaymentByReference(
-  reference: string
+  reference: string,
+  session?: ClientSession,
 ): Promise<Payment | null> {
-  const doc = await (await payments()).findOne({ reference });
+  const doc = await (await payments()).findOne({ reference }, { session });
   return doc ? toPayment(doc) : null;
 }
 
 export async function markPaymentFulfilled(
   reference: string,
-  paidAt: Date
+  paidAt: Date,
+  session?: ClientSession,
 ): Promise<Payment | null> {
   const result = await (await payments()).findOneAndUpdate(
     { reference, premiumActivated: { $ne: true } },
@@ -153,9 +155,9 @@ export async function markPaymentFulfilled(
         updatedAt: new Date(),
       },
     },
-    { returnDocument: "after" }
+    { returnDocument: "after", session }
   );
-  return result ? toPayment(result) : findPaymentByReference(reference);
+  return result ? toPayment(result) : findPaymentByReference(reference, session);
 }
 
 export async function markPremiumActivated(reference: string): Promise<void> {
@@ -183,7 +185,8 @@ export async function markAdminNotified(reference: string): Promise<void> {
 
 export async function markPaymentFailed(
   reference: string,
-  reason: string
+  reason: string,
+  session?: ClientSession,
 ): Promise<void> {
   await (await payments()).updateOne(
     { reference, status: "pending" },
@@ -193,7 +196,8 @@ export async function markPaymentFailed(
         failureReason: reason,
         updatedAt: new Date(),
       },
-    }
+    },
+    { session },
   );
 }
 

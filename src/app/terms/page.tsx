@@ -8,13 +8,9 @@ export const metadata: Metadata = {
   description: "The terms that govern your use of VMC.",
 };
 
-export default function TermsPage() {
-  const updated = new Date().toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+const LAST_UPDATED = "9 October 2026";
 
+export default function TermsPage() {
   return (
     <SitePage>
       <div className="relative mx-auto max-w-3xl px-4 pb-20 pt-28 sm:px-6 sm:pt-32">
@@ -27,7 +23,7 @@ export default function TermsPage() {
           >
             Terms of Service
           </h1>
-          <p className="mt-2 text-sm text-white/45">Last updated: {updated}</p>
+          <p className="mt-2 text-sm text-white/45">Last updated: {LAST_UPDATED}</p>
 
           <div className="mt-10 space-y-8 text-[15px] leading-7 text-white/70">
             <Section title="1. Acceptance of terms">

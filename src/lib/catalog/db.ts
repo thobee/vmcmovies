@@ -9,20 +9,20 @@ const COLLECTION = "content";
 
 type ContentDoc = Document & Content & { featured?: boolean };
 
-let indexesReady = false;
+let indexesReady: Promise<void> | undefined;
 
 async function contentCollection(): Promise<Collection<ContentDoc>> {
   const db = await getDb();
   const col = db.collection<ContentDoc>(COLLECTION);
 
-  if (!indexesReady) {
+  indexesReady ??= (async () => {
     await col.createIndex({ id: 1 }, { unique: true });
     await col.createIndex({ slug: 1 }, { unique: true, sparse: true });
     await col.createIndex({ type: 1, createdAt: -1 });
     await col.createIndex({ title: "text", description: "text", genres: "text" });
     await col.createIndex({ featured: 1 });
-    indexesReady = true;
-  }
+  })().catch((error) => { indexesReady = undefined; throw error; });
+  await indexesReady;
 
   return col;
 }

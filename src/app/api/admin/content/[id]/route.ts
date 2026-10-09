@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { CATALOG_CACHE_TAG } from "@/lib/catalog/cache";
 import { getAdminSession } from "@/lib/admin/session";
 import { inputToContent } from "@/lib/admin/content";
 import { contentInputSchema } from "@/lib/admin/validation";
@@ -68,6 +70,7 @@ export async function PUT(request: Request, context: RouteContext) {
       featured: parsed.data.featured,
     });
 
+    revalidateTag(CATALOG_CACHE_TAG, { expire: 0 });
     return NextResponse.json({ item });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Update failed";
@@ -93,6 +96,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  revalidateTag(CATALOG_CACHE_TAG, { expire: 0 });
   return NextResponse.json({ ok: true });
 }
 
@@ -111,6 +115,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
     await dbSetFeatured(existing.id);
+    revalidateTag(CATALOG_CACHE_TAG, { expire: 0 });
     return NextResponse.json({ ok: true });
   }
 

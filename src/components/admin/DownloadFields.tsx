@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
-import type { DownloadFile, Season } from "@/lib/catalog/types";
+import type { DownloadFile, Episode, Season } from "@/lib/catalog/types";
 import { FormField, inputClass } from "@/components/admin/form";
 
 const actionClass = "inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-emerald-300 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-emerald-300";
@@ -44,8 +44,24 @@ export function SeasonFilesFields({ season, onChange }: {
   onChange: (patch: Partial<Season>) => void;
 }) {
   const episodes = season.episodes ?? [];
+  const updateEpisodes = (next: Episode[]) => {
+    onChange({
+      episodes: next,
+      status: next.some(ep => ep.isFinal) ? "completed" : "ongoing",
+    });
+  };
   return (
     <div className="space-y-4 border-t border-white/10 pt-4">
+      <FormField label="Season status" hint="Completed means all episodes are available on VMC. This does not change the overall series status.">
+        <select className={inputClass} value={season.status ?? ""} onChange={e => {
+          const status = e.target.value as "ongoing" | "completed";
+          onChange({ status, episodes: status === "ongoing" ? episodes.map(ep => ({ ...ep, isFinal: false })) : episodes });
+        }}>
+          <option value="" disabled>Choose season status</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+        </select>
+      </FormField>
       <FormField label="Full season ZIP link (optional)">
         <input className={inputClass} type="url" value={season.zipUrl ?? ""} placeholder="https://t.me/yourbot?start=..." onChange={e => onChange({ zipUrl: e.target.value })} />
       </FormField>
@@ -63,10 +79,15 @@ export function SeasonFilesFields({ season, onChange }: {
           <FormField label="Episode Telegram link" required>
             <input type="url" required className={inputClass} value={episode.downloadUrl} placeholder="https://t.me/yourbot?start=..." onChange={e => onChange({ episodes: episodes.map((ep, i) => i === index ? { ...ep, downloadUrl: e.target.value } : ep) })} />
           </FormField>
-          <button type="button" className={actionClass} onClick={() => onChange({ episodes: episodes.filter((_, i) => i !== index) })}><Trash2 size={16} /> Remove episode {episode.episodeNumber}</button>
+          <label className="flex min-h-11 cursor-pointer items-start gap-3 py-2 text-sm text-white/80">
+            <input type="checkbox" className="mt-0.5 size-5 shrink-0 accent-emerald-400" checked={episode.isFinal ?? false}
+              onChange={e => updateEpisodes(episodes.map((ep, i) => ({ ...ep, isFinal: i === index ? e.target.checked : false })))} />
+            <span>This is the final episode of this season<span className="mt-1 block text-xs leading-5 text-white/50">Saving marks this season Completed. Confirm all episodes are available.</span></span>
+          </label>
+          <button type="button" className={actionClass} onClick={() => updateEpisodes(episodes.filter((_, i) => i !== index).map(ep => ({ ...ep, isFinal: false })))}><Trash2 size={16} /> Remove episode {episode.episodeNumber}</button>
         </fieldset>
       ))}
-      <button type="button" className={actionClass} disabled={episodes.length >= 500} onClick={() => onChange({ episodes: [...episodes, { episodeNumber: Math.max(0, ...episodes.map(ep => ep.episodeNumber)) + 1, downloadUrl: "" }] })}><Plus size={16} /> Add episode</button>
+      <button type="button" className={actionClass} disabled={episodes.length >= 500} onClick={() => updateEpisodes([...episodes.map(ep => ({ ...ep, isFinal: false })), { episodeNumber: Math.max(0, ...episodes.map(ep => ep.episodeNumber)) + 1, downloadUrl: "" }])}><Plus size={16} /> Add episode</button>
     </div>
   );
 }

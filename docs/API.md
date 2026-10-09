@@ -117,14 +117,15 @@ Start Paystack checkout.
 { "planId": "monthly" | "quarterly" | "biannual" | "yearly" }
 ```
 
-**Plans:**
+**Plans:** Prices are resolved on the server from **Admin → Billing** at checkout. Do not
+hardcode a price in a client, bot, or external integration. The available plan IDs are:
 
-| planId | Price | Duration |
-|--------|-------|----------|
-| `monthly` | ₦700 | 1 month |
-| `quarterly` | ₦1,800 | 3 months |
-| `biannual` | ₦3,000 | 6 months |
-| `yearly` | ₦5,000 | 12 months |
+| planId | Duration |
+|--------|----------|
+| `monthly` | 1 month |
+| `quarterly` | 3 months |
+| `biannual` | 6 months |
+| `yearly` | 12 months |
 
 **Success `200`:**
 ```json

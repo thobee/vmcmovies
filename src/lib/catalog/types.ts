@@ -13,12 +13,14 @@ export interface DownloadFile {
 }
 
 export interface Episode {
+  isFinal?: boolean;
   episodeNumber: number;
   title?: string;
   downloadUrl: string;
 }
 
 export interface Season {
+  status?: "ongoing" | "completed";
   seasonNumber: number;
   /** Your Telegram deep link for this season (from the bot). */
   downloadUrl: string;

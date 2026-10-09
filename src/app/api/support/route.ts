@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     if (honeypotTripped(body)) {
       return NextResponse.json({ ok: true, ticketId: "ok" }, { status: 201 });
     }
-    if (rateLimited(`support:${session?.user.id ?? clientIp(request)}`, 6)) {
+    if (await rateLimited(`support:${session?.user.id ?? clientIp(request)}`, 6)) {
       return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
     }
     const parsed = bodySchema.safeParse(body);

@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Log in to continue" }, { status: 401 });
 
-  if (rateLimited(`trial:${session.user.id}:${clientIp(request)}`, 4)) {
+  if (await rateLimited(`trial:${session.user.id}:${clientIp(request)}`, 4)) {
     return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
   }
 

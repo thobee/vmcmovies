@@ -3,6 +3,7 @@ import { Baloo_2, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import SessionIdleMonitor from "@/components/auth/SessionIdleMonitor";
 import { SiteToastProvider } from "@/components/ui/SiteToast";
+import AppLaunchScreen from "@/components/loading-ui/AppLaunchScreen";
 import { getSession } from "@/lib/auth/session";
 import { getAppUrl } from "@/lib/payments/app-url";
 import "./globals.css";
@@ -69,6 +70,7 @@ export default async function RootLayout({
       <body className="min-h-screen antialiased">
         <AuthProvider initialUser={session?.user ?? null}>
           <SiteToastProvider>
+            <AppLaunchScreen />
             <SessionIdleMonitor />
             {children}
           </SiteToastProvider>

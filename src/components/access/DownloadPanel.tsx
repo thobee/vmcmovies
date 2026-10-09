@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowSquareOut,
+  CaretDown,
   Check,
+  DeviceMobile,
   DownloadSimple,
   EyeSlash,
   Lock,
@@ -21,7 +23,7 @@ import { Arc } from "@/components/loading-ui/arc";
 import TelegramIcon from "@/components/brand/TelegramIcon";
 
 const PANEL_SHELL =
-  "w-full max-w-xl rounded-[28px] border border-white/10 bg-[#101214]/95 p-5 shadow-[0_18px_52px_rgba(0,0,0,0.35)] sm:p-6";
+  "w-full max-w-xl rounded-[22px] border border-white/10 bg-[#101214]/95 p-4 shadow-[0_18px_52px_rgba(0,0,0,0.35)] sm:rounded-[26px] sm:p-6";
 const BTN_PRIMARY = "auth-btn w-full gap-2 px-6 py-3 text-sm sm:w-auto sm:min-w-[11.5rem]";
 const BTN_SECONDARY =
   "inline-flex w-full cursor-pointer items-center justify-center rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08] active:scale-[0.98] sm:w-auto sm:min-w-[7.5rem]";
@@ -130,7 +132,7 @@ export default function DownloadPanel({
             </div>
           </div>
           <p className="mt-4 text-sm leading-6 text-white/60">
-            Create an account to download this movie.
+            Create an account first. Then VMC sends your download through Telegram.
           </p>
           <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-white/[0.07] pt-5 sm:flex-row">
             <Link href="/signup" className={BTN_PRIMARY}>
@@ -197,10 +199,13 @@ export default function DownloadPanel({
                 className="mt-1 text-xl font-bold text-white"
                 style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}
               >
-                Unlock this download
+                Choose Premium to download
               </h2>
             </div>
           </div>
+          <p className="mt-4 text-sm leading-6 text-white/60">
+            Premium lets the VMC bot send this title directly to your Telegram.
+          </p>
           <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-white/[0.07] pt-5 sm:flex-row sm:flex-wrap">
             {loggedIn && trialEligible ? (
               <button
@@ -262,38 +267,36 @@ function PremiumDownloadPanel({
 
   const heading =
     accessKind === "free" || accessKind === "temporary_free"
-      ? "Free download"
+      ? "Download with Telegram"
       : premiumSource === "trial"
-          ? "Welcome access active"
-          : "Download unlocked";
+          ? "Your trial is active"
+          : "Ready to download";
 
   return (
     <section id="download" className={cn(PANEL_SHELL, "relative overflow-hidden ring-1 ring-emerald-400/15")}>
-      <div aria-hidden className="absolute inset-x-6 top-0 h-px bg-emerald-300/50" />
+      <div aria-hidden className="absolute inset-x-5 top-0 h-px bg-emerald-300/50 sm:inset-x-6" />
       <div className="flex items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-300">
-          <DownloadSimple className="size-5" weight="duotone" />
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-400/[0.08] text-emerald-300 ring-1 ring-inset ring-emerald-300/15">
+          <DownloadSimple className="size-[18px]" weight="light" />
         </span>
         <div className="min-w-0">
-        <h2 className="text-base font-bold text-white">
-          {heading}
-        </h2>
-        <p className="mt-1 text-sm leading-5 text-white/60">
-          Your next watch, delivered on Telegram.
-        </p>
+          <h2 className="text-base font-bold text-white">{heading}</h2>
+          <p className="mt-1 text-sm leading-5 text-white/60">
+            First time only: tap Start in the VMC bot, then come back and choose a file.
+          </p>
         </div>
       </div>
 
       {!setupHidden ? (
-        <div id="telegram-setup" className="mt-6 scroll-mt-28 border-t border-white/10 pt-6">
+        <div id="telegram-setup" className="mt-5 scroll-mt-28 border-t border-white/10 pt-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-sky-400/15 text-sky-300">
-                <Robot className="size-6" weight="duotone" />
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-white/65 ring-1 ring-inset ring-white/[0.08]">
+                <Robot className="size-[18px]" weight="light" />
               </span>
               <div>
-                <p className="text-xs font-semibold text-sky-300">One-time setup</p>
-                <h3 className="mt-1 text-lg font-bold text-white">Start with the VMC bot</h3>
+                <p className="text-xs font-semibold text-sky-300">First-time setup</p>
+                <h3 className="mt-1 text-base font-bold text-white">Two quick steps</h3>
               </div>
             </div>
             {downloadsReady && (
@@ -304,62 +307,100 @@ function PremiumDownloadPanel({
             )}
           </div>
 
-          <ol className="mt-6">
-            <li className="relative flex gap-4 pb-6">
+          <ol className="mt-5 rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 sm:p-4">
+            <li className="relative flex gap-3 pb-4">
               <span aria-hidden className="absolute bottom-0 left-[15px] top-9 w-px bg-sky-300/20" />
               <span className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-sky-400/15 text-sm font-bold text-sky-300 ring-1 ring-sky-300/25">1</span>
               <div className="min-w-0 flex-1">
-                <h4 className="font-semibold text-white">Open the bot and tap Start</h4>
-                <p className="mt-1 text-sm leading-6 text-white/65">Tap Start inside Telegram so the bot can send you files.</p>
+                <h4 className="font-semibold text-white">Open VMC bot and tap Start</h4>
+                <p className="mt-1 text-sm leading-5 text-white/65">Telegram needs this before it can send files to you.</p>
                 <a href={botUrl} target="_blank" rel="noopener noreferrer"
                   onClick={() => setBotOpened(true)}
-                  className="group mt-4 flex min-h-12 w-full items-center gap-3 rounded-full bg-[#2AABEE] py-2 pl-5 pr-2 text-sm font-bold text-black transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 active:scale-[0.99]">
+                  className="group mt-3 flex min-h-11 w-full items-center gap-3 rounded-full bg-[#2AABEE] py-2 pl-4 pr-2 text-sm font-bold text-black transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300 active:scale-[0.99]">
                   <TelegramIcon className="size-5 shrink-0" /> Open VMC bot
                   <span className="ml-auto flex size-9 shrink-0 items-center justify-center rounded-full bg-black/10">
                     <ArrowSquareOut className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none" weight="bold" />
                   </span>
                 </a>
-                <p className="mt-2 text-xs text-white/45">Opens Telegram. Keep this page open.</p>
+                <p className="mt-2 text-xs leading-5 text-white/45">Telegram opens in a new tab. Return here when you are done.</p>
               </div>
             </li>
-            <li className="flex gap-4">
+            <li className="flex gap-3 pt-1">
               <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ring-1", downloadsReady ? "bg-emerald-400/15 text-emerald-300 ring-emerald-300/30" : "bg-white/5 text-white/70 ring-white/15")}>
                 {downloadsReady ? <Check className="size-4" weight="bold" /> : "2"}
               </span>
               <div className="min-w-0 flex-1">
-                <h4 className="font-semibold text-white">Come back here to download</h4>
-                <p className="mt-1 text-sm leading-6 text-white/65">Confirm you tapped Start, then choose your movie or season below.</p>
+                <h4 className="font-semibold text-white">Confirm you are back</h4>
+                <p className="mt-1 text-sm leading-5 text-white/65">Then choose this movie, season, or episode below.</p>
               </div>
             </li>
           </ol>
 
-          <div className="mt-5 border-t border-white/10 pt-4">
+          <div className="mt-4 border-t border-white/10 pt-3">
             {downloadsReady ? (
               <p role="status" className="flex items-center gap-2 py-2 text-sm text-emerald-300">
-                <Check className="size-4" weight="bold" /> Setup saved. Choose your download below.
+                <Check className="size-4" weight="bold" />
+                Setup complete. Choose a file below.
               </p>
             ) : (
               <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg bg-white/[0.04] px-3 py-3 text-sm font-medium text-white/85 transition hover:bg-white/[0.07] focus-within:ring-2 focus-within:ring-sky-300">
-                <input type="checkbox" checked={false} onChange={() => updateSetup("complete")}
+                <input type="checkbox" checked={false} onChange={() => updateSetup("hidden")}
                   className="size-5 shrink-0 accent-emerald-400" />
-                I have tapped Start in the VMC bot
+                I tapped Start in the VMC bot
               </label>
             )}
           </div>
           {botOpened && !downloadsReady && (
-            <p role="status" className="mt-3 text-sm leading-6 text-sky-200">Back from Telegram? Tick the box above after tapping Start.</p>
+            <p role="status" className="mt-3 text-sm leading-5 text-sky-200">Back from Telegram? Tick the box after tapping Start.</p>
           )}
         </div>
       ) : (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4">
-          <p className="flex items-center gap-2 text-sm text-white/70">
-            <TelegramIcon className="size-5 text-sky-300" /> Download with Telegram
-          </p>
-          <button type="button" onClick={() => updateSetup("complete")}
-            className="min-h-11 text-sm font-semibold text-sky-300 hover:text-sky-200">
-            Show setup steps
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-400/[0.08] text-emerald-300 ring-1 ring-inset ring-emerald-300/15">
+              <Check className="size-4" weight="bold" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white">Telegram is ready</p>
+              <p className="mt-0.5 text-xs text-white/50">Choose a file to continue.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => updateSetup("complete")}
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-sky-300 transition hover:bg-sky-400/10 hover:text-sky-200"
+          >
+            Review setup <CaretDown className="size-4" weight="bold" />
           </button>
         </div>
+      )}
+
+      {(movieDownloadUrl || seasons.length > 0 || additionalFiles.length > 0) && (
+        <details className="group mt-5 border-y border-white/[0.08]">
+          <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 py-2.5 marker:content-none">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-white/60 ring-1 ring-inset ring-white/[0.08]">
+              <DeviceMobile className="size-[18px]" weight="light" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold text-white">Choose the right file</span>
+              <span className="mt-0.5 block text-xs leading-5 text-white/50">Check quality and size before downloading.</span>
+            </span>
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-white/55 ring-1 ring-inset ring-white/[0.08] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:bg-emerald-400/10 group-open:text-emerald-300">
+              <CaretDown className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:rotate-180" weight="bold" />
+            </span>
+          </summary>
+          <div className="pb-4 pl-[52px] pr-1">
+            <p className="text-xs leading-5 text-white/60">
+              Pick what fits your phone, storage, and data. Higher quality usually means a larger file.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+              <span className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-white/65"><strong className="block text-white">480p</strong>Smallest file</span>
+              <span className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-white/65"><strong className="block text-white">720p</strong>Balanced</span>
+              <span className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-white/65"><strong className="block text-white">1080p / 2K</strong>Sharper, larger</span>
+              <span className="rounded-lg bg-white/[0.04] px-2.5 py-2 text-white/65 sm:col-span-3"><strong className="block text-white">ZIP file</strong>Usually contains a full season or file pack.</span>
+            </div>
+          </div>
+        </details>
       )}
 
       {movieDownloadUrl && (
@@ -380,7 +421,7 @@ function PremiumDownloadPanel({
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white/42 ring-1 ring-inset ring-white/[0.08]"
             >
               <Lock className="h-4 w-4" weight="bold" />
-              Complete Telegram setup
+              Finish step 1 to continue
             </a>
           )}
         </div>
@@ -392,10 +433,12 @@ function PremiumDownloadPanel({
           {seasons.map(season => (
             <details key={season.seasonNumber} open={seasons.length === 1} className="border-b border-white/10 pb-3">
               <summary className="cursor-pointer py-3 text-sm font-bold text-white focus-visible:outline-2 focus-visible:outline-emerald-300">
-                {seasonLabel(season)}{season.episodes?.length ? ` · ${season.episodes.length} episodes available` : ""}
+                {seasonLabel(season)}
+                {season.status && <span className={cn("ml-2 inline-block text-xs font-semibold", season.status === "completed" ? "text-emerald-300" : "text-amber-300")}>· {season.status === "completed" ? "Completed" : "Ongoing"}</span>}
+                {season.episodes?.length ? <span className="mt-1 block text-xs font-normal text-white/55">{season.episodes.length} {season.episodes.length === 1 ? "episode" : "episodes"} available</span> : null}
               </summary>
               <div className="grid gap-2 pt-2">
-                {season.downloadUrl && <FileLink label="Open season in Telegram" url={season.downloadUrl} ready={downloadsReady} />}
+                {season.downloadUrl && <FileLink label="Download season" url={season.downloadUrl} ready={downloadsReady} />}
                 {season.zipUrl && <FileLink label="Download full season ZIP" url={season.zipUrl} ready={downloadsReady} />}
                 {[...(season.episodes ?? [])].sort((a, b) => a.episodeNumber - b.episodeNumber).map(ep => (
                   <FileLink key={ep.episodeNumber} label={`Episode ${ep.episodeNumber}${ep.title ? ` - ${ep.title}` : ""}`} url={ep.downloadUrl} ready={downloadsReady} />
@@ -421,7 +464,7 @@ function FileLink({ label, detail, url, ready }: { label: string; detail?: strin
   return (
     <a href={ready ? url : "#telegram-setup"} target={ready ? "_blank" : undefined} rel={ready ? "noopener noreferrer" : undefined}
       className="flex min-h-12 items-center justify-between gap-3 rounded-lg bg-white/[0.04] px-4 py-3 text-sm text-white/85 transition hover:bg-emerald-400/10 focus-visible:outline-2 focus-visible:outline-emerald-300">
-      <span className="min-w-0 break-words"><span className="font-semibold">{label}</span>{detail && <span className="mt-1 block text-xs text-white/55">{detail}</span>}{!ready && <span className="mt-1 block text-xs text-white/55">Complete Telegram setup</span>}</span>
+      <span className="min-w-0 break-words"><span className="font-semibold">{label}</span>{detail && <span className="mt-1 block text-xs text-white/55">{detail}</span>}{!ready && <span className="mt-1 block text-xs text-white/55">Finish setup to open</span>}</span>
       {ready ? <DownloadSimple className="size-5 shrink-0 text-emerald-300" /> : <Lock className="size-4 shrink-0 text-white/50" />}
     </a>
   );

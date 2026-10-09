@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (rateLimited(`title-request:${session.user.id}`, 8)) {
+    if (await rateLimited(`title-request:${session.user.id}`, 8)) {
       return NextResponse.json({ error: RATE_LIMIT_MSG }, { status: 429 });
     }
 

@@ -43,3 +43,8 @@ export async function getDb(): Promise<Db> {
   const client = await getClientPromise();
   return client.db(process.env.MONGODB_DB_NAME ?? "vmc");
 }
+
+/** Use only for multi-document operations that must commit atomically. */
+export async function getMongoClient(): Promise<MongoClient> {
+  return getClientPromise();
+}

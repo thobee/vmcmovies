@@ -16,6 +16,7 @@ import {
   PASSWORD_MIN_LENGTH,
   passwordSchema,
 } from "@/lib/validation/password";
+import { telegramUsernameSchema } from "@/lib/validation/auth";
 
 const GOOGLE_ERRORS: Record<string, string> = {
   google_cancelled: "Google sign-in was cancelled.",
@@ -28,6 +29,9 @@ interface AuthFormProps {
   errorCode?: string;
 }
 
+type FieldName = "email" | "telegram" | "password" | "confirm";
+type FieldErrors = Partial<Record<FieldName, string>>;
+
 export default function AuthForm({ mode, errorCode }: AuthFormProps) {
   const router = useRouter();
   const { setUser } = useAuth();
@@ -37,6 +41,7 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
   const [telegramUsername, setTelegramUsername] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState(errorCode ? (GOOGLE_ERRORS[errorCode] ?? "") : "");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
   const [navigating, setNavigating] = useState(false);
 
@@ -56,21 +61,51 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
     !googleClientId.includes("your-client-id") &&
     googleClientId.endsWith(".apps.googleusercontent.com");
 
+  const setFieldError = (field: FieldName, message?: string) => {
+    setFieldErrors((current) => ({ ...current, [field]: message }));
+  };
+
+  const validateField = (field: FieldName) => {
+    if (field === "email") {
+      setFieldError("email", /^\S+@\S+\.\S+$/.test(email.trim()) ? undefined : "Enter a valid email address");
+      return;
+    }
+    if (field === "telegram") {
+      const parsed = telegramUsernameSchema.safeParse(telegramUsername);
+      setFieldError("telegram", parsed.success ? undefined : (parsed.error.issues[0]?.message ?? "Enter your Telegram username"));
+      return;
+    }
+    if (field === "password" && isSignup) {
+      const parsed = passwordSchema.safeParse(password);
+      setFieldError("password", parsed.success ? undefined : (parsed.error.issues[0]?.message ?? "Enter a valid password"));
+      return;
+    }
+    if (field === "password") {
+      setFieldError("password", password ? undefined : "Enter your password");
+      return;
+    }
+    setFieldError("confirm", password === confirm ? undefined : "Passwords do not match");
+  };
+
+  const validateBeforeSubmit = (): boolean => {
+    const nextErrors: FieldErrors = {};
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) nextErrors.email = "Enter a valid email address";
+    if (!password) nextErrors.password = "Enter your password";
+    if (isSignup) {
+      const telegram = telegramUsernameSchema.safeParse(telegramUsername);
+      const pw = passwordSchema.safeParse(password);
+      if (!telegram.success) nextErrors.telegram = telegram.error.issues[0]?.message ?? "Enter your Telegram username";
+      if (!pw.success) nextErrors.password = pw.error.issues[0]?.message ?? "Enter a valid password";
+      if (password !== confirm) nextErrors.confirm = "Passwords do not match";
+    }
+    setFieldErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-
-    if (isSignup) {
-      const pw = passwordSchema.safeParse(password);
-      if (!pw.success) {
-        setError(pw.error.issues[0]?.message ?? "Invalid password");
-        return;
-      }
-      if (password !== confirm) {
-        setError("Passwords don’t match");
-        return;
-      }
-    }
+    if (!validateBeforeSubmit()) return;
 
     const website = String(new FormData(e.currentTarget).get("website") ?? "");
     setPending(true);
@@ -87,7 +122,16 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong");
+        const message = data.error ?? "Something went wrong";
+        if ((/email/i.test(message) && /password/i.test(message)) || /invalid credentials|incorrect login/i.test(message)) {
+          setFieldErrors({ email: "Check this email", password: "Check this password" });
+        } else if (/email/i.test(message)) {
+          setFieldErrors({ email: message });
+        } else if (/password/i.test(message)) {
+          setFieldErrors({ password: message });
+        } else {
+          setError(message);
+        }
         return;
       }
       setUser(data.user);
@@ -138,9 +182,14 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         autoComplete="email"
         required
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          if (fieldErrors.email) setFieldError("email");
+        }}
+        onBlur={() => validateField("email")}
         placeholder="Enter your email"
         icon={<At className="h-[18px] w-[18px]" weight="light" />}
+        error={fieldErrors.email}
       />
 
       {isSignup && (
@@ -151,9 +200,14 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
           autoComplete="username"
           required
           value={telegramUsername}
-          onChange={(e) => setTelegramUsername(e.target.value)}
+          onChange={(e) => {
+            setTelegramUsername(e.target.value);
+            if (fieldErrors.telegram) setFieldError("telegram");
+          }}
+          onBlur={() => validateField("telegram")}
           placeholder="@yourusername"
           hint="Needed for premium Telegram downloads."
+          error={fieldErrors.telegram}
         />
       )}
 
@@ -161,12 +215,18 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
         id="password"
         label="Password"
         value={password}
-        onChange={setPassword}
+        onChange={(value) => {
+          setPassword(value);
+          if (fieldErrors.password) setFieldError("password");
+          if (fieldErrors.confirm && value === confirm) setFieldError("confirm");
+        }}
+        onBlur={() => validateField("password")}
         autoComplete={isSignup ? "new-password" : "current-password"}
         minLength={isSignup ? PASSWORD_MIN_LENGTH : 1}
         maxLength={isSignup ? PASSWORD_MAX_LENGTH : undefined}
         showPolicyHint={isSignup}
         placeholder={isSignup ? "8–12 characters" : "Enter your password"}
+        error={fieldErrors.password}
       />
 
       {isSignup && (
@@ -174,11 +234,16 @@ export default function AuthForm({ mode, errorCode }: AuthFormProps) {
           id="confirm"
           label="Confirm password"
           value={confirm}
-          onChange={setConfirm}
+          onChange={(value) => {
+            setConfirm(value);
+            if (fieldErrors.confirm) setFieldError("confirm");
+          }}
+          onBlur={() => validateField("confirm")}
           autoComplete="new-password"
           minLength={PASSWORD_MIN_LENGTH}
           maxLength={PASSWORD_MAX_LENGTH}
           placeholder="Repeat your password"
+          error={fieldErrors.confirm}
         />
       )}
       </div>

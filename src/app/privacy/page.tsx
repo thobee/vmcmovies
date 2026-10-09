@@ -8,13 +8,9 @@ export const metadata: Metadata = {
   description: "How VMC collects, uses, and protects your data.",
 };
 
-export default function PrivacyPage() {
-  const updated = new Date().toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+const LAST_UPDATED = "9 October 2026";
 
+export default function PrivacyPage() {
   return (
     <SitePage>
       <div className="relative mx-auto max-w-3xl px-4 pb-20 pt-28 sm:px-6 sm:pt-32">
@@ -27,7 +23,7 @@ export default function PrivacyPage() {
           >
             Privacy Policy
           </h1>
-          <p className="mt-2 text-sm text-white/45">Last updated: {updated}</p>
+          <p className="mt-2 text-sm text-white/45">Last updated: {LAST_UPDATED}</p>
 
           <div className="mt-10 space-y-8 text-[15px] leading-7 text-white/70">
             <Section title="1. What we collect">
@@ -45,9 +41,12 @@ export default function PrivacyPage() {
               requests. We do not sell your personal data to third parties.
             </Section>
 
-            <Section title="3. Cookies & sessions">
-              VMC uses a single HTTP-only session cookie to keep you signed in. It contains no
-              tracking or advertising data and is only readable by our own servers.
+            <Section title="3. Cookies & local storage">
+              VMC uses essential HTTP-only cookies to keep members and administrators signed in.
+              If the optional admin gate is enabled, it also stores a short-lived essential cookie
+              after the correct private access link is used. We store a Telegram setup preference
+              in your browser&apos;s local storage so the download guide can be shown again when you
+              ask for it. These are functional settings, not advertising or analytics trackers.
             </Section>
 
             <Section title="4. Third parties">
