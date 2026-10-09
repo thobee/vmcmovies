@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, Check, DownloadSimple, Lightning, ShieldCheck } from "@phosphor-icons/react";
+import { ArrowRight, DownloadSimple, Lightning, ShieldCheck } from "@phosphor-icons/react";
 import type { ResolvedPlanOffer } from "@/lib/payments/billing/types";
 import { formatMoney } from "@/lib/payments/currency";
 import TelegramIcon from "@/components/brand/TelegramIcon";
@@ -103,17 +103,14 @@ export default function PremiumBanner({
           <div className="relative mt-10 border-t border-white/[0.08] pt-7 sm:mt-12 sm:pt-8">
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <h3 className="text-xl font-bold text-white sm:text-2xl">Choose your Premium plan</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">
+                  Choose your access
+                </p>
                 <p className="mt-1.5 text-sm text-white/45">
-                  One payment. No automatic renewal.
+                  One payment. Your time starts after checkout.
                 </p>
               </div>
-              <p className="hidden text-xs text-white/50 sm:block">Same access. Choose your duration.</p>
-            </div>
-            <div className="mb-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
-              {["Premium movies & series", "Telegram downloads", "Request titles"].map((benefit) => (
-                <span key={benefit} className="inline-flex items-center gap-2"><Check className="size-4 shrink-0 text-emerald-300" />{benefit}</span>
-              ))}
+              <p className="hidden text-xs text-white/30 sm:block">Longer plans save more</p>
             </div>
 
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4 xl:gap-5">
@@ -130,31 +127,35 @@ export default function PremiumBanner({
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.65, delay: index * 0.08, ease: [0.32, 0.72, 0, 1] }}
                     className={cn(
-                      "rounded-lg ring-1 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                      "rounded-[24px] p-1 ring-1 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
                       featured
-                        ? "bg-[#111918] ring-emerald-300/40"
-                        : "bg-[#111516] ring-white/10 hover:ring-white/25",
+                        ? "bg-emerald-400/12 ring-emerald-300/35"
+                        : "bg-white/[0.025] ring-white/[0.07] hover:-translate-y-1 hover:ring-white/[0.14]",
                     )}
                   >
                     <Link
                       href={`/get-access?plan=${plan.id}`}
                       className={cn(
-                        "group grid h-full grid-cols-[minmax(0,1fr)_auto] gap-x-3 rounded-lg p-4 text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.025] sm:flex sm:min-h-[272px] sm:flex-col sm:justify-between sm:p-5",
+                        "group flex h-full min-h-[226px] flex-col justify-between rounded-[20px] px-5 py-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] lg:min-h-[244px] xl:px-6 xl:py-6",
+                        featured
+                          ? "bg-emerald-400 text-[#07100c]"
+                          : "bg-[#111516] hover:bg-[#14191a]",
                       )}
                     >
                       <div>
                         <div className="flex min-h-7 items-start gap-3">
                           <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-base font-semibold text-white/85">
+                            <p className={cn("text-sm font-bold", featured ? "text-black/70" : "text-white/65")}>
                               {plan.name}
                             </p>
                             {plan.badge && (
                               <span
                                 className={cn(
-                                  "text-xs font-medium text-emerald-300",
+                                  "rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em]",
+                                  featured ? "bg-black/10 text-black/65" : "bg-white/[0.07] text-emerald-300",
                                 )}
                               >
-                                {featured ? "Recommended" : plan.badge}
+                                {plan.badge}
                               </span>
                             )}
                           </div>
@@ -162,33 +163,35 @@ export default function PremiumBanner({
 
                         <p
                           className={cn(
-                            "mt-3 break-words text-2xl font-bold leading-tight sm:mt-5 sm:text-3xl",
+                            "mt-5 text-[2.35rem] font-bold leading-none sm:text-[2.6rem] lg:text-[2.15rem] xl:text-[2.65rem]",
+                            featured ? "text-black" : "text-white",
                           )}
                           style={{ fontFamily: "var(--font-display)" }}
                         >
                           {formatMoney(plan.display, "NGN")}
                         </p>
-                        <p className="mt-1 text-xs leading-5 text-white/50">
-                          {plan.months === 1 ? "Paid once for 1 month" : `About ${formatMoney(monthlyEquivalent, "NGN")} / month`}
+                        <p className={cn("mt-2 text-xs", featured ? "text-black/55" : "text-white/35")}>
+                          About {formatMoney(monthlyEquivalent, "NGN")} per month
                         </p>
 
-                        <p className="mt-2 text-xs leading-5 text-emerald-300 sm:mt-4">
+                        <p className={cn("mt-4 text-xs font-semibold", featured ? "text-black/65" : "text-emerald-300")}>
                           {plan.promoLabel ?? (savings > 0 ? `Save ${formatMoney(savings, "NGN")}` : plan.months === 1 ? "Flexible monthly access" : "Full Premium access")}
                         </p>
                       </div>
 
                       <div
                         className={cn(
-                          "flex flex-col items-end justify-center gap-2 sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:border-t sm:border-white/10 sm:pt-4",
+                          "mt-6 flex items-center justify-between border-t pt-4",
+                          featured ? "border-black/10" : "border-white/[0.07]",
                         )}
                       >
-                        <span className="text-xs font-semibold text-white/80 sm:text-sm">
-                          Choose {plan.months} {plan.months === 1 ? "month" : "months"}
+                        <span className={cn("text-sm font-bold", featured ? "text-black" : "text-white/70")}>
+                          Get access
                         </span>
                         <span
                           className={cn(
                             "flex h-8 w-8 items-center justify-center rounded-full transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-[1px] group-hover:scale-105",
-                            "bg-white/[0.05] text-emerald-300",
+                            featured ? "bg-black text-white" : "bg-white/[0.07] text-emerald-300",
                           )}
                         >
                           <ArrowRight className="h-4 w-4" weight="bold" />
