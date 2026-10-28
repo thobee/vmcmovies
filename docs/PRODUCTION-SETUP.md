@@ -7,8 +7,9 @@ them in Vercel Production Environment Variables instead.
 
 - `MONGODB_URI` and optional `MONGODB_DB_NAME`
 - `AUTH_SECRET` - a unique random value with at least 32 characters
-- `PAYSTACK_SECRET_KEY` - the live Paystack secret key only
-- `PAYSTACK_RETURN_BASE_URL=https://www.vmcmovies.xyz`
+- `BACHS_API_KEY` - a live Bachs key with Payments **Create & charge** and **View payments** scopes
+- `BACHS_WEBHOOK_SECRET` - the signing secret for the VMC webhook endpoint
+- `PAYMENT_RETURN_BASE_URL=https://www.vmcmovies.xyz`
 - `NEXT_PUBLIC_APP_URL=https://www.vmcmovies.xyz`
 - `NEXT_PUBLIC_TELEGRAM_BOT`
 
@@ -21,7 +22,8 @@ Set these when their features are enabled:
 
 ## Provider setup
 
-- Paystack webhook: `https://www.vmcmovies.xyz/api/payments/webhook`
+- Bachs webhook: `https://www.vmcmovies.xyz/api/payments/webhook`
+  - Subscribe to `checkout.completed`, `collection.succeeded`, and `collection.failed`.
 - Google OAuth callback: `https://www.vmcmovies.xyz/api/auth/google/callback`
 - Resend: verify the sending domain before using a public receipt address.
 - Cloudinary: configure before uploading images from the production admin panel.

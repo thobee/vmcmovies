@@ -132,7 +132,7 @@ export default async function AdminPaymentsPage() {
       <AdminPageHeader
         title="Payments"
         badge={`${stats.successful} paid`}
-        subtitle="Paystack checkouts, revenue, and premium activation status."
+        subtitle="Bachs checkouts, revenue, and premium activation status."
       />
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
@@ -203,8 +203,8 @@ function CashMovementChart({ points }: { points: CashPoint[] }) {
         })}
       </div>
       <p className="mt-3 text-xs leading-5 text-white/40">
-        Inflow is successful Paystack payment value recorded in VMC. Outflow is reserved for future
-        expense/refund tracking; Paystack settlement withdrawals happen in Paystack, not from this app.
+        Inflow is successful Bachs payment value recorded in VMC. Outflow is reserved for future
+        expense/refund tracking; Bachs settlements happen in Bachs, not from this app.
       </p>
     </div>
   );
@@ -216,11 +216,11 @@ function SettlementPanel() {
       <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">
         Balance & withdrawal
       </p>
-      <h2 className="mt-1 text-lg font-bold text-white">Managed by Paystack</h2>
+      <h2 className="mt-1 text-lg font-bold text-white">Managed by Bachs</h2>
       <p className="mt-3 text-sm leading-6 text-white/50">
         This admin panel records customer payments and premium activation. Available balance,
         settlement timing, bank account, and manual withdrawals should be handled inside your
-        Paystack dashboard.
+        Bachs dashboard.
       </p>
       <div className="mt-4 rounded-xl border border-amber-400/15 bg-amber-400/10 px-3 py-3">
         <p className="text-xs leading-5 text-amber-100/80">

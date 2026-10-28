@@ -5,6 +5,7 @@ import type { PlanId } from "@/lib/payments/plans";
 import type { PricingKind } from "@/lib/payments/billing/types";
 
 export type PaymentStatus = "pending" | "success" | "failed";
+export type PaymentProvider = "bachs" | "paystack";
 
 export interface Payment {
   _id: string;
@@ -19,6 +20,9 @@ export interface Payment {
   notificationSentAt?: Date | null;
   adminNotifiedAt?: Date | null;
   checkoutId?: string | null;
+  provider?: PaymentProvider;
+  providerReference?: string | null;
+  /** @deprecated retained for historical Paystack records */
   paystackReference?: string | null;
   paidAt?: Date | null;
   failureReason?: string | null;
@@ -41,6 +45,9 @@ type PaymentDoc = Document & {
   notificationSentAt?: Date | null;
   adminNotifiedAt?: Date | null;
   checkoutId?: string | null;
+  provider?: PaymentProvider;
+  providerReference?: string | null;
+  /** @deprecated retained for historical Paystack records */
   paystackReference?: string | null;
   paidAt?: Date | null;
   failureReason?: string | null;
@@ -57,6 +64,7 @@ async function payments(): Promise<Collection<PaymentDoc>> {
 
   if (!indexesReady) {
     await col.createIndex({ reference: 1 }, { unique: true });
+    await col.createIndex({ checkoutId: 1 });
     await col.createIndex({ userId: 1, createdAt: -1 });
     await col.createIndex({ status: 1, createdAt: -1 });
     indexesReady = true;
@@ -79,6 +87,8 @@ function toPayment(doc: PaymentDoc): Payment {
     notificationSentAt: doc.notificationSentAt ?? null,
     adminNotifiedAt: doc.adminNotifiedAt ?? null,
     checkoutId: doc.checkoutId ?? null,
+    provider: doc.provider ?? "paystack",
+    providerReference: doc.providerReference ?? doc.paystackReference ?? null,
     paystackReference: doc.paystackReference ?? null,
     paidAt: doc.paidAt ?? null,
     failureReason: doc.failureReason ?? null,
@@ -96,6 +106,7 @@ export async function createPendingPayment(input: {
   reference: string;
   checkoutId?: string;
   pricingKind?: PricingKind;
+  provider?: PaymentProvider;
 }): Promise<Payment> {
   const now = new Date();
   const doc: Omit<PaymentDoc, "_id"> = {
@@ -106,6 +117,7 @@ export async function createPendingPayment(input: {
     reference: input.reference,
     checkoutId: input.checkoutId ?? null,
     pricingKind: input.pricingKind ?? "standard",
+    provider: input.provider ?? "bachs",
     status: "pending",
     premiumActivated: false,
     createdAt: now,
@@ -150,7 +162,7 @@ export async function markPaymentFulfilled(
       $set: {
         status: "success",
         paidAt,
-        paystackReference: reference,
+        providerReference: reference,
         premiumActivated: true,
         updatedAt: new Date(),
       },

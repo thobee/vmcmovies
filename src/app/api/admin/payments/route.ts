@@ -117,10 +117,10 @@ export async function GET() {
       },
       movement: cashMovement(payments),
       settlement: {
-        provider: "Paystack",
+        provider: "Bachs",
         inAppWithdrawals: false,
         note:
-          "VMC records payments and premium activation. Balance, settlement, and bank withdrawals are managed in Paystack.",
+          "VMC records payments and premium activation. Balance, settlement, and bank withdrawals are managed in Bachs.",
       },
     });
   } catch (err) {

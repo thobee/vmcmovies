@@ -158,7 +158,7 @@ export default function GuidePage() {
             </div>
             <div>
               <dt className="text-base font-semibold text-emerald-300">You choose when to renew</dt>
-              <dd className="mt-2 text-sm leading-6 text-white/60">Paid plans use Paystack checkout. There is no automatic renewal. Check your remaining access in your dashboard and choose another plan when you need it.</dd>
+              <dd className="mt-2 text-sm leading-6 text-white/60">Paid plans use secure Bachs checkout. There is no automatic renewal. Check your remaining access in your dashboard and choose another plan when you need it.</dd>
             </div>
           </dl>
         </section>

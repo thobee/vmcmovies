@@ -1,6 +1,6 @@
 import { paymentMismatch } from "@/lib/payments/match";
 import { getPlanMonths, isKnownPlanId } from "@/lib/payments/plans";
-import type { PaymentVerifyData } from "@/lib/payments/paystack";
+import type { PaymentVerifyData } from "@/lib/payments/provider";
 import {
   findPaymentByReference,
   markPaymentFailed,
@@ -15,9 +15,9 @@ export interface FulfillResult {
   alreadyFulfilled?: boolean;
   error?: string;
   expiryDate?: Date;
-  /** Permanent failures — webhook should return 200 so Paystack stops retrying */
+  /** Permanent failures — webhook should return 200 so the provider stops retrying */
   permanent?: boolean;
-  /** Transient failures — webhook should return 500 so Paystack retries */
+  /** Transient failures — webhook should return 500 so the provider retries */
   retryable?: boolean;
 }
 
@@ -36,6 +36,10 @@ export async function fulfillPayment(
           result = { ok: true, alreadyFulfilled: true };
           return;
         }
+        if (paymentData.reference && paymentData.reference !== payment.reference) {
+          result = { ok: false, error: "Payment reference mismatch", permanent: true };
+          return;
+        }
 
         if (!isKnownPlanId(payment.planId)) {
           await markPaymentFailed(reference, "Invalid plan", session);
@@ -47,7 +51,7 @@ export async function fulfillPayment(
           const mismatch = paymentMismatch(paymentData, payment);
           if (mismatch) {
             if (mismatch === "Payment not successful") {
-              await markPaymentFailed(reference, `Paystack status: ${paymentData.status}`, session);
+              await markPaymentFailed(reference, `Provider status: ${paymentData.status}`, session);
             }
             result = { ok: false, error: mismatch, permanent: true };
             return;

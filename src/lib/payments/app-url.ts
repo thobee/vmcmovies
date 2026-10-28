@@ -49,7 +49,7 @@ export function originFromRequest(request: Request): string {
 
 /** Prefer your deployed site URL when developing local payment callbacks. */
 export function paymentReturnBase(request: Request): string {
-  const paymentBase = process.env.PAYSTACK_RETURN_BASE_URL?.trim();
+  const paymentBase = process.env.PAYMENT_RETURN_BASE_URL?.trim();
   const candidates = [
     paymentBase ? normalizePublicUrl(paymentBase) : null,
     originFromRequest(request),
@@ -62,7 +62,7 @@ export function paymentReturnBase(request: Request): string {
   }
 
   throw new Error(
-    "Payments need a public callback URL. Deploy the app and set PAYSTACK_RETURN_BASE_URL to your live domain.",
+    "Bachs needs a public callback URL. Deploy the app and set PAYMENT_RETURN_BASE_URL to your live domain.",
   );
 }
 

@@ -1,56 +1,56 @@
 import { NextResponse } from "next/server";
-import {
-  isPaystackPaid,
-  toVerifyData,
-  verifyWebhookSignature,
-  type PaystackTransactionData,
-} from "@/lib/payments/paystack";
+import { retrieveCheckoutSession, verifyBachsWebhook } from "@/lib/payments/bachs";
 import { fulfillPayment } from "@/lib/payments/fulfill";
+import { isPaymentPaid } from "@/lib/payments/provider";
+import { findPaymentByCheckoutId } from "@/lib/payments/records";
 
 export const runtime = "nodejs";
 
-type CollectionSucceededEvent = {
-  event: string;
-  data?: PaystackTransactionData;
+type BachsWebhookEvent = {
+  id?: string;
+  type?: string;
+  event?: string;
+  data?: {
+    checkout_id?: string;
+    id?: string;
+  };
 };
 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
-    const signature = request.headers.get("x-paystack-signature");
-
-    if (!verifyWebhookSignature(rawBody, signature)) {
+    if (!verifyBachsWebhook(rawBody, request.headers)) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
-    const event = JSON.parse(rawBody) as CollectionSucceededEvent;
-
-    if (event.event !== "charge.success") {
+    const event = JSON.parse(rawBody) as BachsWebhookEvent;
+    const eventType = event.type ?? event.event;
+    if (eventType !== "checkout.completed" && eventType !== "collection.succeeded") {
       return NextResponse.json({ received: true });
     }
 
-    const data = event.data;
-    const reference = data?.reference;
-    if (!reference || typeof data?.amount !== "number" || !data?.currency || !data?.status) {
-      return NextResponse.json({ error: "Incomplete webhook payload" }, { status: 400 });
+    const checkoutId =
+      event.data?.checkout_id ?? (eventType === "checkout.completed" ? event.data?.id : undefined);
+    if (!checkoutId) {
+      return NextResponse.json({ error: "Missing checkout ID" }, { status: 400 });
     }
 
-    if (!isPaystackPaid(data.status)) {
-      return NextResponse.json({ received: true });
+    const [payment, paymentData] = await Promise.all([
+      findPaymentByCheckoutId(checkoutId),
+      retrieveCheckoutSession(checkoutId),
+    ]);
+    if (!payment) return NextResponse.json({ received: true, error: "Payment not found" });
+    if (!paymentData || !isPaymentPaid(paymentData.status)) {
+      return NextResponse.json({ error: "Payment is not confirmed" }, { status: 500 });
     }
 
-    const result = await fulfillPayment(reference, toVerifyData(data));
-
-    if (!result.ok) {
-      if (result.retryable) {
-        return NextResponse.json({ error: result.error }, { status: 500 });
-      }
-      return NextResponse.json({ received: true, error: result.error });
+    const result = await fulfillPayment(payment.reference, paymentData);
+    if (!result.ok && result.retryable) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
-
-    return NextResponse.json({ received: true });
-  } catch (err) {
-    console.error("[payments/webhook]", err);
+    return NextResponse.json({ received: true, error: result.ok ? undefined : result.error });
+  } catch (error) {
+    console.error("[payments/webhook]", error);
     return NextResponse.json({ error: "Webhook error" }, { status: 500 });
   }
 }

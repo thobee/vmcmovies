@@ -18,8 +18,8 @@ Base URL: `http://localhost:3000` (dev) or your production domain.
 | `/login` | GET | User login form. |
 | `/signup` | GET | User registration form. |
 | `/account` | GET | Protected user profile — email, Telegram, premium status, expiry. |
-| `/get-access` | GET | Premium pricing grid + Paystack checkout (login required to pay). |
-| `/payment/callback` | GET | Post-Paystack redirect — verifies payment, shows success/failure. |
+| `/get-access` | GET | Premium pricing grid + Bachs checkout (login required to pay). |
+| `/payment/callback` | GET | Post-Bachs redirect — verifies payment, shows success/failure. |
 
 ---
 
@@ -39,7 +39,7 @@ Admin auth is separate from user accounts. Login at `/admin/login`.
 | `/admin/series/[id]/edit` | GET | Edit series and episodes. |
 | `/admin/homepage` | GET | Homepage hero slides and section titles. |
 | `/admin/users` | GET | Registered users + subscription alerts. |
-| `/admin/payments` | GET | Paystack payments, balance, withdrawals. |
+| `/admin/payments` | GET | Bachs payments, revenue, and activation status. |
 | `/admin/support` | GET | Support tickets. |
 
 ---
@@ -104,13 +104,13 @@ Returns current user or null.
 
 ---
 
-## Payments API (Paystack)
+## Payments API (Bachs)
 
 Requires logged-in user session.
 
 ### `POST /api/payments/initialize`
 
-Start Paystack checkout.
+Start a hosted Bachs checkout.
 
 **Body:**
 ```json
@@ -130,7 +130,7 @@ hardcode a price in a client, bot, or external integration. The available plan I
 **Success `200`:**
 ```json
 {
-  "authorizationUrl": "https://checkout.paystack.com/...",
+  "authorizationUrl": "https://checkout.bachs.io/...",
   "reference": "vmc_..."
 }
 ```
@@ -141,7 +141,8 @@ hardcode a price in a client, bot, or external integration. The available plan I
 
 ### `GET /api/payments/verify?reference=vmc_...`
 
-Verify payment after Paystack redirect (also used by callback page).
+Verify payment after the Bachs redirect (also used by the callback page). Bachs redirects with
+`checkout_id`; the endpoint also accepts VMC's internal `reference` for support and recovery.
 
 **Success `200`:**
 ```json
@@ -159,13 +160,14 @@ Verify payment after Paystack redirect (also used by callback page).
 
 ### `POST /api/payments/webhook`
 
-Paystack server webhook. Event: `charge.success`.
+Bachs server webhook. Fulfilment events: `checkout.completed` and `collection.succeeded`.
 
-**Headers:** `x-paystack-signature` (HMAC SHA-512)
+**Headers:** `x-bachs-signature-v2` (preferred) or `x-bachs-timestamp` plus
+`x-bachs-signature`. Signatures are HMAC SHA-256 over `{timestamp}.{raw_body}`.
 
 **Success `200`:** `{ "received": true }`
 
-Configure in Paystack dashboard:
+Configure in the Bachs developer portal:
 ```
 https://your-domain.com/api/payments/webhook
 ```
@@ -320,9 +322,10 @@ Fetch full details for a specific TMDB result, mapped to the admin form's fields
 | `TMDB_API_KEY` | Enables the "Fill from TMDB" search box in the admin panel |
 | `ADMIN_EMAIL` | Admin panel login email |
 | `ADMIN_PASSWORD_HASH` | Bcrypt hash — `npm run admin:hash-password` |
-| `PAYSTACK_SECRET_KEY` | Paystack secret key |
-| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key (optional) |
-| `NEXT_PUBLIC_APP_URL` | App URL for Paystack callbacks |
+| `BACHS_API_KEY` | Bachs sandbox or live secret key |
+| `BACHS_WEBHOOK_SECRET` | Bachs webhook signing secret |
+| `PAYMENT_RETURN_BASE_URL` | Public app URL for payment callbacks |
+| `NEXT_PUBLIC_APP_URL` | Public app URL used by the rest of VMC |
 | `NEXT_PUBLIC_TELEGRAM_BOT` | Bot username for download links |
 | `NEXT_PUBLIC_TELEGRAM_CHANNEL` | Telegram channel URL |
 
@@ -333,7 +336,7 @@ Fetch full details for a specific TMDB result, mapped to the admin form's fields
 | Collection | Purpose |
 |------------|---------|
 | `users` | Registered users, premium status, expiry |
-| `payments` | Paystack payment records |
+| `payments` | Provider-neutral payment records (including historical Paystack rows) |
 | `content` | Movies, series, episodes |
 
 ---
@@ -341,11 +344,11 @@ Fetch full details for a specific TMDB result, mapped to the admin form's fields
 ## Premium flow
 
 ```
-Browse (free) → Sign up → Get Access → Paystack → /payment/callback
+Browse (free) → Sign up → Get Access → Bachs → /payment/callback
   → verify API → activatePremium() → download links unlock
 ```
 
-Webhook (`charge.success`) acts as backup if callback verification fails.
+Signed Bachs webhooks act as the source-of-truth backup if callback verification fails.
 
 ---
 

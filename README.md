@@ -18,7 +18,7 @@ VMC is a movie and series catalog app built for a premium media experience. It c
 - TypeScript
 - Tailwind CSS
 - MongoDB for app data and user state
-- Paystack for premium purchasing
+- Bachs hosted checkout for premium purchasing
 - Telegram deep links for download access
 
 ## Project structure

@@ -35,7 +35,7 @@ const STATUS: Record<
   },
   pending: {
     label: "Payment pending",
-    hint: "Premium turns on automatically as soon as Paystack confirms your payment.",
+    hint: "Premium turns on automatically as soon as Bachs confirms your payment.",
     badge: "text-amber-200 bg-amber-500/10 border-amber-500/25",
     tone: "text-amber-200",
   },

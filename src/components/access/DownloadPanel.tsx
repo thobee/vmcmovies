@@ -163,7 +163,7 @@ export default function DownloadPanel({
                 Payment pending
               </h2>
               <p className="mt-2 text-sm leading-6 text-white/70">
-                Your premium download opens as soon as Paystack confirms the payment.
+                Your premium download opens as soon as Bachs confirms the payment.
                 Open the bot and tap Start. Then return here to download once your payment is confirmed.
               </p>
             </div>
