@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { passwordSchema } from "@/lib/validation/password";
 
+/** Trim first so stray spaces don't fail the format check; 254 is the email length limit. */
+const emailSchema = z.string().trim().max(254, "Email is too long").email("Enter a valid email");
+
 export const telegramUsernameSchema = z
   .string()
   .min(2, "Telegram username is required")
@@ -13,13 +16,13 @@ export const telegramUsernameSchema = z
   );
 
 export const signupSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: emailSchema,
   password: passwordSchema,
   telegramUsername: telegramUsernameSchema,
 });
 
 export const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: emailSchema,
   password: z.string().min(1, "Password is required"),
   remember: z.boolean().optional(),
 });
@@ -29,7 +32,7 @@ export const updateTelegramSchema = z.object({
 });
 
 export const adminSignupSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: emailSchema,
   password: passwordSchema,
 });
 

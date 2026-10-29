@@ -5,13 +5,7 @@ import { getPlanDestination } from "@/lib/payments/plan-destination";
 const ASIDE = {
   eyebrow: "VMC",
   headline: "Download movies. No ads.",
-  description:
-    "Get the latest movies and series — new titles added regularly. Browse free on the site. Premium members download straight to Telegram with zero ads.",
-  highlights: [
-    "Latest movies & series",
-    "No ads, no popups",
-    "New titles added regularly",
-  ],
+  description: "Browse free on the site. Your downloads arrive straight in Telegram — no pop-ups, no mystery pages.",
 };
 
 export default async function LoginPage({

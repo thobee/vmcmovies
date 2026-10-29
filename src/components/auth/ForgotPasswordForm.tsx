@@ -154,7 +154,7 @@ export default function ForgotPasswordForm() {
             minLength={PASSWORD_MIN_LENGTH}
             maxLength={PASSWORD_MAX_LENGTH}
             showPolicyHint
-            placeholder="8–12 characters"
+            placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
           />
           <PasswordField
             label="Confirm password"

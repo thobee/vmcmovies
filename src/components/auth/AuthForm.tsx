@@ -30,7 +30,7 @@ interface AuthFormProps {
   nextDestination?: string;
 }
 
-type FieldName = "email" | "telegram" | "password" | "confirm";
+type FieldName = "email" | "telegram" | "password";
 type FieldErrors = Partial<Record<FieldName, string>>;
 
 export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormProps) {
@@ -38,7 +38,6 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
   const [telegramUsername, setTelegramUsername] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState(errorCode ? (GOOGLE_ERRORS[errorCode] ?? "") : "");
@@ -81,11 +80,7 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
       setFieldError("password", parsed.success ? undefined : (parsed.error.issues[0]?.message ?? "Enter a valid password"));
       return;
     }
-    if (field === "password") {
-      setFieldError("password", password ? undefined : "Enter your password");
-      return;
-    }
-    setFieldError("confirm", password === confirm ? undefined : "Passwords do not match");
+    setFieldError("password", password ? undefined : "Enter your password");
   };
 
   const validateBeforeSubmit = (): boolean => {
@@ -97,7 +92,6 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
       const pw = passwordSchema.safeParse(password);
       if (!telegram.success) nextErrors.telegram = telegram.error.issues[0]?.message ?? "Enter your Telegram username";
       if (!pw.success) nextErrors.password = pw.error.issues[0]?.message ?? "Enter a valid password";
-      if (password !== confirm) nextErrors.confirm = "Passwords do not match";
     }
     setFieldErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -175,7 +169,7 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
         </>
       )}
 
-      <div className={cn("grid gap-4", isSignup && "sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2")}>
+      <div className="grid gap-4">
       <AuthField
         id="email"
         label="Email"
@@ -207,7 +201,7 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
           }}
           onBlur={() => validateField("telegram")}
           placeholder="@yourusername"
-          hint="Needed for premium Telegram downloads."
+          hint="Find it in Telegram → Settings. The VMC bot uses it to send your files."
           error={fieldErrors.telegram}
         />
       )}
@@ -219,39 +213,21 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
         onChange={(value) => {
           setPassword(value);
           if (fieldErrors.password) setFieldError("password");
-          if (fieldErrors.confirm && value === confirm) setFieldError("confirm");
         }}
         onBlur={() => validateField("password")}
         autoComplete={isSignup ? "new-password" : "current-password"}
         minLength={isSignup ? PASSWORD_MIN_LENGTH : 1}
         maxLength={isSignup ? PASSWORD_MAX_LENGTH : undefined}
         showPolicyHint={isSignup}
-        placeholder={isSignup ? "8–12 characters" : "Enter your password"}
+        placeholder={isSignup ? `At least ${PASSWORD_MIN_LENGTH} characters` : "Enter your password"}
         error={fieldErrors.password}
       />
 
-      {isSignup && (
-        <PasswordField
-          id="confirm"
-          label="Confirm password"
-          value={confirm}
-          onChange={(value) => {
-            setConfirm(value);
-            if (fieldErrors.confirm) setFieldError("confirm");
-          }}
-          onBlur={() => validateField("confirm")}
-          autoComplete="new-password"
-          minLength={PASSWORD_MIN_LENGTH}
-          maxLength={PASSWORD_MAX_LENGTH}
-          placeholder="Repeat your password"
-          error={fieldErrors.confirm}
-        />
-      )}
       </div>
 
       {!isSignup && (
-        <div className="flex flex-col gap-3 pt-0.5 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <label className="flex cursor-pointer items-center gap-2.5 text-white/50">
+        <div className="flex items-center justify-between gap-3 pt-0.5 text-sm">
+          <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-white/60">
             <input
               type="checkbox"
               checked={remember}
@@ -262,7 +238,7 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
           </label>
           <Link
             href="/forgot-password"
-            className="font-medium text-white/45 transition hover:text-emerald-300 sm:text-right"
+            className="inline-flex min-h-11 items-center font-medium text-emerald-300 transition-colors hover:text-emerald-200"
           >
             Forgot password?
           </Link>
@@ -279,7 +255,7 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
         <span>{busy ? loadingLabel : actionLabel}</span>
       </button>
 
-      <p className="pt-1 text-center text-sm text-white/50">
+      <p className="pt-1 text-center text-sm text-white/60">
         {isSignup ? "Already have an account?" : "Don’t have an account?"}{" "}
         <Link
           href={`${isSignup ? "/login" : "/signup"}${nextDestination ? `?next=${encodeURIComponent(nextDestination)}` : ""}`}

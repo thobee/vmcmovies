@@ -11,7 +11,6 @@ export default function AuthPageLoading() {
         eyebrow: "VMC",
         headline: "Movies, series, and downloads in one account.",
         description: "Your profile, Telegram username, and premium access stay connected.",
-        highlights: ["Secure account access", "Premium downloads", "Fast catalog updates"],
       }}
     >
       <div className="space-y-4">

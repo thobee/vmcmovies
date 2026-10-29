@@ -31,7 +31,7 @@ export default function PasswordField({
   minLength?: number;
   maxLength?: number;
   placeholder?: string;
-  /** Show 8–12 character guidance (signup / reset). */
+  /** Show password length guidance (signup / reset). */
   showPolicyHint?: boolean;
   error?: string;
   onBlur?: () => void;
