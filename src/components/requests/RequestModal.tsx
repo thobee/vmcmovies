@@ -81,7 +81,7 @@ export default function RequestModal({
       <button
         type="button"
         aria-label="Close"
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
         onClick={handleClose}
       />
 
@@ -109,7 +109,7 @@ export default function RequestModal({
           </button>
 
           <div className="px-5 pt-6 pb-5 sm:px-7 sm:pt-7 sm:pb-6">
-            <div className="mb-5 inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+            <div className="mb-5 inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
               Premium request
             </div>
 

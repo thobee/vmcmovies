@@ -67,7 +67,7 @@ export default function GuidePage() {
               />
               <div className="relative">
                 <VmcLogo height={66} />
-                <p className="mt-8 inline-flex rounded-full border border-emerald-400/15 bg-emerald-400/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">
+                <p className="mt-8 inline-flex rounded-full border border-emerald-400/15 bg-emerald-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">
                   VMC guide
                 </p>
                 <h1
@@ -86,13 +86,13 @@ export default function GuidePage() {
                     className="auth-btn group gap-3 px-5 py-3 text-sm active:scale-[0.98]"
                   >
                     Start browsing
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/15 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px]">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/15 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px]">
                       <ArrowUpRight className="h-4 w-4" weight="bold" />
                     </span>
                   </Link>
                   <Link
                     href="/account"
-                    className="inline-flex items-center justify-center gap-3 rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-emerald-400/35 hover:bg-emerald-400/8"
+                    className="inline-flex items-center justify-center gap-3 rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-emerald-400/35 hover:bg-emerald-400/8"
                   >
                     Open dashboard
                   </Link>
@@ -174,7 +174,7 @@ export default function GuidePage() {
             </div>
             <Link
               href="/support"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08]"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08]"
             >
               <ChatCircle className="h-4 w-4" weight="bold" />
               Contact support

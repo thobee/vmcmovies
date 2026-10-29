@@ -49,7 +49,7 @@ export default function ShareBar({ item }: { item: ShareItem }) {
             <ShareNetwork className="h-[18px] w-[18px]" weight="duotone" />
           </span>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">
               Share
             </p>
             <p className="mt-0.5 text-sm font-semibold text-white">Send this title</p>

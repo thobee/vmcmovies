@@ -103,7 +103,7 @@ export default function TelegramSetupPrompt({
               Telegram username
             </label>
             <div className="relative">
-              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/35">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/55">
                 @
               </span>
               <input
@@ -126,7 +126,7 @@ export default function TelegramSetupPrompt({
             {error ? (
               <p className="mt-2 text-xs text-red-300">{error}</p>
             ) : (
-              <p className="mt-2 text-xs text-white/35">
+              <p className="mt-2 text-xs text-white/55">
                 Letters, numbers, and underscores only.
               </p>
             )}

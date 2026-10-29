@@ -20,6 +20,12 @@ export default function SitePage({
         className,
       )}
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-emerald-400 focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-black"
+      >
+        Skip to main content
+      </a>
       <Navbar />
       <div
         className="pointer-events-none absolute inset-x-0 top-20 z-[1] h-px bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent"
@@ -31,7 +37,9 @@ export default function SitePage({
           aria-hidden
         />
       )}
-      <div className="relative z-[2]">{children}</div>
+      <div id="main-content" tabIndex={-1} className="relative z-[2] outline-none">
+        {children}
+      </div>
       <MobileDock />
     </div>
   );

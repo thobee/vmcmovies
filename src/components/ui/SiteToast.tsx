@@ -81,7 +81,7 @@ export function SiteToastProvider({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
-              className="self-start rounded-lg p-1 text-white/25 hover:text-white/70"
+              className="self-start rounded-lg p-1 text-white/55 hover:text-white/70"
               aria-label="Dismiss"
             >
               <X className="h-3.5 w-3.5" weight="bold" />

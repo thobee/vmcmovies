@@ -37,7 +37,7 @@ export default function WelcomePremiumCard({ welcome }: { welcome: BillingConfig
         type="button"
         onClick={dismiss}
         aria-label="Dismiss welcome"
-        className="absolute right-4 top-4 rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+        className="absolute right-4 top-4 rounded-lg p-1.5 text-white/55 hover:bg-white/10 hover:text-white"
       >
         <X className="h-4 w-4" weight="bold" />
       </button>
@@ -47,7 +47,7 @@ export default function WelcomePremiumCard({ welcome }: { welcome: BillingConfig
       </p>
       <p className="mt-2 max-w-lg text-sm leading-6 text-white/75">{welcome.intro}</p>
       <div className="mt-4 space-y-3 rounded-2xl border border-white/10 bg-black/20 p-4">
-        <p className="text-xs font-bold uppercase tracking-wide text-white/40">How downloads work</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-white/55">How downloads work</p>
         <p className="text-sm leading-6 text-white/70">{welcome.downloadSteps}</p>
       </div>
       <Link

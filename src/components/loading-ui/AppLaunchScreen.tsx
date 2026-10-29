@@ -29,7 +29,7 @@ export default function AppLaunchScreen() {
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-[#050606] px-5 text-white transition-opacity duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      className="fixed inset-0 z-50 grid place-items-center bg-[#050606] px-5 text-white transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
       role="status"
       aria-live="polite"
       aria-label="VMC is loading"

@@ -48,7 +48,7 @@ export default function PasswordField({
         {label}
       </label>
       <div className="relative">
-        <Lock className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white/35" weight="light" />
+        <Lock className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white/55" weight="light" />
         <input
           id={id}
           type={visible ? "text" : "password"}
@@ -70,7 +70,7 @@ export default function PasswordField({
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-0 top-0 flex h-full w-12 items-center justify-center text-white/35 hover:text-white/70"
+          className="absolute right-0 top-0 flex h-full w-12 items-center justify-center text-white/55 hover:text-white/70"
         >
           {visible ? <EyeSlash className="h-[18px] w-[18px]" weight="light" /> : <Eye className="h-[18px] w-[18px]" weight="light" />}
         </button>
@@ -87,7 +87,7 @@ export default function PasswordField({
               ? "mt-1.5 text-xs text-emerald-400/80"
               : policyMessage && value.length > 0
                 ? "mt-1.5 text-xs text-amber-300/90"
-                : "mt-1.5 text-xs text-white/40"
+                : "mt-1.5 text-xs text-white/55"
           }
         >
           {policyOk ? "Password length looks good." : (policyMessage ?? PASSWORD_HINT)}

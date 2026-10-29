@@ -41,9 +41,9 @@ export default function Footer() {
             </p>
             <p className="mt-1 text-sm font-medium text-black/65">Browse free titles or unlock the full Premium catalogue.</p>
           </div>
-          <Link href="/get-access" className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-black py-1.5 pl-6 pr-1.5 text-sm font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200 active:scale-[0.98]">
+          <Link href="/get-access" className="group inline-flex shrink-0 items-center gap-2.5 rounded-full bg-black py-1.5 pl-6 pr-1.5 text-sm font-bold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200 active:scale-[0.98]">
             Compare plans
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
               <ArrowRight className="h-4 w-4" weight="bold" />
             </span>
           </Link>
@@ -76,7 +76,7 @@ export default function Footer() {
                 <ul className="mt-4 space-y-3.5">
                   {group.links.map((link) => (
                     <li key={link.label}>
-                      <Link href={link.href} className="text-sm font-medium text-white/55 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white">
+                      <Link href={link.href} className="text-sm font-medium text-white/55 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white">
                         {link.label}
                       </Link>
                     </li>

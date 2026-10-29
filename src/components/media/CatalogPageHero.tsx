@@ -55,7 +55,7 @@ export default function CatalogPageHero({
               {title}
             </h1>
             <p className="mt-3 max-w-lg text-[15px] leading-7 text-white/70">{description}</p>
-            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-white/35">
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-white/55">
               {count} {count === 1 ? "title" : "titles"} available
             </p>
           </div>

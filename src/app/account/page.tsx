@@ -140,7 +140,7 @@ export default async function AccountPage({
       <main className="relative mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6 sm:pt-32 lg:px-8">
         <header className="mb-7 flex flex-col gap-4 border-b border-white/[0.08] pb-7 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">
               Member dashboard
             </p>
             <h1
@@ -171,7 +171,7 @@ export default async function AccountPage({
             </div>
             <Link
               href="/movies"
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 py-2.5 text-xs font-bold text-black transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-emerald-300"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 py-2.5 text-xs font-bold text-black transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-emerald-300"
             >
               Browse Premium titles
               <ArrowUpRight className="h-3.5 w-3.5" weight="bold" />
@@ -184,14 +184,14 @@ export default async function AccountPage({
             <div className="h-full rounded-[calc(2rem-0.375rem)] bg-[#0f1214] p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)] sm:p-7">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">
                     Your access
                   </p>
                   <h2 className={cn("mt-2 text-2xl font-bold", status.tone)}>{status.label}</h2>
                 </div>
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em]",
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em]",
                     status.badge,
                   )}
                 >
@@ -207,7 +207,7 @@ export default async function AccountPage({
               {user.premiumStatus === "active" && expiry && daysRemaining !== null ? (
                 <div className="mt-6 grid gap-3 border-t border-white/[0.08] pt-5 sm:grid-cols-2">
                   <div className="rounded-2xl bg-emerald-400/[0.08] p-4 ring-1 ring-inset ring-emerald-300/15">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-300/70">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-300/70">
                       Time remaining
                     </p>
                     <p className="mt-2 text-2xl font-bold text-white">
@@ -215,18 +215,18 @@ export default async function AccountPage({
                     </p>
                   </div>
                   <div className="rounded-2xl bg-white/[0.035] p-4 ring-1 ring-inset ring-white/[0.08]">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/38">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/55">
                       Expiry date
                     </p>
                     <p className="mt-2 text-base font-semibold text-white">{expiry}</p>
-                    <p className="mt-1 text-xs text-white/38">Access remains active through this date.</p>
+                    <p className="mt-1 text-xs text-white/55">Access remains active through this date.</p>
                   </div>
                 </div>
               ) : (
                 <div className="mt-6 border-t border-white/[0.08] pt-5">
                   <Link
                     href="/get-access"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
                   >
                     {user.premiumStatus === "expired" ? "Renew Premium" : "View Premium plans"}
                     <ArrowUpRight className="h-4 w-4" weight="bold" />
@@ -238,7 +238,7 @@ export default async function AccountPage({
 
           <aside className="rounded-[2rem] border border-emerald-400/18 bg-emerald-500/[0.055] p-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
             <div className="flex h-full flex-col rounded-[calc(2rem-0.375rem)] bg-[#101513] p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] sm:p-6">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
                 {nextAction.eyebrow}
               </p>
               <h2 className="mt-3 text-xl font-bold text-white">{nextAction.title}</h2>
@@ -248,7 +248,7 @@ export default async function AccountPage({
                 className="auth-btn group mt-6 w-full gap-3 px-5 py-3 text-sm"
               >
                 {nextAction.label}
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/15 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px]">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black/15 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px]">
                   <ArrowUpRight className="h-4 w-4" weight="bold" />
                 </span>
               </Link>
@@ -265,7 +265,7 @@ export default async function AccountPage({
           >
             <div className="rounded-[calc(2rem-0.375rem)] bg-[#101214] p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] sm:p-6">
               <div className="mb-5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#48b7ea]">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#48b7ea]">
                   Download delivery
                 </p>
                 <h2 className="mt-2 text-xl font-bold text-white">Telegram setup</h2>
@@ -281,7 +281,7 @@ export default async function AccountPage({
             <div className="h-full rounded-[calc(2rem-0.375rem)] bg-[#101214] p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] sm:p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">
                     Account details
                   </p>
                   <h2 className="mt-2 text-xl font-bold text-white">Your profile</h2>
@@ -290,11 +290,11 @@ export default async function AccountPage({
               </div>
               <dl className="mt-6 divide-y divide-white/[0.07] rounded-2xl bg-black/18 px-4 ring-1 ring-inset ring-white/[0.07]">
                 <div className="py-4">
-                  <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">Email</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/55">Email</dt>
                   <dd className="mt-1.5 break-all text-sm font-semibold text-white/82">{user.email}</dd>
                 </div>
                 <div className="py-4">
-                  <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">Telegram</dt>
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/55">Telegram</dt>
                   <dd className="mt-1.5 text-sm font-semibold text-white/82">
                     {hasTelegram ? `@${user.telegramUsername}` : "Not connected"}
                   </dd>
@@ -306,7 +306,7 @@ export default async function AccountPage({
 
         <section className="mt-8">
           <div className="mb-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">Shortcuts</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">Shortcuts</p>
             <h2 className="mt-2 text-xl font-bold text-white">Where do you want to go?</h2>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -314,10 +314,10 @@ export default async function AccountPage({
               <Link
                 key={href}
                 href={href}
-                className="group rounded-[1.5rem] border border-white/10 bg-[#101214] p-4 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-emerald-400/35 hover:bg-emerald-400/[0.06] active:scale-[0.99]"
+                className="group rounded-[1.5rem] border border-white/10 bg-[#101214] p-4 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-emerald-400/35 hover:bg-emerald-400/[0.06] active:scale-[0.99]"
               >
                 <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/[0.06] text-white/45 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:bg-emerald-400/12 group-hover:text-emerald-300">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/[0.06] text-white/45 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:bg-emerald-400/12 group-hover:text-emerald-300">
                     <Icon className="h-5 w-5" weight="light" />
                   </span>
                   <span className="min-w-0 flex-1">
@@ -325,7 +325,7 @@ export default async function AccountPage({
                     <span className="mt-1 block text-xs leading-5 text-white/45">{hint}</span>
                   </span>
                   <ArrowUpRight
-                    className="h-4 w-4 text-white/22 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px] group-hover:text-emerald-300"
+                    className="h-4 w-4 text-white/55 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px] group-hover:text-emerald-300"
                     weight="bold"
                   />
                 </div>
@@ -344,7 +344,7 @@ export default async function AccountPage({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               href="/support"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08]"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08]"
             >
               <ChatCircle className="h-4 w-4" weight="bold" />
               Contact support

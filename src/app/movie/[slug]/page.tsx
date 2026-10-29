@@ -43,6 +43,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
       premiumStatus={session?.user.premiumStatus ?? "none"}
       premiumSource={session?.user.premiumSource ?? null}
       trialEligible={billing.trial.eligible}
+      trialActive={billing.trial.active}
       trialDays={billing.trial.durationDays}
       loggedIn={!!session}
     />

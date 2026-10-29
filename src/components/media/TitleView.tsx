@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Clock, FilmStrip, Star, Television } from "@phosphor-icons/react/dist/ssr";
+import { ArrowDown, ArrowLeft, Clock, FilmStrip, Star, Television } from "@phosphor-icons/react/dist/ssr";
 import CatalogImage from "@/components/ui/CatalogImage";
 import { resolvePosterImage } from "@/lib/catalog/image";
 import type { Content } from "@/lib/catalog/types";
@@ -23,6 +23,7 @@ export default function TitleView({
   premiumStatus,
   premiumSource,
   trialEligible,
+  trialActive,
   trialDays,
   loggedIn,
 }: {
@@ -31,6 +32,7 @@ export default function TitleView({
   premiumStatus: PremiumStatus;
   premiumSource: PremiumSource | null;
   trialEligible: boolean;
+  trialActive: boolean;
   trialDays: number;
   loggedIn: boolean;
 }) {
@@ -43,6 +45,16 @@ export default function TitleView({
   const accessKind = contentAccessKind(item);
   const hasDownloadAccess =
     loggedIn && (accessKind !== "premium" || premiumStatus === "active");
+  // Phones: the panel sits below the plot, so a button under the title says what to do and jumps there.
+  const jumpLabel = hasDownloadAccess
+    ? "Download now"
+    : !loggedIn
+      ? "Get it on Telegram"
+      : premiumStatus === "pending"
+        ? "Check payment status"
+        : trialEligible
+          ? "Start free trial"
+          : "Get Premium to download";
 
   return (
     <SitePage glow={false}>
@@ -68,21 +80,21 @@ export default function TitleView({
         <div className="relative z-10 mx-auto max-w-screen-2xl px-4 pb-10 pt-[104px] sm:px-6 sm:pb-12 lg:px-10 lg:pb-14">
           <Link
             href={browseHref}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-black/35 px-4 text-sm font-semibold text-white/70 ring-1 ring-inset ring-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08] hover:text-white active:scale-[0.97]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-black/35 px-4 text-sm font-semibold text-white/70 ring-1 ring-inset ring-white/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08] hover:text-white active:scale-[0.97]"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to {browseLabel}
           </Link>
 
-          <div className="mt-6 grid items-start gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-12">
-            <div className="mx-auto w-44 sm:w-52 lg:mx-0 lg:w-full">
+          <div className="mt-6 grid grid-cols-[6.5rem_minmax(0,1fr)] items-start gap-x-4 gap-y-6 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-x-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-x-10 xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-x-12">
+            <div className="w-full lg:row-span-2">
               <div className="bezel-outer">
                 <div className="bezel-inner relative aspect-[2/3] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
                   <CatalogImage
                     src={poster}
                     alt={item.title}
                     fill
-                    sizes="(max-width: 1024px) 208px, 240px"
+                    sizes="(max-width: 639px) 104px, (max-width: 1023px) 160px, 240px"
                   />
                 </div>
               </div>
@@ -90,8 +102,8 @@ export default function TitleView({
 
             <div className="min-w-0">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <AccessBadge kind={accessKind} className="min-h-6 px-2.5 text-[9px]" />
-                <span className="rounded-full bg-emerald-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-black">
+                <AccessBadge kind={accessKind} className="min-h-6 px-2.5 text-[10px]" />
+                <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white/80">
                   {isSeries ? "Series" : "Movie"}
                 </span>
                 {item.genres.map((g) => (
@@ -106,7 +118,7 @@ export default function TitleView({
               </div>
 
               <h1
-                className="text-[2rem] font-bold leading-[1.05] text-white sm:text-4xl lg:text-[2.75rem]"
+                className="text-[1.6rem] font-bold leading-[1.05] text-white sm:text-4xl lg:text-[2.75rem]"
                 style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}
               >
                 {item.title}
@@ -143,8 +155,18 @@ export default function TitleView({
                 )}
               </div>
 
+              <a
+                href="#download"
+                className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-400 px-5 text-sm font-bold text-black transition-[background-color,scale] duration-200 hover:bg-emerald-300 active:scale-[0.98] lg:hidden"
+              >
+                {jumpLabel}
+                <ArrowDown className="h-4 w-4" weight="bold" />
+              </a>
+            </div>
+
+            <div className="col-span-2 min-w-0 lg:col-span-1 lg:col-start-2">
               {item.description && (
-                <div className="mt-6">
+                <div className="lg:mt-0">
                   <PlotText text={item.description} />
                 </div>
               )}
@@ -156,6 +178,7 @@ export default function TitleView({
                     premiumSource={premiumSource}
                     accessKind={accessKind}
                     trialEligible={trialEligible}
+                    trialActive={trialActive}
                     trialDays={trialDays}
                     loggedIn={loggedIn}
                     movieDownloadUrl={hasDownloadAccess ? item.downloadUrl : undefined}

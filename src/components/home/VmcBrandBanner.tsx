@@ -70,7 +70,7 @@ export default function VmcBrandBanner() {
               </div>
               <Link href="/movies" className="btn-nested-primary group mt-7 w-full justify-between sm:w-fit">
                 Browse the catalogue
-                <span className="btn-nested-icon bg-black/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
+                <span className="btn-nested-icon bg-black/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
                   <ArrowRight className="h-4 w-4" weight="bold" />
                 </span>
               </Link>
@@ -87,7 +87,7 @@ export default function VmcBrandBanner() {
                       <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400/12 text-emerald-300">
                         <item.icon className="h-5 w-5" weight="light" />
                       </span>
-                      <span className="text-[11px] font-bold tabular-nums text-white/25">0{index + 1}</span>
+                      <span className="text-[11px] font-bold tabular-nums text-white/55">0{index + 1}</span>
                     </div>
                     <h3 className="mt-6 text-sm font-bold text-white">{item.label}</h3>
                     <p className="mt-1.5 text-xs leading-5 text-white/45">{item.detail}</p>

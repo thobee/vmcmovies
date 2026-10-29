@@ -25,7 +25,7 @@ export default function QualityBadges({
       <span
         className={cn(
           "inline-flex items-center font-extrabold leading-none rounded bg-[var(--gold)] text-black tracking-wide",
-          compact ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-[10px]",
+          compact ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-[11px]",
           className
         )}
       >
@@ -45,7 +45,7 @@ export default function QualityBadges({
             q === "4K"
               ? "bg-emerald-400 text-black"
               : "bg-white/10 text-white/85 ring-1 ring-white/15",
-            compact ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-[10px]"
+            compact ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-[11px]"
           )}
         >
           {q}

@@ -70,7 +70,7 @@ export default async function HomePage() {
   const trendingMovies = publicMovies.slice(0, HOMEPAGE_RAIL_LIMIT);
   const popularSeries = publicSeries.slice(0, HOMEPAGE_RAIL_LIMIT);
   const recentlyAdded = sortByNewest([...publicMovies, ...publicSeries]).slice(0, HOMEPAGE_RAIL_LIMIT);
-  const topRated = sortByRating(publicMovies).slice(0, HOMEPAGE_RAIL_LIMIT);
+  const topTen = sortByRating(publicMovies).slice(0, 10);
   const catalog = [...publicMovies, ...publicSeries];
   const heroFallback = featured ?? catalog[0] ?? null;
   const trialActive = isWelcomeTrialWindowActive(billing);
@@ -152,10 +152,10 @@ export default async function HomePage() {
               {!session && (
                 <Link
                   href="/signup"
-                  className="group inline-flex w-fit shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
+                  className="group inline-flex w-fit shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
                 >
                   Create account
-                  <ArrowRight className="h-3.5 w-3.5 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" weight="bold" />
+                  <ArrowRight className="h-3.5 w-3.5 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" weight="bold" />
                 </Link>
               )}
             </div>
@@ -165,11 +165,11 @@ export default async function HomePage() {
 
       <div className="flex flex-col gap-12 pt-10 pb-6 sm:gap-14 sm:pt-12">
         <ContentRail title={titles.trendingMovies} items={trendingMovies} viewAllHref="/movies" />
-        <ContentRail title={titles.popularSeries} items={popularSeries} viewAllHref="/series" />
-        <ContentRail title={titles.recentlyAdded} items={recentlyAdded} viewAllHref="/movies" />
-        {topRated.length >= 4 && (
-          <ContentRail title={titles.awardWinning} items={topRated} viewAllHref="/movies" />
+        {topTen.length >= 5 && (
+          <ContentRail title={titles.awardWinning} items={topTen} viewAllHref="/movies" ranked />
         )}
+        <ContentRail title={titles.popularSeries} items={popularSeries} viewAllHref="/series" />
+        <ContentRail title={titles.recentlyAdded} items={recentlyAdded} viewAllHref="/movies" landscape />
       </div>
 
       <HowItWorks />

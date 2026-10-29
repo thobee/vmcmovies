@@ -33,6 +33,14 @@ export default function Navbar() {
   const [signingOut, setSigningOut] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Solid bar once content scrolls under it; lighter over the hero at the top.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen && !accountOpen) return;
@@ -84,7 +92,12 @@ export default function Navbar() {
     <>
       <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
         <div
-          className="mx-auto flex h-[68px] max-w-screen-2xl items-center gap-1.5 rounded-[24px] border border-white/10 bg-[#101214]/95 px-3 shadow-[0_8px_32px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl sm:gap-3 sm:rounded-full sm:px-5 xl:gap-6 xl:px-7"
+          className={cn(
+            "mx-auto flex h-[68px] max-w-screen-2xl items-center gap-1.5 rounded-[24px] border px-3 backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-300 sm:gap-3 sm:rounded-full sm:px-5 xl:gap-6 xl:px-7",
+            scrolled
+              ? "border-white/[0.12] bg-[#0d0f11] shadow-[0_12px_40px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.05)]"
+              : "border-white/10 bg-[#101214]/80 shadow-[0_8px_32px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)]",
+          )}
         >
           <VmcLogo
             href="/"
@@ -153,7 +166,7 @@ export default function Navbar() {
                   <span className="text-xs font-bold text-black">Account</span>
                   <CaretDown
                     className={cn(
-                      "h-3.5 w-3.5 text-black/65 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                      "h-3.5 w-3.5 text-black/65 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
                       accountOpen && "rotate-180",
                     )}
                     weight="bold"
@@ -164,7 +177,7 @@ export default function Navbar() {
                   <div className="absolute right-0 top-[calc(100%+10px)] w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#101214] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
                     <div className="border-b border-white/[0.07] px-3 py-2.5">
                       <p className="truncate text-xs font-semibold text-white">{user.email}</p>
-                      <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-emerald-300/70">
+                      <p className="mt-0.5 text-[11px] uppercase tracking-[0.12em] text-emerald-300/70">
                         {user.premiumStatus === "active" ? "Premium member" : "VMC member"}
                       </p>
                     </div>
@@ -227,7 +240,7 @@ export default function Navbar() {
         aria-hidden={!mobileOpen}
         inert={!mobileOpen}
         className={cn(
-          "fixed inset-x-0 top-[92px] z-40 origin-top px-3 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-4 lg:hidden",
+          "fixed inset-x-0 top-[92px] z-40 origin-top px-3 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:px-4 lg:hidden",
           mobileOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0",
@@ -280,7 +293,7 @@ export default function Navbar() {
                 <p className="text-xs font-semibold text-white">
                   {user ? "Open user dashboard" : "Log in"}
                 </p>
-                <p className="truncate text-[10px] text-white/35">
+                <p className="truncate text-[11px] text-white/55">
                   {user ? user.email : "Create or access your account"}
                 </p>
               </div>

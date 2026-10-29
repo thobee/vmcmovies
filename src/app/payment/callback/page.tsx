@@ -24,7 +24,7 @@ export default function PaymentCallbackPage() {
         <Suspense fallback={<CallbackFallback />}>
           <PaymentCallbackClient />
         </Suspense>
-        <p className="relative mt-6 max-w-sm text-center text-xs leading-5 text-white/35 sm:mt-8">
+        <p className="relative mt-6 max-w-sm text-center text-xs leading-5 text-white/55 sm:mt-8">
           Need help with your payment?{" "}
           <Link href="/support?category=payment" className="text-emerald-400/80 hover:text-emerald-300">
             Contact support

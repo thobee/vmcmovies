@@ -77,7 +77,7 @@ export default function HeroCarousel({ slides, fallback }: HeroCarouselProps) {
       {items.map((item, i) => (
         <div
           key={item.id}
-          className="absolute inset-0 transition-opacity duration-700"
+          className="absolute inset-0 transition-opacity duration-300"
           style={{ opacity: i === index ? 1 : 0, pointerEvents: i === index ? "auto" : "none" }}
         >
           <Image
@@ -97,7 +97,7 @@ export default function HeroCarousel({ slides, fallback }: HeroCarouselProps) {
 
       <div className="relative z-10 h-full max-w-screen-2xl mx-auto px-5 sm:px-8 lg:px-14 flex flex-col justify-end pb-20 sm:pb-24 md:justify-center md:pb-0">
         <div className="max-w-[520px]">
-          <p className="text-[var(--amber)] text-[10px] sm:text-[11px] font-bold tracking-[0.25em] uppercase mb-3 flex items-center gap-2">
+          <p className="text-[var(--amber)] text-[11px] sm:text-[11px] font-bold tracking-[0.25em] uppercase mb-3 flex items-center gap-2">
             <span className="inline-block w-4 h-px bg-[var(--amber)]" />
             {active.eyebrow}
           </p>
@@ -122,14 +122,14 @@ export default function HeroCarousel({ slides, fallback }: HeroCarouselProps) {
           <div className="flex flex-wrap gap-3">
             <Link
               href={active.ctaHref}
-              className="flex items-center gap-2.5 px-7 py-3 rounded-xl bg-[var(--amber)] text-white text-sm font-bold tracking-wide hover:bg-[var(--amber-hover)] active:scale-95 transition-all shadow-xl shadow-[var(--amber)]/30"
+              className="flex items-center gap-2.5 px-7 py-3 rounded-xl bg-[var(--amber)] text-white text-sm font-bold tracking-wide hover:bg-[var(--amber-hover)] active:scale-95 transition shadow-xl shadow-[var(--amber)]/30"
             >
               <Info className="w-4 h-4" weight="bold" />
               {active.ctaLabel}
             </Link>
             <Link
               href="/get-access"
-              className="flex items-center gap-2.5 px-7 py-3 rounded-xl glass text-white text-sm font-semibold hover:bg-[var(--surface-2)] active:scale-95 transition-all"
+              className="flex items-center gap-2.5 px-7 py-3 rounded-xl glass text-white text-sm font-semibold hover:bg-[var(--surface-2)] active:scale-95 transition"
             >
               Get Premium Access
             </Link>

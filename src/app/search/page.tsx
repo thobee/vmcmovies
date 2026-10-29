@@ -50,7 +50,7 @@ function SearchInner() {
           </p>
 
           <div className="relative mt-8 max-w-2xl">
-            <MagnifyingGlass className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" weight="bold" />
+            <MagnifyingGlass className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/55" weight="bold" />
             <input
               type="text"
               inputMode="search"
@@ -68,7 +68,7 @@ function SearchInner() {
 
           {searched && results.length > 0 && (
             <div className="mt-4 max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-[#101214]">
-              <p className="border-b border-white/10 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white/40">
+              <p className="border-b border-white/10 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-white/55">
                 Quick picks
               </p>
               <ul>
@@ -121,7 +121,7 @@ function SearchInner() {
         {!loading && !error && searched && results.length === 0 && (
           <div className="rounded-[28px] border border-white/10 bg-[#101214] px-6 py-16 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04]">
-              <MagnifyingGlassMinus className="h-6 w-6 text-white/30" weight="light" />
+              <MagnifyingGlassMinus className="h-6 w-6 text-white/55" weight="light" />
             </div>
             <p className="break-words text-lg font-semibold text-white">No matches for &ldquo;{trimmed}&rdquo;</p>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-white/55">

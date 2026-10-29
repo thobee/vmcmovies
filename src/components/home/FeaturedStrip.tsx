@@ -1,15 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
-import { CaretLeft, CaretRight, DownloadSimple, Info } from "@phosphor-icons/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ArrowRight, CaretLeft, CaretRight, Info, ShieldCheck } from "@phosphor-icons/react";
 import type { Content } from "@/lib/catalog/types";
 import type { HeroSlide } from "@/lib/site/types";
 import { contentDetailPath } from "@/lib/catalog/paths";
 import { resolveHeroImage } from "@/lib/catalog/image";
 import CatalogImage from "@/components/ui/CatalogImage";
 import QualityBadges from "@/components/media/QualityBadges";
+import TelegramIcon from "@/components/brand/TelegramIcon";
 
 type Featured = {
   id: string;
@@ -108,17 +109,22 @@ export default function FeaturedStrip({
 
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  // Auto-rotation stops while the hero is hovered or focused, and never runs for reduced-motion users.
+  const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
   const active = items[index] ?? items[0];
 
-  const next = useCallback(() => {
-    setDirection(1);
-    setIndex((i) => (i + 1) % items.length);
-  }, [items.length]);
+  const count = items.length;
 
-  const previous = useCallback(() => {
+  const next = () => {
+    setDirection(1);
+    setIndex((i) => (i + 1) % count);
+  };
+
+  const previous = () => {
     setDirection(-1);
-    setIndex((i) => (i - 1 + items.length) % items.length);
-  }, [items.length]);
+    setIndex((i) => (i - 1 + count) % count);
+  };
 
   const goTo = (nextIndex: number) => {
     if (nextIndex === index) return;
@@ -127,18 +133,33 @@ export default function FeaturedStrip({
   };
 
   useEffect(() => {
-    if (items.length <= 1) return;
-    const timer = window.setInterval(next, 7000);
+    if (count <= 1 || paused || reduceMotion) return;
+    const timer = window.setInterval(() => {
+      setDirection(1);
+      setIndex((i) => (i + 1) % count);
+    }, 7000);
     return () => window.clearInterval(timer);
-  }, [items.length, next]);
+  }, [count, paused, reduceMotion]);
 
   if (!active) return null;
+
+  // Slides that point at a title lead with the real action; custom admin labels are kept as-is.
+  const opensTitle = /^\/(movie|series)\//.test(active.ctaHref);
+  const primaryLabel = opensTitle && active.ctaLabel === "View details" ? "Download on Telegram" : active.ctaLabel;
 
   return (
     <section className="relative px-4 pt-[88px] sm:px-6 sm:pt-[92px] lg:px-10">
       <div className="home-hero-glow pointer-events-none absolute inset-x-0 top-0 h-72" aria-hidden />
 
-      <div className="bezel-outer relative mx-auto max-w-screen-2xl">
+      <div
+        className="bezel-outer relative mx-auto max-w-screen-2xl"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocus={() => setPaused(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false);
+        }}
+      >
         <div className="bezel-inner relative overflow-hidden border border-white/[0.08] bg-[#0a0a0a] shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_1px_rgba(255,255,255,0.06)]">
           <div className="relative isolate min-h-[clamp(300px,58vw,480px)] w-full">
             <AnimatePresence initial={false} custom={direction}>
@@ -177,7 +198,21 @@ export default function FeaturedStrip({
               aria-hidden
             />
 
-            <div className="relative z-[2] flex min-h-[clamp(360px,58vw,520px)] items-end p-5 sm:p-7 lg:p-9">
+            <div className="absolute inset-x-5 top-5 z-[3] flex sm:inset-x-7 sm:top-6 lg:inset-x-9 lg:top-8">
+              <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-black/45 py-1.5 pl-2 pr-3.5 text-xs font-medium text-white/85 backdrop-blur-md sm:text-[13px]">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#2AABEE] text-white">
+                  <TelegramIcon className="h-3.5 w-3.5" />
+                </span>
+                <span className="truncate sm:hidden">
+                  Verified titles <span className="text-white/40" aria-hidden>·</span> Sent to your Telegram
+                </span>
+                <span className="hidden truncate sm:inline">
+                  Verified movies &amp; series <span className="text-white/40" aria-hidden>·</span> Delivered to your Telegram
+                </span>
+              </p>
+            </div>
+
+            <div className="relative z-[2] flex min-h-[clamp(360px,58vw,520px)] items-end p-5 pt-20 sm:p-7 sm:pt-24 lg:p-9 lg:pt-28">
               <div className="grid w-full items-end gap-7 md:grid-cols-[minmax(0,1fr)_minmax(13rem,18rem)] lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)]">
                 <motion.div
                   key={`${active.id}-copy`}
@@ -196,7 +231,7 @@ export default function FeaturedStrip({
                   <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-white/55">
                     {active.qualities && <QualityBadges qualities={active.qualities} size="sm" hd />}
                     {active.type && (
-                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                         {active.type === "series" ? "Series" : "Movie"}
                       </span>
                     )}
@@ -210,21 +245,25 @@ export default function FeaturedStrip({
                   )}
                   <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
                     <Link href={active.ctaHref} className="btn-nested-primary w-full justify-between sm:w-auto">
-                      {active.ctaLabel}
+                      {primaryLabel}
                       <span className="btn-nested-icon bg-black/10">
-                        <Info className="h-4 w-4" weight="bold" />
+                        {opensTitle ? <TelegramIcon className="h-4 w-4" /> : <Info className="h-4 w-4" weight="bold" />}
                       </span>
                     </Link>
                     <Link href="/get-access" className="btn-nested-ghost w-full justify-between sm:w-auto">
-                      Get premium
+                      See Premium plans
                       <span className="btn-nested-icon bg-white/10">
-                        <DownloadSimple className="h-4 w-4" weight="bold" />
+                        <ArrowRight className="h-4 w-4" weight="bold" />
                       </span>
                     </Link>
                   </div>
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-white/55">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" weight="fill" />
+                    Free titles need only an account. Premium has no auto-renewal.
+                  </p>
                   {items.length > 1 && (
                     <div className="mt-5 flex items-center gap-3">
-                      <div className="flex items-center gap-1.5" aria-label="Featured titles">
+                      <div className="-mx-1.5 flex items-center" aria-label="Featured titles">
                         {items.map((item, i) => (
                           <button
                             key={item.id}
@@ -232,12 +271,16 @@ export default function FeaturedStrip({
                             aria-label={`Show ${item.title}`}
                             aria-current={i === index ? "true" : undefined}
                             onClick={() => goTo(i)}
-                            className={
-                              i === index
-                                ? "h-1.5 w-6 rounded-full bg-emerald-400 transition-all"
-                                : "h-1.5 w-1.5 rounded-full bg-white/25 transition-all hover:bg-white/50"
-                            }
-                          />
+                            className="group/dot grid h-8 place-items-center px-1.5"
+                          >
+                            <span
+                              className={
+                                i === index
+                                  ? "block h-1.5 w-6 rounded-full bg-emerald-400 transition-[width,background-color] duration-300"
+                                  : "block h-1.5 w-1.5 rounded-full bg-white/30 transition-[width,background-color] duration-300 group-hover/dot:bg-white/60"
+                              }
+                            />
+                          </button>
                         ))}
                       </div>
                       <div className="flex items-center gap-1">
@@ -246,7 +289,7 @@ export default function FeaturedStrip({
                           onClick={previous}
                           aria-label="Previous featured title"
                           title="Previous"
-                          className="grid h-8 w-8 place-items-center rounded-full border border-white/12 bg-black/30 text-white/65 backdrop-blur transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+                          className="grid h-10 w-10 place-items-center rounded-full border border-white/12 bg-black/30 text-white/65 backdrop-blur transition hover:border-white/25 hover:bg-white/10 hover:text-white"
                         >
                           <CaretLeft className="h-4 w-4" weight="bold" />
                         </button>
@@ -255,7 +298,7 @@ export default function FeaturedStrip({
                           onClick={next}
                           aria-label="Next featured title"
                           title="Next"
-                          className="grid h-8 w-8 place-items-center rounded-full border border-white/12 bg-black/30 text-white/65 backdrop-blur transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+                          className="grid h-10 w-10 place-items-center rounded-full border border-white/12 bg-black/30 text-white/65 backdrop-blur transition hover:border-white/25 hover:bg-white/10 hover:text-white"
                         >
                           <CaretRight className="h-4 w-4" weight="bold" />
                         </button>
@@ -290,18 +333,6 @@ export default function FeaturedStrip({
                         className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/5"
                         aria-hidden
                       />
-                    </div>
-                    <div className="mt-3 flex justify-center gap-1.5">
-                      {items.slice(0, 5).map((item, i) => (
-                        <span
-                          key={`${item.id}-poster-dot`}
-                          className={
-                            i === index
-                              ? "h-1.5 w-7 rounded-full bg-emerald-300"
-                              : "h-1.5 w-1.5 rounded-full bg-white/28"
-                          }
-                        />
-                      ))}
                     </div>
                   </div>
                 </motion.div>

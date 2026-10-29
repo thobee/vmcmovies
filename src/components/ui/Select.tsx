@@ -209,7 +209,7 @@ export function SelectTrigger({ className, children }: SelectTriggerProps) {
         aria-hidden
         animate={{ rotate: ctx.open ? 180 : 0 }}
         transition={ctx.reduce ? { duration: 0 } : CHEVRON_TRANSITION}
-        className="text-white/40"
+        className="text-white/55"
       >
         <CaretDown className="h-4 w-4" weight="bold" />
       </motion.span>
@@ -226,7 +226,7 @@ export function SelectValue({ placeholder, className }: SelectValueProps) {
   const ctx = useSelectContext("SelectValue");
   const label = ctx.labelFor(ctx.value);
   return (
-    <span className={cn(label ? "text-white" : "text-white/40", className)}>
+    <span className={cn(label ? "text-white" : "text-white/55", className)}>
       {label ?? placeholder ?? "Select"}
     </span>
   );

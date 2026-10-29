@@ -2,10 +2,12 @@
 
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
+  ArrowClockwise,
   ArrowSquareOut,
   CaretDown,
+  Clock,
   Check,
   DeviceMobile,
   DownloadSimple,
@@ -23,7 +25,7 @@ import { Arc } from "@/components/loading-ui/arc";
 import TelegramIcon from "@/components/brand/TelegramIcon";
 
 const PANEL_SHELL =
-  "w-full max-w-xl rounded-[22px] border border-white/10 bg-[#101214]/95 p-4 shadow-[0_18px_52px_rgba(0,0,0,0.35)] sm:rounded-[26px] sm:p-6";
+  "w-full max-w-xl scroll-mt-28 rounded-[22px] border border-white/10 bg-[#101214]/95 p-4 shadow-[0_18px_52px_rgba(0,0,0,0.35)] sm:rounded-[26px] sm:p-6";
 const BTN_PRIMARY = "auth-btn w-full gap-2 px-6 py-3 text-sm sm:w-auto sm:min-w-[11.5rem]";
 const BTN_SECONDARY =
   "inline-flex w-full cursor-pointer items-center justify-center rounded-full border border-white/12 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.08] active:scale-[0.98] sm:w-auto sm:min-w-[7.5rem]";
@@ -67,6 +69,8 @@ interface DownloadPanelProps {
   premiumSource?: PremiumSource | null;
   accessKind?: ContentAccessKind;
   trialEligible?: boolean;
+  /** Welcome-trial window is open right now (drives signed-out copy). */
+  trialActive?: boolean;
   trialDays?: number;
   loggedIn?: boolean;
   movieDownloadUrl?: string;
@@ -79,6 +83,7 @@ export default function DownloadPanel({
   premiumSource = null,
   accessKind = "premium",
   trialEligible = false,
+  trialActive = false,
   trialDays = 7,
   loggedIn = false,
   movieDownloadUrl,
@@ -86,6 +91,10 @@ export default function DownloadPanel({
   additionalFiles,
 }: DownloadPanelProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const returnQuery = `?next=${encodeURIComponent(pathname)}`;
+  const isFree = accessKind === "free" || accessKind === "temporary_free";
+  const [refreshing, setRefreshing] = useState(false);
   const [activatingTrial, setActivatingTrial] = useState(false);
   const [trialError, setTrialError] = useState("");
   const botUrl = getTelegramBotUrl();
@@ -120,28 +129,33 @@ export default function DownloadPanel({
               <Lock className="h-5 w-5" weight="fill" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
-                Account required
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+                {isFree ? "Free download" : "Premium title"}
               </p>
               <h2
                 className="mt-1 text-xl font-bold text-white"
                 style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}
               >
-                Sign up to download
+                {isFree ? "Create an account to download" : "Create an account to get started"}
               </h2>
             </div>
           </div>
           <p className="mt-4 text-sm leading-6 text-white/60">
-            Create an account first. Then VMC sends your download through Telegram.
+            {isFree
+              ? "It's free. Once you're in, VMC sends this title straight to your Telegram."
+              : trialActive
+                ? `Create a free account, then start your ${trialDays}-day free Premium trial or pick a plan. VMC sends this title to your Telegram.`
+                : "Create a free account, then pick a Premium plan. VMC sends this title to your Telegram."}
           </p>
           <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-white/[0.07] pt-5 sm:flex-row">
-            <Link href="/signup" className={BTN_PRIMARY}>
-              Create account
+            <Link href={`/signup${returnQuery}`} className={BTN_PRIMARY}>
+              Create free account
             </Link>
-            <Link href="/login" className={BTN_SECONDARY}>
-              Log in
+            <Link href={`/login${returnQuery}`} className={BTN_SECONDARY}>
+              I have an account
             </Link>
           </div>
+          <p className="mt-3 text-xs text-white/55">You&apos;ll come straight back to this page.</p>
         </section>
       ) : unlocked ? (
         <PremiumDownloadPanel
@@ -156,34 +170,37 @@ export default function DownloadPanel({
         <section id="download" className={PANEL_SHELL}>
           <div className="flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400/12 text-amber-200 ring-1 ring-amber-300/20">
-              <Lock className="h-5 w-5" weight="bold" />
+              <Clock className="h-5 w-5" weight="bold" />
             </div>
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-amber-200">
-                Payment pending
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-amber-200">Payment pending</p>
+              <h2 role="status" className="mt-1 text-lg font-bold text-white">
+                Waiting for Bachs to confirm your payment
               </h2>
-              <p className="mt-2 text-sm leading-6 text-white/70">
-                Your premium download opens as soon as Bachs confirms the payment.
-                Open the bot and tap Start. Then return here to download once your payment is confirmed.
+              <p className="mt-2 text-sm leading-6 text-white/65">
+                This usually takes a minute. While you wait, open the VMC bot and tap Start so it can send your file.
               </p>
             </div>
           </div>
-          <a
-            href={botUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/35 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200"
-          >
-            <Robot className="h-4 w-4" weight="duotone" />
-            Open bot
-          </a>
-          <button
-            disabled
-            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white/5 px-5 py-3 text-sm font-semibold text-white/35 sm:w-auto"
-          >
-            <Lock className="h-4 w-4" weight="bold" />
-            Download (pending)
-          </button>
+          <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-white/[0.07] pt-5 sm:flex-row">
+            <a href={botUrl} target="_blank" rel="noopener noreferrer" className={BTN_PRIMARY}>
+              <TelegramIcon className="h-4 w-4" />
+              Open VMC bot
+            </a>
+            <button
+              type="button"
+              disabled={refreshing}
+              onClick={() => {
+                setRefreshing(true);
+                router.refresh();
+                window.setTimeout(() => setRefreshing(false), 1500);
+              }}
+              className={cn(BTN_SECONDARY, "gap-2")}
+            >
+              <ArrowClockwise className={cn("h-4 w-4", refreshing && "animate-spin")} weight="bold" />
+              {refreshing ? "Checking..." : "Check again"}
+            </button>
+          </div>
         </section>
       ) : (
         <section id="download" className={PANEL_SHELL}>
@@ -192,19 +209,21 @@ export default function DownloadPanel({
               <Lock className="h-5 w-5" weight="fill" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-300">
                 Premium required
               </p>
               <h2
                 className="mt-1 text-xl font-bold text-white"
                 style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}
               >
-                Choose Premium to download
+                {trialEligible ? "Start your free trial to download" : "Choose Premium to download"}
               </h2>
             </div>
           </div>
           <p className="mt-4 text-sm leading-6 text-white/60">
-            Premium lets the VMC bot send this title directly to your Telegram.
+            {trialEligible
+              ? `You get ${trialDays} days of Premium free, no card needed. The VMC bot then sends this title to your Telegram.`
+              : "Premium lets the VMC bot send this title directly to your Telegram."}
           </p>
           <div className="mt-5 flex flex-col items-stretch gap-2.5 border-t border-white/[0.07] pt-5 sm:flex-row sm:flex-wrap">
             {loggedIn && trialEligible ? (
@@ -212,17 +231,22 @@ export default function DownloadPanel({
                 type="button"
                 onClick={() => void activateTrial()}
                 disabled={activatingTrial}
-                className={cn(BTN_PRIMARY, "bg-sky-400 hover:bg-sky-300")}
+                className={BTN_PRIMARY}
               >
                 {activatingTrial ? <Arc className="size-4" /> : <Sparkle className="h-4 w-4" weight="fill" />}
-                {activatingTrial ? "Activating..." : `Start ${trialDays}-day free access`}
+                {activatingTrial ? "Activating..." : `Start ${trialDays}-day free trial`}
               </button>
             ) : (
               <Link href="/get-access" className={BTN_PRIMARY}>
-                Get premium
+                See Premium plans
               </Link>
             )}
-            {loggedIn && (
+            {loggedIn && trialEligible && (
+              <Link href="/get-access" className={BTN_SECONDARY}>
+                See plans
+              </Link>
+            )}
+            {loggedIn && !trialEligible && (
               <Link href="/support?category=download" className={BTN_SECONDARY}>
                 Need help?
               </Link>
@@ -385,8 +409,8 @@ function PremiumDownloadPanel({
               <span className="block text-sm font-bold text-white">Choose the right file</span>
               <span className="mt-0.5 block text-xs leading-5 text-white/50">Check quality and size before downloading.</span>
             </span>
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-white/55 ring-1 ring-inset ring-white/[0.08] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:bg-emerald-400/10 group-open:text-emerald-300">
-              <CaretDown className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:rotate-180" weight="bold" />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-white/55 ring-1 ring-inset ring-white/[0.08] transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:bg-emerald-400/10 group-open:text-emerald-300">
+              <CaretDown className="size-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-open:rotate-180" weight="bold" />
             </span>
           </summary>
           <div className="pb-4 pl-[52px] pr-1">

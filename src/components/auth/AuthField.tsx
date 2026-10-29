@@ -23,7 +23,7 @@ export default function AuthField({
       </label>
       <div className="relative">
         {icon && (
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/35">
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/55">
             {icon}
           </span>
         )}
@@ -42,7 +42,7 @@ export default function AuthField({
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-hint`} className="mt-1.5 text-[11px] text-white/35">{hint}</p>
+        <p id={`${id}-hint`} className="mt-1.5 text-[11px] text-white/55">{hint}</p>
       ) : null}
     </div>
   );

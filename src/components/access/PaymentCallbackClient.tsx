@@ -60,7 +60,7 @@ function ReferenceChip({
       )}
     >
       <div className="min-w-0 flex-1 text-left">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
           Payment reference
         </p>
         <p
@@ -258,12 +258,12 @@ export default function PaymentCallbackClient() {
                         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
                         active && "bg-emerald-500/10 text-emerald-200",
                         done && !active && "text-white/50",
-                        !done && !active && "text-white/35",
+                        !done && !active && "text-white/55",
                       )}
                     >
                       <span
                         className={cn(
-                          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold",
+                          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold",
                           active && "border-emerald-400/50 bg-emerald-500/20",
                           done && "border-emerald-400/30 bg-emerald-500/10 text-emerald-400",
                           !done && !active && "border-white/15",
@@ -313,7 +313,7 @@ export default function PaymentCallbackClient() {
 
               {displayRef && <ReferenceChip reference={displayRef} className="mt-5" />}
 
-              <p className="mt-4 text-xs text-white/40">Taking you to your account…</p>
+              <p className="mt-4 text-xs text-white/55">Taking you to your account…</p>
 
               <ul className="mx-auto mt-5 max-w-sm space-y-2 text-left text-sm text-white/60">
                 <li className="flex items-start gap-2.5">

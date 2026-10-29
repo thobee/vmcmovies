@@ -167,7 +167,7 @@ export default function AuthForm({ mode, errorCode, nextDestination }: AuthFormP
           <GoogleButton mode={mode} disabled={busy} nextDestination={nextDestination} />
           <div className="flex items-center gap-4 py-1">
             <span className="h-px flex-1 bg-white/10" />
-            <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/35">
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-white/55">
               Or use email
             </span>
             <span className="h-px flex-1 bg-white/10" />

@@ -178,7 +178,7 @@ export default function ForgotPasswordForm() {
         </>
       )}
 
-      <p className="text-center text-sm text-white/40">
+      <p className="text-center text-sm text-white/55">
         <Link href="/login" className="font-semibold text-emerald-300 hover:underline">
           Back to sign in
         </Link>

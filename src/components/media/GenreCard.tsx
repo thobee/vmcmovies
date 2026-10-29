@@ -48,7 +48,7 @@ export default function GenreCard({ genre, href, className }: GenreCardProps) {
     <Link
       href={href}
       className={cn(
-        "group bezel-outer flex-shrink-0 w-[140px] md:w-[168px] cursor-pointer transition-all duration-300 hover:opacity-95",
+        "group bezel-outer flex-shrink-0 w-[140px] md:w-[168px] cursor-pointer transition duration-300 hover:opacity-95",
         className
       )}
     >
@@ -59,7 +59,7 @@ export default function GenreCard({ genre, href, className }: GenreCardProps) {
       >
         <div className={cn("absolute inset-0 bg-gradient-to-br", config.gradient)} />
 
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{ background: "radial-gradient(ellipse at 50% 120%, rgba(91,141,239,0.14) 0%, transparent 70%)" }}
         />
 
@@ -76,7 +76,7 @@ export default function GenreCard({ genre, href, className }: GenreCardProps) {
         />
 
         <div className="absolute inset-0 flex flex-col items-start justify-end p-3.5">
-          <IconComponent className="w-4 h-4 text-white/70 mb-1 group-hover:text-[var(--amber-100)] group-hover:scale-110 transition-all origin-left" weight="bold" />
+          <IconComponent className="w-4 h-4 text-white/70 mb-1 group-hover:text-[var(--amber-100)] group-hover:scale-110 transition origin-left" weight="bold" />
           <span
             className="text-white text-sm font-bold leading-none group-hover:text-[var(--amber-100)] transition-colors"
             style={{ fontFamily: "var(--font-display)", letterSpacing: "0.01em" }}

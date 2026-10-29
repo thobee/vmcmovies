@@ -12,6 +12,8 @@ interface ContentRailProps {
   items: Content[];
   viewAllHref?: string;
   landscape?: boolean;
+  /** Top-10 style: large rank numbers beside each poster. */
+  ranked?: boolean;
   className?: string;
 }
 
@@ -20,6 +22,7 @@ export default function ContentRail({
   items,
   viewAllHref,
   landscape = false,
+  ranked = false,
   className,
 }: ContentRailProps) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -63,8 +66,8 @@ export default function ContentRail({
           >
             {title}
           </h2>
-          <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/35 sm:text-xs">
-            {items.length} {items.length === 1 ? "title" : "titles"}
+          <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/55 sm:text-xs">
+            {ranked ? `Top ${items.length} by rating` : `${items.length} ${items.length === 1 ? "title" : "titles"}`}
           </p>
         </div>
         {viewAllHref && <ViewAllLink href={viewAllHref} className="hidden sm:inline-flex" />}
@@ -76,9 +79,16 @@ export default function ContentRail({
           onScroll={syncScroll}
           className="flex gap-3.5 overflow-x-auto hide-scroll px-4 pb-1 sm:px-6 lg:gap-4 lg:px-10"
         >
-          {items.map((item, i) => (
-            <MovieCard key={item.id} item={item} landscape={landscape} index={i} />
-          ))}
+          {items.map((item, i) =>
+            ranked ? (
+              <div key={item.id} className="flex shrink-0 items-end">
+                <span aria-hidden className="rank-number">{i + 1}</span>
+                <MovieCard item={item} index={i} className="relative z-[1]" />
+              </div>
+            ) : (
+              <MovieCard key={item.id} item={item} landscape={landscape} index={i} />
+            ),
+          )}
           <div className="w-2 flex-shrink-0" aria-hidden />
         </div>
 

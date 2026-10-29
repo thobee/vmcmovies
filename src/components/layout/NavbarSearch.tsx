@@ -91,7 +91,7 @@ export default function NavbarSearch({
             : "h-11 rounded-2xl px-4",
         )}
       >
-        <MagnifyingGlass className="h-4 w-4 shrink-0 text-white/35" weight="bold" />
+        <MagnifyingGlass className="h-4 w-4 shrink-0 text-white/55" weight="bold" />
         <input
           ref={inputRef}
           type="text"
@@ -122,7 +122,7 @@ export default function NavbarSearch({
               inputRef.current?.focus();
             }}
             aria-label="Clear search"
-            className="rounded-full p-0.5 text-white/40 transition hover:bg-white/10 hover:text-white"
+            className="rounded-full p-0.5 text-white/55 transition hover:bg-white/10 hover:text-white"
           >
             <X className="h-3.5 w-3.5" weight="bold" />
           </button>

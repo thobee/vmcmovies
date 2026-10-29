@@ -137,7 +137,7 @@ export default function SupportForm({ loggedIn, email, telegramUsername }: Suppo
             Telegram username
           </label>
           <div className="relative">
-            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/35">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/55">
               @
             </span>
             <input
@@ -153,7 +153,7 @@ export default function SupportForm({ loggedIn, email, telegramUsername }: Suppo
               placeholder="username"
             />
           </div>
-          <p className="mt-1.5 text-xs text-white/40">
+          <p className="mt-1.5 text-xs text-white/55">
             Same Telegram account you use for downloads.
           </p>
         </div>

@@ -33,7 +33,7 @@ export default function WhyVmcSection() {
           className="grid gap-5 border-b border-white/[0.08] pb-9 md:grid-cols-[minmax(0,0.8fr)_minmax(22rem,1.2fr)] md:items-end md:gap-12"
         >
           <div>
-            <p className="eyebrow-pill text-[10px]">Why choose VMC?</p>
+            <p className="eyebrow-pill text-[11px]">Why choose VMC?</p>
             <h2
               className="mt-4 text-[1.8rem] font-semibold leading-[1.08] text-white sm:text-4xl"
               style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}
@@ -75,7 +75,7 @@ export default function WhyVmcSection() {
             <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-3">
               {["Open a title", "Tap download", "Receive in Telegram"].map((label, index) => (
                 <div key={label} className="flex items-center gap-2 border-t border-emerald-300/20 pt-3">
-                  <span className="text-[10px] font-extrabold text-emerald-300">0{index + 1}</span>
+                  <span className="text-[11px] font-extrabold text-emerald-300">0{index + 1}</span>
                   <span className="text-xs font-semibold text-white/65">{label}</span>
                 </div>
               ))}
@@ -124,9 +124,9 @@ export default function WhyVmcSection() {
             <CheckCircle className="h-4 w-4 text-emerald-300" weight="fill" />
             Browse freely. Create an account only when you are ready to download.
           </p>
-          <Link href="/get-access" className="group inline-flex items-center gap-2 text-sm font-bold text-emerald-300 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200">
+          <Link href="/get-access" className="group inline-flex items-center gap-2 text-sm font-bold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200">
             Compare Premium plans
-            <ArrowRight className="h-4 w-4 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1" weight="bold" />
+            <ArrowRight className="h-4 w-4 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1" weight="bold" />
           </Link>
         </div>
       </div>

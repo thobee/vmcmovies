@@ -38,7 +38,7 @@ export default function VmcLogo({
   const content = admin ? (
     <span className="inline-flex items-center gap-2.5">
       {img}
-      <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">Admin</span>
+      <span className="text-[11px] font-bold uppercase tracking-[0.28em] text-white/55">Admin</span>
     </span>
   ) : (
     img

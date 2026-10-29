@@ -23,7 +23,7 @@ export default function AccessBadge({
   return (
     <span
       className={cn(
-        "inline-flex min-h-5 shrink-0 items-center rounded px-1.5 py-0.5 text-[8px] font-extrabold uppercase leading-none ring-1 ring-inset sm:text-[9px]",
+        "inline-flex min-h-5 shrink-0 items-center rounded px-1.5 py-0.5 text-[8px] font-extrabold uppercase leading-none ring-1 ring-inset sm:text-[10px]",
         TONES[kind],
         className,
       )}

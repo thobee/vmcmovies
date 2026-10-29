@@ -50,7 +50,7 @@ export default function Hero({ item }: HeroProps) {
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-4 fade-up delay-2 text-sm">
             <QualityBadges qualities={item.qualities} hd />
-            <span className="px-2 py-1 rounded text-[10px] font-bold bg-[var(--amber)] text-white uppercase leading-none">
+            <span className="px-2 py-1 rounded text-[11px] font-bold bg-[var(--amber)] text-white uppercase leading-none">
               {item.type === "series" ? "Series" : "Movie"}
             </span>
             {item.rating && (

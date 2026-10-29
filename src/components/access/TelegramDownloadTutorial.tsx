@@ -101,7 +101,7 @@ export default function TelegramDownloadTutorial({
                     <PlayCircle className="h-6 w-6" weight="fill" />
                   </span>
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#67c8f5]">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#67c8f5]">
                       Quick guide
                     </p>
                     <h2
@@ -142,7 +142,7 @@ export default function TelegramDownloadTutorial({
                       aria-selected={platform === id}
                       onClick={() => setPlatform(id)}
                       className={cn(
-                        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] sm:text-sm",
+                        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] sm:text-sm",
                         platform === id
                           ? "bg-white text-black shadow-[0_8px_24px_rgba(0,0,0,0.18)]"
                           : "text-white/50 hover:bg-white/[0.05] hover:text-white",
@@ -158,7 +158,7 @@ export default function TelegramDownloadTutorial({
                   <div className="rounded-[18px] bg-black/20 px-4 py-5 sm:px-5">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/55">
                           {guide.steps.length} simple steps
                         </p>
                         <h3 className="mt-1.5 text-base font-bold text-white">{guide.title}</h3>
@@ -184,7 +184,7 @@ export default function TelegramDownloadTutorial({
                     href={botUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex min-h-12 items-center justify-between rounded-full bg-white/[0.06] py-2 pl-5 pr-2 text-sm font-bold text-white ring-1 ring-inset ring-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/10 active:scale-[0.98]"
+                    className="group inline-flex min-h-12 items-center justify-between rounded-full bg-white/[0.06] py-2 pl-5 pr-2 text-sm font-bold text-white ring-1 ring-inset ring-white/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/10 active:scale-[0.98]"
                   >
                     <span className="inline-flex items-center gap-2">
                       <Robot className="h-5 w-5 text-emerald-300" weight="duotone" /> Open bot
@@ -195,7 +195,7 @@ export default function TelegramDownloadTutorial({
                   </a>
                 </div>
 
-                <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-white/38">
+                <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-white/55">
                   <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" weight="bold" />
                   Tap Start in the bot once, then return to the movie or series page and tap Download.
                 </p>

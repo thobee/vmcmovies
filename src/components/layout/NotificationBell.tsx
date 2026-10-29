@@ -146,7 +146,7 @@ export default function NotificationBell() {
         <Bell className="h-4.5 w-4.5 shrink-0" weight="bold" />
           <span className="hidden text-xs font-semibold min-[360px]:inline">Updates</span>
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-black shadow-sm shadow-emerald-500/40">
+          <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald-500 px-1 text-[11px] font-bold text-black shadow-sm shadow-emerald-500/40">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -165,7 +165,7 @@ export default function NotificationBell() {
               <button
                 type="button"
                 onClick={markAllRead}
-                className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-300 transition hover:bg-emerald-500/25"
+                className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-300 transition hover:bg-emerald-500/25"
               >
                 Mark all read
               </button>
@@ -223,18 +223,18 @@ export default function NotificationBell() {
                           <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
                         )}
                       </div>
-                      <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/35">
+                      <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/55">
                         {isPremium ? "Your account" : UPDATE_KIND_LABELS[item.kind as SiteUpdateKind] ?? item.kind}
                       </p>
                       <p
                         className={cn(
                           "mt-1 line-clamp-2 text-xs leading-5",
-                          isUnread ? "text-white/55" : "text-white/40",
+                          isUnread ? "text-white/55" : "text-white/55",
                         )}
                       >
                         {item.body}
                       </p>
-                      <p className="mt-1.5 text-[10px] text-white/35">{timeAgo(item.publishedAt)}</p>
+                      <p className="mt-1.5 text-[11px] text-white/55">{timeAgo(item.publishedAt)}</p>
                     </div>
                   </>
                 );
@@ -257,12 +257,12 @@ export default function NotificationBell() {
                           className={rowClass}
                         >
                           {inner}
-                          <ArrowSquareOut className="mt-1 h-3.5 w-3.5 shrink-0 text-white/25" weight="bold" />
+                          <ArrowSquareOut className="mt-1 h-3.5 w-3.5 shrink-0 text-white/55" weight="bold" />
                         </a>
                       ) : (
                         <Link href={item.href} onClick={() => onItemOpen(item.id)} className={rowClass}>
                           {inner}
-                          <ArrowSquareOut className="mt-1 h-3.5 w-3.5 shrink-0 text-white/25" weight="bold" />
+                          <ArrowSquareOut className="mt-1 h-3.5 w-3.5 shrink-0 text-white/55" weight="bold" />
                         </Link>
                       )
                     ) : (

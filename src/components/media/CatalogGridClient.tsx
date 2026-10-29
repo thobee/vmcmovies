@@ -63,7 +63,7 @@ export default function CatalogGridClient({ initialItems, type }: CatalogGridCli
       </div>
 
       <div className="mb-5 flex items-center justify-between gap-3">
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-white/55">
           <span className="font-semibold text-white/75">{items.length}</span>{" "}
           {items.length === 1 ? "title" : "titles"}
           {hasFilters && items.length !== initialItems.length ? ` from ${initialItems.length}` : ""}
@@ -72,7 +72,7 @@ export default function CatalogGridClient({ initialItems, type }: CatalogGridCli
           <button
             type="button"
             onClick={resetFilters}
-            className="text-xs font-semibold text-white/45 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white"
+            className="text-xs font-semibold text-white/45 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white"
           >
             Clear genre
           </button>
@@ -89,7 +89,7 @@ export default function CatalogGridClient({ initialItems, type }: CatalogGridCli
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-6 inline-flex rounded-full bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-inset ring-white/10 transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.1]"
+              className="mt-6 inline-flex rounded-full bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-inset ring-white/10 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/[0.1]"
             >
               Clear filters
             </button>
