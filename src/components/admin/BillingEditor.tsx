@@ -90,7 +90,7 @@ export default function BillingEditor() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-12 text-sm text-white/45">
+      <div className="flex items-center gap-2 py-12 text-sm text-white/60">
         <Loader2 className="h-4 w-4 animate-spin" /> Loading billing…
       </div>
     );
@@ -270,7 +270,7 @@ export default function BillingEditor() {
       <FormSection title="Plan promos" hint="Optional time-boxed discounts on any plan (overrides standard price).">
         {(["monthly", "quarterly", "biannual", "yearly"] as const).map((planId) => (
           <div key={planId} className="rounded-xl border border-white/10 p-4 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-white/45">{planId}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-white/60">{planId}</p>
             <CheckRow
               checked={config.planPromos[planId].enabled}
               onChange={(checked) =>

@@ -76,7 +76,7 @@ export default function TmdbSearch({
 
   return (
     <div className="rounded-2xl panel p-4 sm:p-5 space-y-4 border-[var(--amber)]/20">
-      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--amber-100)]">
+      <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.14em] text-[var(--amber-100)]">
         <Sparkles className="w-3.5 h-3.5" />
         Fill from TMDB
       </div>
@@ -93,7 +93,7 @@ export default function TmdbSearch({
           type="button"
           onClick={search}
           disabled={loading || !query.trim()}
-          className="inline-flex min-h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--amber)] px-5 text-sm font-bold text-white disabled:opacity-50 hover:bg-[var(--amber-hover)]"
+          className="inline-flex min-h-11 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--amber)] px-5 text-sm font-bold text-black disabled:opacity-50 hover:bg-[var(--amber-hover)]"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -107,7 +107,7 @@ export default function TmdbSearch({
       {error && <p className="text-xs text-red-300">{error}</p>}
 
       {results && results.length === 0 && (
-        <p className="text-sm text-white/40">No results found.</p>
+        <p className="text-sm text-white/60">No results found.</p>
       )}
 
       {results && results.length > 0 && (
@@ -130,7 +130,7 @@ export default function TmdbSearch({
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">
+                  <div className="w-full h-full flex items-center justify-center text-white/60 text-xs">
                     No image
                   </div>
                 )}
@@ -142,7 +142,7 @@ export default function TmdbSearch({
               </div>
               <div className="p-2">
                 <p className="text-[12px] text-white font-semibold truncate">{r.title}</p>
-                <p className="text-[11px] text-white/40">{r.year ?? "—"}</p>
+                <p className="text-[12px] text-white/60">{r.year ?? "—"}</p>
               </div>
             </button>
           ))}

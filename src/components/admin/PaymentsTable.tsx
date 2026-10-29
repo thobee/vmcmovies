@@ -46,7 +46,7 @@ function StatusBadge({
     <div>
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wide",
           STATUS_STYLES[status],
         )}
       >
@@ -56,7 +56,7 @@ function StatusBadge({
         )}
       </span>
       {failureReason && (
-        <p className="mt-1 max-w-[220px] truncate text-[10px] text-red-300/80" title={failureReason}>
+        <p className="mt-1 max-w-[220px] truncate text-[12px] text-red-300/80" title={failureReason}>
           {failureReason}
         </p>
       )}
@@ -68,7 +68,7 @@ export default function PaymentsTable({ payments }: { payments: AdminPaymentRow[
   if (payments.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-[#1a1a1a] px-6 py-16 text-center">
-        <p className="text-sm text-white/45">
+        <p className="text-sm text-white/60">
           No payments yet. They&apos;ll appear here after someone pays on Get Access.
         </p>
       </div>
@@ -85,7 +85,7 @@ export default function PaymentsTable({ payments }: { payments: AdminPaymentRow[
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate font-medium text-white">{p.email}</p>
-                  <p className="text-[11px] text-white/35">@{p.telegramUsername}</p>
+                  <p className="text-[12px] text-white/60">@{p.telegramUsername}</p>
                 </div>
                 <StatusBadge
                   status={p.status}
@@ -97,15 +97,15 @@ export default function PaymentsTable({ payments }: { payments: AdminPaymentRow[
                 <div>
                   <p className="text-white/50">
                     {p.planName}
-                    <span className="text-white/30"> · {p.months} mo</span>
+                    <span className="text-white/60"> · {p.months} mo</span>
                   </p>
-                  <p className="mt-0.5 text-[11px] text-white/30">
+                  <p className="mt-0.5 text-[12px] text-white/60">
                     {formatDate(p.paidAt ?? p.createdAt)}
                   </p>
                 </div>
                 <p className="whitespace-nowrap font-semibold tabular-nums text-white">
                   {p.amount}
-                  <span className="ml-1 text-[10px] font-normal text-white/35">{p.currency}</span>
+                  <span className="ml-1 text-[12px] font-normal text-white/60">{p.currency}</span>
                 </p>
               </div>
             </article>
@@ -117,7 +117,7 @@ export default function PaymentsTable({ payments }: { payments: AdminPaymentRow[
       <div className="hidden md:block max-h-[min(70vh,32rem)] overflow-auto overscroll-contain">
         <table className="w-full min-w-[720px] text-sm">
           <thead className="sticky top-0 z-10 bg-[#1a1a1a] shadow-[0_1px_0_rgba(255,255,255,0.06)]">
-            <tr className="border-b border-white/[0.06] text-left text-[11px] uppercase tracking-[0.14em] text-white/35">
+            <tr className="border-b border-white/[0.06] text-left text-[12px] uppercase tracking-[0.14em] text-white/60">
               <th className="px-5 py-3.5 font-semibold w-[22%]">Date</th>
               <th className="px-5 py-3.5 font-semibold w-[30%]">User</th>
               <th className="px-5 py-3.5 font-semibold w-[20%]">Plan</th>
@@ -136,15 +136,15 @@ export default function PaymentsTable({ payments }: { payments: AdminPaymentRow[
                 </td>
                 <td className="px-5 py-3.5">
                   <p className="truncate font-medium text-white">{p.email}</p>
-                  <p className="text-[11px] text-white/35">@{p.telegramUsername}</p>
+                  <p className="text-[12px] text-white/60">@{p.telegramUsername}</p>
                 </td>
                 <td className="px-5 py-3.5 text-white/60">
                   {p.planName}
-                  <span className="text-xs text-white/30"> · {p.months} mo</span>
+                  <span className="text-xs text-white/60"> · {p.months} mo</span>
                 </td>
                 <td className="whitespace-nowrap px-5 py-3.5 font-semibold text-white">
                   {p.amount}
-                  <span className="ml-1 text-[10px] font-normal text-white/35">{p.currency}</span>
+                  <span className="ml-1 text-[12px] font-normal text-white/60">{p.currency}</span>
                 </td>
                 <td className="px-5 py-3.5">
                   <StatusBadge

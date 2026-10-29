@@ -174,7 +174,7 @@ export default function AdminLoginForm() {
           <div className="flex justify-end -mt-2">
             <Link
               href="/admin/forgot"
-              className="text-xs font-medium text-white/40 hover:text-[var(--amber)] transition-colors"
+              className="text-xs font-medium text-white/60 hover:text-[var(--amber)] transition-colors"
             >
               Forgot password?
             </Link>
@@ -208,7 +208,7 @@ export default function AdminLoginForm() {
             />
           )}
           <div>
-            <p className="mb-1.5 text-xs font-medium text-white/40">Or type this key in the app</p>
+            <p className="mb-1.5 text-xs font-medium text-white/60">Or type this key in the app</p>
             <code className="block break-all rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-center text-sm tracking-wider text-white/80">
               {secret}
             </code>
@@ -226,7 +226,7 @@ export default function AdminLoginForm() {
           <button
             type="button"
             onClick={resetToPassword}
-            className="w-full text-center text-xs font-medium text-white/40 hover:text-[var(--amber)]"
+            className="w-full text-center text-xs font-medium text-white/60 hover:text-[var(--amber)]"
           >
             Start over with email and password
           </button>
@@ -258,7 +258,7 @@ export default function AdminLoginForm() {
           )}
           <button
             type="button"
-            className="text-xs font-medium text-white/40 hover:text-[var(--amber)]"
+            className="text-xs font-medium text-white/60 hover:text-[var(--amber)]"
             onClick={() => {
               setUseRecovery((v) => !v);
               setCode("");
@@ -279,7 +279,7 @@ export default function AdminLoginForm() {
           <button
             type="button"
             onClick={resetToPassword}
-            className="w-full text-center text-xs font-medium text-white/40 hover:text-[var(--amber)]"
+            className="w-full text-center text-xs font-medium text-white/60 hover:text-[var(--amber)]"
           >
             Start over with email and password
           </button>

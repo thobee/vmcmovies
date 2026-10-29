@@ -14,7 +14,7 @@ export default function AdminLoadingShell() {
         </div>
       </aside>
       <main className="w-full px-4 py-5 sm:px-8 sm:py-8 lg:px-12 lg:py-10">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/35">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
           <Arc className="size-3 border-[1.5px] text-amber" />
           Loading admin
         </div>

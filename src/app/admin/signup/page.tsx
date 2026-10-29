@@ -26,7 +26,7 @@ export default async function AdminSignupPage() {
           <Link href="/admin/login" className="font-semibold text-[var(--amber)] hover:underline">
             Sign in
           </Link>
-          <span className="text-white/20"> · </span>
+          <span className="text-white/60"> · </span>
           <Link href="/signup" className="text-white/50 hover:text-white/80 hover:underline">
             Public signup
           </Link>

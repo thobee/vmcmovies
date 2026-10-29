@@ -66,19 +66,19 @@ function TabButton({
         "flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-medium transition-colors",
         active
           ? "bg-white/[0.08] text-white"
-          : "text-white/45 hover:text-white/75 hover:bg-white/[0.03]"
+          : "text-white/60 hover:text-white/75 hover:bg-white/[0.03]"
       )}
     >
       <Icon className="h-4 w-4" />
       {label}
       <span
         className={cn(
-          "rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
+          "rounded-full px-1.5 py-0.5 text-[12px] font-bold tabular-nums",
           active
             ? "bg-white/[0.1] text-white/70"
             : highlight
               ? "bg-white/[0.08] text-white/60"
-              : "bg-white/[0.04] text-white/35"
+              : "bg-white/[0.04] text-white/60"
         )}
       >
         {count}

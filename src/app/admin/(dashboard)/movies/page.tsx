@@ -22,7 +22,7 @@ export default async function AdminMoviesPage() {
         action={
           <Link
             href="/admin/movies/new"
-            className="inline-flex w-full sm:w-auto min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--amber)] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[var(--amber)]/20 hover:bg-[var(--amber-hover)]"
+            className="inline-flex w-full sm:w-auto min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--amber)] px-4 py-2.5 text-sm font-bold text-black shadow-lg shadow-[var(--amber)]/20 hover:bg-[var(--amber-hover)]"
           >
             <Plus className="w-4 h-4" />
             Add movie

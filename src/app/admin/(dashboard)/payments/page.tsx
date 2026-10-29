@@ -149,7 +149,7 @@ export default async function AdminPaymentsPage() {
         <SettlementPanel />
       </div>
 
-      <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/30">
+      <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">
         Recent payments
       </p>
       <PaymentsTable payments={payments} />
@@ -166,18 +166,18 @@ function CashMovementChart({ points }: { points: CashPoint[] }) {
     <div className="rounded-2xl panel p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">
+          <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">
             Cash movement
           </p>
           <h2 className="mt-1 text-lg font-bold text-white">Last 14 days</h2>
         </div>
         <div className="grid grid-cols-2 gap-2 text-right text-xs">
           <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-3 py-2">
-            <p className="text-white/40">Inflow</p>
+            <p className="text-white/60">Inflow</p>
             <p className="font-bold text-emerald-200">{formatMoney(totalInflow / 100, "NGN")}</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-            <p className="text-white/40">Outflow</p>
+            <p className="text-white/60">Outflow</p>
             <p className="font-bold text-white/55">{formatMoney(totalOutflow / 100, "NGN")}</p>
           </div>
         </div>
@@ -195,14 +195,14 @@ function CashMovementChart({ points }: { points: CashPoint[] }) {
                   title={`${point.label}: ${formatMoney(point.inflowMinor / 100, "NGN")}`}
                 />
               </div>
-              <p className="-rotate-45 truncate text-[10px] text-white/30 sm:rotate-0 sm:text-center">
+              <p className="-rotate-45 truncate text-[12px] text-white/60 sm:rotate-0 sm:text-center">
                 {point.label}
               </p>
             </div>
           );
         })}
       </div>
-      <p className="mt-3 text-xs leading-5 text-white/40">
+      <p className="mt-3 text-xs leading-5 text-white/60">
         Inflow is successful Bachs payment value recorded in VMC. Outflow is reserved for future
         expense/refund tracking; Bachs settlements happen in Bachs, not from this app.
       </p>
@@ -213,7 +213,7 @@ function CashMovementChart({ points }: { points: CashPoint[] }) {
 function SettlementPanel() {
   return (
     <div className="rounded-2xl panel p-4 sm:p-5">
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">
+      <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">
         Balance & withdrawal
       </p>
       <h2 className="mt-1 text-lg font-bold text-white">Managed by Bachs</h2>
@@ -245,7 +245,7 @@ function Stat({
 }) {
   return (
     <div className="rounded-2xl panel px-4 py-4">
-      <p className="text-[10px] uppercase tracking-widest text-white/35 mb-1.5">{label}</p>
+      <p className="text-[12px] uppercase tracking-widest text-white/60 mb-1.5">{label}</p>
       <p
         className={cn(
           "font-bold tabular-nums tracking-tight",

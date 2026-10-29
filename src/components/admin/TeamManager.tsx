@@ -22,7 +22,7 @@ function roleLabel(role: UserRole) {
 function roleBadge(role: UserRole) {
   if (role === "admin") return "border-emerald-500/25 bg-emerald-500/12 text-emerald-300";
   if (role === "content_admin") return "border-amber-500/25 bg-amber-500/12 text-amber-200";
-  return "border-white/10 bg-white/[0.05] text-white/45";
+  return "border-white/10 bg-white/[0.05] text-white/60";
 }
 
 export default function TeamManager({
@@ -112,7 +112,7 @@ export default function TeamManager({
       <section className="rounded-2xl panel p-4 sm:p-5">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">
+            <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">
               Mini admin instructions
             </p>
             <h2 className="mt-1 text-lg font-bold text-white">How a content admin logs in</h2>
@@ -137,7 +137,7 @@ export default function TeamManager({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-white">Find account</p>
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-xs text-white/60">
               Search existing users by email, then assign the right admin role.
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function TeamManager({
               type="button"
               onClick={() => void search()}
               disabled={loading}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--amber)] px-4 text-sm font-bold text-white disabled:opacity-60"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--amber)] px-4 text-sm font-bold text-black disabled:opacity-60"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               Search
@@ -175,7 +175,7 @@ export default function TeamManager({
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px] text-sm">
             <thead>
-              <tr className="border-b border-white/[0.06] text-left text-[11px] uppercase tracking-[0.14em] text-white/35">
+              <tr className="border-b border-white/[0.06] text-left text-[12px] uppercase tracking-[0.14em] text-white/60">
                 <th className="px-5 py-3.5 font-semibold">Account</th>
                 <th className="px-5 py-3.5 font-semibold">Current role</th>
                 <th className="px-5 py-3.5 font-semibold">MFA</th>
@@ -191,15 +191,15 @@ export default function TeamManager({
                   <tr key={user._id} className="border-b border-white/[0.04] last:border-0">
                     <td className="px-5 py-4">
                       <p className="font-medium text-white">{user.email}</p>
-                      <p className="mt-0.5 text-xs text-white/35">
+                      <p className="mt-0.5 text-xs text-white/60">
                         @{user.telegramUsername} · joined {new Date(user.createdAt).toLocaleDateString()}
                       </p>
                     </td>
                     <td className="px-5 py-4">
-                      <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide", roleBadge(user.role))}>
+                      <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-[12px] font-bold uppercase tracking-wide", roleBadge(user.role))}>
                         {roleLabel(user.role)}
                       </span>
-                      {isSelf && <p className="mt-1 text-[10px] text-white/35">You</p>}
+                      {isSelf && <p className="mt-1 text-[12px] text-white/60">You</p>}
                     </td>
                     <td className="px-5 py-4 text-white/50">
                       {user.role === "user" ? "No admin MFA" : user.totpEnabled ? "Enabled" : "Needs setup"}
@@ -223,7 +223,7 @@ export default function TeamManager({
                         type="button"
                         onClick={() => resetMfa(user)}
                         disabled={busy || user.role === "user"}
-                        className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-white/10 px-3 text-xs font-semibold text-white/60 transition hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-white/10 px-3 text-sm font-semibold md:min-h-9 md:text-xs text-white/60 transition hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldMinus className="h-3.5 w-3.5" />}
                         Reset MFA
@@ -255,7 +255,7 @@ function Stat({
         <Icon className="h-4 w-4" />
       </div>
       <p className="text-2xl font-bold tabular-nums text-white">{value}</p>
-      <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-white/35">{label}</p>
+      <p className="mt-0.5 text-[12px] uppercase tracking-[0.14em] text-white/60">{label}</p>
     </div>
   );
 }

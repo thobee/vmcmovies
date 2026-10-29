@@ -176,13 +176,13 @@ export default function AdminForgotForm() {
             setOk("");
             setError("");
           }}
-          className="w-full text-center text-sm text-white/45 hover:text-white"
+          className="w-full text-center text-sm text-white/60 hover:text-white"
         >
           Use a different email
         </button>
       )}
 
-      <p className="text-center text-sm text-white/40">
+      <p className="text-center text-sm text-white/60">
         Remembered it?{" "}
         <Link href="/admin/login" className="font-semibold text-[var(--amber)] hover:underline">
           Sign in

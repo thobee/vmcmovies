@@ -640,7 +640,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
               </select>
             </FormField>
             {seasons.length === 0 && (
-              <p className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-white/40">
+              <p className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-white/60">
                 No seasons yet. Add at least Season 1.
               </p>
             )}
@@ -655,7 +655,7 @@ export function SeriesForm({ initial, mode }: SeriesFormProps) {
                   <button
                     type="button"
                     onClick={() => removeSeason(index)}
-                    className="inline-flex min-h-9 items-center gap-1.5 px-2 text-xs font-semibold text-red-400 hover:text-red-300"
+                    className="inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-red-300 hover:text-red-200 md:min-h-9 md:px-2 md:text-xs"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Remove
@@ -832,7 +832,7 @@ function EditorGuide({
     <div className="rounded-2xl border border-[var(--amber)]/18 bg-[var(--amber)]/[0.06] p-4 sm:p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--amber-100)]">
+          <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-[var(--amber-100)]">
             Guided {mode === "create" ? "upload" : "editor"}
           </p>
           <h2 className="mt-1 text-lg font-bold text-white">
@@ -841,7 +841,7 @@ function EditorGuide({
           <p className="mt-1 max-w-2xl text-sm leading-6 text-white/50">{primaryAction}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">
+          <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-white/60">
             Readiness
           </p>
           <p className="mt-0.5 text-xl font-bold tabular-nums text-white">
@@ -941,7 +941,7 @@ function ContentPreview({
             className="object-cover opacity-70"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-white/[0.03] text-white/20">
+          <div className="flex h-full items-center justify-center bg-white/[0.03] text-white/60">
             <ImageIcon className="h-8 w-8" />
           </div>
         )}
@@ -960,16 +960,16 @@ function ContentPreview({
               className="object-cover"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-white/20">
+            <div className="flex h-full items-center justify-center text-white/60">
               <ImageIcon className="h-7 w-7" />
             </div>
           )}
         </div>
 
         <h3 className="line-clamp-2 text-xl font-bold leading-tight text-white">{displayTitle}</h3>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/45">
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60">
           {qualities.length > 0 && <QualityBadges qualities={qualities} size="sm" hd />}
-          <span className="rounded bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+          <span className="rounded bg-white/10 px-1.5 py-0.5 text-[12px] font-bold uppercase tracking-wide text-white">
             {type === "series" ? "Series" : "Movie"}
           </span>
           {year && <span>{year}</span>}
@@ -983,7 +983,7 @@ function ContentPreview({
         {genres.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {genres.slice(0, 4).map((genre) => (
-              <span key={genre} className="rounded-full border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/45">
+              <span key={genre} className="rounded-full border border-white/10 px-2 py-1 text-[12px] font-semibold text-white/60">
                 {genre}
               </span>
             ))}
@@ -991,7 +991,7 @@ function ContentPreview({
         )}
 
         {type === "series" && (
-          <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/45">
+          <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/60">
             {seasonCount} season link{seasonCount === 1 ? "" : "s"} ready
           </p>
         )}
@@ -1009,7 +1009,7 @@ function ReadinessPanel({ items }: { items: ReadinessItem[] }) {
         <p className="text-sm font-semibold text-white">Before saving</p>
         <span
           className={cn(
-            "rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide",
+            "rounded-full px-2.5 py-1 text-[12px] font-bold uppercase tracking-wide",
             missing === 0
               ? "bg-emerald-500/15 text-emerald-300"
               : "bg-amber-500/15 text-amber-200",
@@ -1030,7 +1030,7 @@ function ReadinessPanel({ items }: { items: ReadinessItem[] }) {
               <p className={cn("text-xs font-semibold", item.ok ? "text-white/70" : "text-white")}>
                 {item.label}
               </p>
-              {!item.ok && item.hint && <p className="mt-0.5 text-[11px] leading-4 text-white/35">{item.hint}</p>}
+              {!item.ok && item.hint && <p className="mt-0.5 text-[12px] leading-4 text-white/60">{item.hint}</p>}
             </div>
           </div>
         ))}

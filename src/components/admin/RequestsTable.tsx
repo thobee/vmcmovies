@@ -40,7 +40,7 @@ export default function RequestsTable({ requests }: { requests: TitleRequest[] }
   if (requests.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-[#1a1a1a] px-6 py-16 text-center">
-        <p className="text-sm text-white/45">No title requests yet.</p>
+        <p className="text-sm text-white/60">No title requests yet.</p>
       </div>
     );
   }
@@ -60,15 +60,15 @@ export default function RequestsTable({ requests }: { requests: TitleRequest[] }
               <div className="mb-1.5 flex flex-wrap items-center gap-2">
                 <span
                   className={cn(
-                    "rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+                    "rounded-full border px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wide",
                     item.status === "open"
                       ? "border-amber-500/30 bg-amber-500/12 text-amber-200"
-                      : "border-white/10 bg-white/4 text-white/45",
+                      : "border-white/10 bg-white/4 text-white/60",
                   )}
                 >
                   {item.status}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-white/35">
+                <span className="inline-flex items-center gap-1 text-[12px] uppercase tracking-widest text-white/60">
                   {item.type === "movie" ? (
                     <Film className="h-3 w-3" />
                   ) : (
@@ -77,15 +77,15 @@ export default function RequestsTable({ requests }: { requests: TitleRequest[] }
                   {item.type}
                 </span>
                 {item.year && (
-                  <span className="text-[10px] text-white/35">{item.year}</span>
+                  <span className="text-[12px] text-white/60">{item.year}</span>
                 )}
-                <span className="text-[10px] text-white/25">{formatDate(item.createdAt)}</span>
+                <span className="text-[12px] text-white/60">{formatDate(item.createdAt)}</span>
               </div>
               <h3 className="text-base font-semibold text-white">{item.title}</h3>
               <p className="mt-1 text-sm text-white/50">
                 {item.email}
                 {item.telegramUsername && (
-                  <span className="text-white/35"> · @{item.telegramUsername}</span>
+                  <span className="text-white/60"> · @{item.telegramUsername}</span>
                 )}
               </p>
             </div>
@@ -93,7 +93,7 @@ export default function RequestsTable({ requests }: { requests: TitleRequest[] }
             <button
               type="button"
               onClick={() => toggleStatus(item)}
-              className="shrink-0 rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/20 hover:bg-white/4 hover:text-white"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold md:min-h-0 md:text-xs text-white/70 transition hover:border-white/20 hover:bg-white/4 hover:text-white"
             >
               {item.status === "open" ? "Mark done" : "Reopen"}
             </button>

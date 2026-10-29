@@ -43,7 +43,7 @@ export default function AdminPasswordField({
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
           aria-pressed={visible}
-          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-white/40 transition-colors hover:text-white/80"
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-white/60 transition-colors hover:text-white/80"
         >
           {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>

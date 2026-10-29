@@ -69,7 +69,7 @@ export default async function AdminDashboardPage() {
         )}
       </div>
 
-      <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/30">
+      <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">
         Quick actions
       </p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -152,7 +152,7 @@ function StatCard({
         <Icon className="h-4 w-4" />
       </div>
       <p className="text-2xl sm:text-3xl font-bold text-white tabular-nums">{value}</p>
-      <p className="mt-0.5 text-[10px] sm:text-[11px] uppercase tracking-[0.14em] text-white/35">
+      <p className="mt-0.5 text-[12px] sm:text-[12px] uppercase tracking-[0.14em] text-white/60">
         {label}
       </p>
     </div>
@@ -180,7 +180,7 @@ function ActionCard({
       </div>
       <div className="min-w-0 pr-5">
         <p className="font-semibold text-white text-sm">{title}</p>
-        <p className="mt-1 text-xs leading-5 text-white/45">{description}</p>
+        <p className="mt-1 text-xs leading-5 text-white/60">{description}</p>
       </div>
       <ArrowUpRight className="absolute right-4 top-4 h-4 w-4 text-white/15 transition-all group-hover:text-amber group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
     </Link>

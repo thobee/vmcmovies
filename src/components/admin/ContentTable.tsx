@@ -58,12 +58,12 @@ export default function ContentTable({
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-[#1a1a1a] px-6 py-16 text-center">
-        <p className="text-sm text-white/45 mb-4">
+        <p className="text-sm text-white/60 mb-4">
           No {type === "movie" ? "movies" : "series"} yet.
         </p>
         <Link
           href={`${base}/new`}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--amber)] px-5 py-2.5 text-sm font-bold text-white hover:bg-[var(--amber-hover)]"
+          className="inline-flex items-center gap-2 rounded-xl bg-[var(--amber)] px-5 py-2.5 text-sm font-bold text-black hover:bg-[var(--amber-hover)]"
         >
           <Plus className="w-4 h-4" />
           Add your first {type}
@@ -78,9 +78,10 @@ export default function ContentTable({
         type="button"
         onClick={() => handleFeatured(item.id, item.title)}
         title={isFeatured ? "Homepage fallback featured" : "Set as featured fallback"}
+        aria-label={isFeatured ? `${item.title} is featured` : `Feature ${item.title}`}
         className={cn(
           "p-2 rounded-lg transition-colors hover:bg-white/[0.06]",
-          isFeatured ? "text-[var(--amber)]" : "text-white/35 hover:text-[var(--amber)]"
+          isFeatured ? "text-[var(--amber)]" : "text-white/60 hover:text-[var(--amber)]"
         )}
       >
         <Star className={cn("w-4 h-4", isFeatured && "fill-current")} />
@@ -88,7 +89,8 @@ export default function ContentTable({
       <Link
         href={type === "movie" ? adminMovieEditPath(item) : adminSeriesEditPath(item)}
         title="Edit"
-        className="p-2 rounded-lg text-white/35 hover:text-white hover:bg-white/[0.06] transition-colors"
+        aria-label={`Edit ${item.title}`}
+        className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
       >
         <Pencil className="w-4 h-4" />
       </Link>
@@ -96,9 +98,44 @@ export default function ContentTable({
         type="button"
         onClick={() => handleDelete(item.id, item.title)}
         title="Delete"
-        className="p-2 rounded-lg text-white/35 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+        aria-label={`Delete ${item.title}`}
+        className="p-2 rounded-lg text-white/60 hover:text-red-400 hover:bg-red-500/10 transition-colors"
       >
         <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  );
+
+  /** Phones: labelled, full-height buttons instead of tiny icons; Delete is red and set apart. */
+  const MobileActions = ({ item, isFeatured }: { item: Content; isFeatured: boolean }) => (
+    <div className="mt-3 flex gap-2 border-t border-white/[0.07] pt-3">
+      <button
+        type="button"
+        onClick={() => handleFeatured(item.id, item.title)}
+        aria-pressed={isFeatured}
+        className={cn(
+          "flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors",
+          isFeatured ? "bg-[var(--amber)]/15 text-[var(--amber)]" : "bg-white/[0.05] text-white/80 active:bg-white/10",
+        )}
+      >
+        <Star className={cn("size-4", isFeatured && "fill-current")} />
+        {isFeatured ? "Featured" : "Feature"}
+      </button>
+      <Link
+        href={type === "movie" ? adminMovieEditPath(item) : adminSeriesEditPath(item)}
+        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-white/[0.05] text-sm font-semibold text-white active:bg-white/10"
+      >
+        <Pencil className="size-4" />
+        Edit
+      </Link>
+      <button
+        type="button"
+        onClick={() => handleDelete(item.id, item.title)}
+        aria-label={`Delete ${item.title}`}
+        className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-400/25 px-4 text-sm font-semibold text-red-300 active:bg-red-500/10"
+      >
+        <Trash2 className="size-4" />
+        Delete
       </button>
     </div>
   );
@@ -109,7 +146,8 @@ export default function ContentTable({
         {items.map((item) => {
           const isFeatured = featuredId === item.id;
           return (
-            <article key={item.id} className="rounded-2xl panel p-3.5 flex gap-3">
+            <article key={item.id} className="rounded-2xl panel p-3.5">
+              <div className="flex gap-3">
               <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-lg ring-1 ring-white/10 bg-white/[0.04]">
                 {item.posterImageUrl && (
                   <Image
@@ -124,21 +162,22 @@ export default function ContentTable({
               <div className="min-w-0 flex-1 flex flex-col">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="font-semibold text-white truncate">{item.title}</p>
-                    <p className="mt-0.5 text-[11px] text-white/35">
+                    <p className="text-base font-semibold leading-snug text-white">{item.title}</p>
+                    <p className="mt-1 text-sm text-white/60">
                       {item.year ?? "—"}
                       {item.genres[0] ? ` · ${item.genres[0]}` : ""}
                     </p>
                     {isFeatured && (
-                      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[var(--amber)]/15 px-2 py-0.5 text-[9px] font-bold uppercase text-[var(--amber)]">
+                      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[var(--amber)]/15 px-2 py-0.5 text-[12px] font-bold uppercase text-[var(--amber)]">
                         <Star className="h-2.5 w-2.5 fill-current" />
                         Featured
                       </span>
                     )}
                   </div>
-                  <Actions item={item} isFeatured={isFeatured} />
                 </div>
               </div>
+              </div>
+              <MobileActions item={item} isFeatured={isFeatured} />
             </article>
           );
         })}
@@ -147,7 +186,7 @@ export default function ContentTable({
       <div className="hidden md:block overflow-x-auto rounded-2xl panel">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/[0.06] text-left text-white/35 text-[11px] uppercase tracking-[0.14em]">
+            <tr className="border-b border-white/[0.06] text-left text-white/60 text-[12px] uppercase tracking-[0.14em]">
               <th className="px-5 py-3.5 font-semibold w-[44%]">Title</th>
               <th className="px-5 py-3.5 font-semibold w-[28%]">Genres</th>
               <th className="px-5 py-3.5 font-semibold w-[12%] text-center">Year</th>
@@ -179,13 +218,13 @@ export default function ContentTable({
                         <p className="font-semibold text-white truncate flex items-center gap-2">
                           {item.title}
                           {isFeatured && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--amber)]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[var(--amber)]">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--amber)]/15 px-2 py-0.5 text-[12px] font-bold uppercase tracking-wide text-[var(--amber)]">
                               <Star className="h-2.5 w-2.5 fill-current" />
                               Featured
                             </span>
                           )}
                         </p>
-                        <p className="mt-0.5 font-mono text-[11px] text-white/30 truncate">
+                        <p className="mt-0.5 font-mono text-[12px] text-white/60 truncate">
                           /{type}/{contentSlug(item)}
                         </p>
                       </div>
@@ -196,7 +235,7 @@ export default function ContentTable({
                       {item.genres.slice(0, 3).map((g) => (
                         <span
                           key={g}
-                          className="rounded-full bg-white/[0.05] border border-white/[0.06] px-2 py-0.5 text-[10px] text-white/50"
+                          className="rounded-full bg-white/[0.05] border border-white/[0.06] px-2 py-0.5 text-[12px] text-white/50"
                         >
                           {g}
                         </span>

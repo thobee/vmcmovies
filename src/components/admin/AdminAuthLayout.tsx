@@ -33,7 +33,7 @@ export default function AdminAuthLayout({
               <VmcLogo href="/" height={52} admin />
             </div>
             <div className="relative max-w-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--amber)]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--amber)]">
                 Staff access
               </p>
               <h2
@@ -42,11 +42,11 @@ export default function AdminAuthLayout({
               >
                 Manage catalogue, payments, and subscribers.
               </h2>
-              <p className="mt-4 text-sm leading-relaxed text-white/45">
+              <p className="mt-4 text-sm leading-relaxed text-white/60">
                 Sign in with your admin account. This area is separate from public site login.
               </p>
             </div>
-            <p className="relative text-xs text-white/30">Vintage Movie Channel</p>
+            <p className="relative text-xs text-white/60">Vintage Movie Channel</p>
           </aside>
 
           <div className="relative p-6 sm:p-10 bg-[#1e1e1e]">
@@ -54,7 +54,7 @@ export default function AdminAuthLayout({
               <VmcLogo href="/" height={44} admin />
             </div>
 
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--amber)]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[var(--amber)]">
               {eyebrow}
             </p>
             <h1
@@ -63,11 +63,11 @@ export default function AdminAuthLayout({
             >
               {title}
             </h1>
-            <p className="mt-2 mb-8 text-sm leading-relaxed text-white/45">{subtitle}</p>
+            <p className="mt-2 mb-8 text-sm leading-relaxed text-white/60">{subtitle}</p>
 
             {children}
 
-            <div className="mt-6 text-center text-sm text-white/40">{footer}</div>
+            <div className="mt-6 text-center text-sm text-white/60">{footer}</div>
           </div>
         </div>
       </div>

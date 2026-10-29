@@ -260,7 +260,7 @@ export default function HomepageEditor({
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-white/60">
             {slides.length} / {MAX_HERO_SLIDES} slides
             {slides.filter((s) => s.enabled).length > 0 &&
               ` · ${slides.filter((s) => s.enabled).length} enabled`}
@@ -269,7 +269,7 @@ export default function HomepageEditor({
             type="button"
             onClick={addSlide}
             disabled={slides.length >= MAX_HERO_SLIDES}
-            className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/60 hover:bg-white/[0.08] hover:text-white disabled:opacity-40 sm:w-auto"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm md:text-xs font-semibold text-white/60 hover:bg-white/[0.08] hover:text-white disabled:opacity-40 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Add custom slide
@@ -278,9 +278,9 @@ export default function HomepageEditor({
 
         {slides.length === 0 && (
           <div className="rounded-xl border border-dashed border-white/10 px-4 py-10 text-center">
-            <ImageIcon className="mx-auto mb-3 h-8 w-8 text-white/20" />
+            <ImageIcon className="mx-auto mb-3 h-8 w-8 text-white/60" />
             <p className="text-sm font-medium text-white/50">No custom slides yet</p>
-            <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-white/35">
+            <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-white/60">
               Choose a movie or series above. If you leave this empty, the homepage uses your
               starred featured title.
             </p>
@@ -311,17 +311,17 @@ export default function HomepageEditor({
                       {slide.title.trim() || `Slide ${index + 1}`}
                     </span>
                     {linkedItem && (
-                      <span className="shrink-0 rounded-full bg-white/[0.07] px-2 py-0.5 text-[10px] font-bold uppercase text-white/45">
+                      <span className="shrink-0 rounded-full bg-white/[0.07] px-2 py-0.5 text-[12px] font-bold uppercase text-white/60">
                         {linkedItem.type === "series" ? "Series" : "Movie"}
                       </span>
                     )}
                     {!slide.enabled && (
-                      <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/40">
+                      <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[12px] font-bold uppercase tracking-wide text-white/60">
                         Hidden
                       </span>
                     )}
                     {slide.enabled && slide.imageUrl && (
-                      <span className="hidden shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-300 sm:inline">
+                      <span className="hidden shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[12px] font-bold uppercase tracking-wide text-emerald-300 sm:inline">
                         Live
                       </span>
                     )}
@@ -332,7 +332,7 @@ export default function HomepageEditor({
                       type="button"
                       onClick={() => moveSlide(index, -1)}
                       disabled={index === 0}
-                      className="rounded-lg p-2 text-white/35 hover:bg-white/[0.06] hover:text-white disabled:opacity-30"
+                      className="rounded-lg p-3 text-white/70 hover:bg-white/[0.06] hover:text-white disabled:opacity-30 md:p-2"
                       aria-label="Move up"
                     >
                       <ChevronUp className="h-4 w-4" />
@@ -341,12 +341,12 @@ export default function HomepageEditor({
                       type="button"
                       onClick={() => moveSlide(index, 1)}
                       disabled={index === slides.length - 1}
-                      className="rounded-lg p-2 text-white/35 hover:bg-white/[0.06] hover:text-white disabled:opacity-30"
+                      className="rounded-lg p-3 text-white/70 hover:bg-white/[0.06] hover:text-white disabled:opacity-30 md:p-2"
                       aria-label="Move down"
                     >
                       <ChevronDown className="h-4 w-4" />
                     </button>
-                    <label className="ml-1 flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-white/55">
+                    <label className="ml-1 flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-[12px] font-semibold text-white/55">
                       <input
                         type="checkbox"
                         checked={slide.enabled}
@@ -358,7 +358,7 @@ export default function HomepageEditor({
                     <button
                       type="button"
                       onClick={() => removeSlide(index)}
-                      className="rounded-lg p-2 text-white/35 hover:bg-red-500/10 hover:text-red-300"
+                      className="rounded-lg p-3 text-red-300/80 hover:bg-red-500/10 hover:text-red-300 md:p-2"
                       aria-label="Remove slide"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -444,7 +444,7 @@ export default function HomepageEditor({
           <button
             type="button"
             onClick={resetTitles}
-            className="text-xs font-semibold text-white/40 transition hover:text-[var(--amber)]"
+            className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-white/65 transition hover:text-[var(--amber)] md:min-h-0 md:text-xs"
           >
             Reset to defaults
           </button>
@@ -462,7 +462,7 @@ export default function HomepageEditor({
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-white">{label}</p>
-                  <p className="mt-0.5 text-xs leading-5 text-white/40">{hint}</p>
+                  <p className="mt-0.5 text-xs leading-5 text-white/60">{hint}</p>
                 </div>
               </div>
               <FormField label="Heading on site">

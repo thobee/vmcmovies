@@ -145,7 +145,7 @@ export default function UpdatesEditor() {
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, kind: k }))}
                     className={cn(
-                      "flex min-h-11 flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2.5 text-[11px] font-semibold transition",
+                      "flex min-h-11 flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2.5 text-[12px] font-semibold transition",
                       on
                         ? "border-[var(--amber)]/40 bg-[var(--amber)]/15 text-[var(--amber-100)]"
                         : "border-white/[0.08] bg-white/[0.03] text-white/50 hover:border-white/15 hover:text-white",
@@ -231,7 +231,7 @@ export default function UpdatesEditor() {
         )}
 
         {!listLoading && items.length === 0 && (
-          <p className="rounded-xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-white/40">
+          <p className="rounded-xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-white/60">
             No updates posted yet. Use the form to send your first alert.
           </p>
         )}
@@ -261,28 +261,28 @@ export default function UpdatesEditor() {
                       <p className="text-sm font-semibold text-white">{item.title}</p>
                       <span
                         className={cn(
-                          "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+                          "rounded-full px-2 py-0.5 text-[12px] font-bold uppercase tracking-wide",
                           item.published
                             ? "bg-emerald-500/15 text-emerald-300"
-                            : "bg-white/10 text-white/40",
+                            : "bg-white/10 text-white/60",
                         )}
                       >
                         {item.published ? "Live" : "Hidden"}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/35">
+                    <p className="mt-0.5 text-[12px] font-semibold uppercase tracking-wide text-white/60">
                       {UPDATE_KIND_LABELS[item.kind]} · {timeAgo(item.publishedAt)}
                     </p>
                     <p className="mt-2 line-clamp-2 text-xs leading-5 text-white/55">{item.body}</p>
                     {item.href && (
-                      <p className="mt-1.5 truncate text-[11px] text-[var(--amber)]/80">{item.href}</p>
+                      <p className="mt-1.5 truncate text-[12px] text-[var(--amber)]/80">{item.href}</p>
                     )}
 
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         type="button"
                         onClick={() => togglePublished(item)}
-                        className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-xs font-semibold text-white/60 transition hover:border-white/20 hover:text-white"
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-sm font-semibold md:min-h-9 md:text-xs text-white/60 transition hover:border-white/20 hover:text-white"
                       >
                         {item.published ? (
                           <>
@@ -299,7 +299,7 @@ export default function UpdatesEditor() {
                       <button
                         type="button"
                         onClick={() => remove(item)}
-                        className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-xs font-semibold text-white/45 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-sm font-semibold md:min-h-9 md:text-xs text-white/60 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                         Delete

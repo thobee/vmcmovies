@@ -23,13 +23,13 @@ export default function AdminPageHeader({
             {title}
           </h1>
           {badge && (
-            <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-0.5 text-[11px] font-semibold text-white/55">
+            <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-0.5 text-[12px] font-semibold text-white/55">
               {badge}
             </span>
           )}
         </div>
         {subtitle && (
-          <p className="mt-1.5 text-sm text-white/45 max-w-xl leading-relaxed">{subtitle}</p>
+          <p className="mt-1.5 text-sm text-white/60 max-w-xl leading-relaxed">{subtitle}</p>
         )}
       </div>
       {action && <div className="w-full sm:w-auto shrink-0">{action}</div>}

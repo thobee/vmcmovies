@@ -74,7 +74,7 @@ export default function UsersTable({ users }: { users: AdminUserRow[] }) {
   if (users.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-[#1a1a1a] px-6 py-16 text-center">
-        <p className="text-sm text-white/45">
+        <p className="text-sm text-white/60">
           No registered users yet. They&apos;ll appear here after signing up on the site.
         </p>
       </div>
@@ -112,18 +112,18 @@ export default function UsersTable({ users }: { users: AdminUserRow[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-white truncate">{user.email}</p>
-                <p className="text-[11px] text-white/40">@{user.telegramUsername}</p>
+                <p className="text-[12px] text-white/60">@{user.telegramUsername}</p>
               </div>
               <span
                 className={cn(
-                  "shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase",
+                  "shrink-0 rounded-full border px-2 py-0.5 text-[12px] font-bold uppercase",
                   STATUS_BADGE[user.premiumStatus]
                 )}
               >
                 {user.premiumStatus}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3 text-[11px] text-white/35">
+            <div className="flex items-center justify-between gap-3 text-[12px] text-white/60">
               <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
               {user.premiumExpiryDate && user.premiumStatus === "active" && (
                 <span>until {new Date(user.premiumExpiryDate).toLocaleDateString()}</span>
@@ -137,7 +137,7 @@ export default function UsersTable({ users }: { users: AdminUserRow[] }) {
       <div className="hidden md:block overflow-x-auto rounded-2xl panel">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/[0.06] text-left text-[11px] uppercase tracking-[0.14em] text-white/35">
+            <tr className="border-b border-white/[0.06] text-left text-[12px] uppercase tracking-[0.14em] text-white/60">
               <th className="px-5 py-3.5 font-semibold w-[32%]">User</th>
               <th className="px-5 py-3.5 font-semibold w-[18%]">Telegram</th>
               <th className="px-5 py-3.5 font-semibold w-[16%]">Premium</th>
@@ -168,19 +168,19 @@ export default function UsersTable({ users }: { users: AdminUserRow[] }) {
                 <td className="px-5 py-3.5">
                   <span
                     className={cn(
-                      "inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide",
+                      "inline-flex rounded-full border px-2.5 py-1 text-[12px] font-bold uppercase tracking-wide",
                       STATUS_BADGE[user.premiumStatus]
                     )}
                   >
                     {user.premiumStatus}
                   </span>
                   {user.premiumExpiryDate && user.premiumStatus === "active" && (
-                    <p className="mt-1 text-[10px] text-white/35">
+                    <p className="mt-1 text-[12px] text-white/60">
                       until {new Date(user.premiumExpiryDate).toLocaleDateString()}
                     </p>
                   )}
                 </td>
-                <td className="px-5 py-3.5 text-white/45 text-xs">
+                <td className="px-5 py-3.5 text-white/60 text-xs">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-5 py-3.5">

@@ -125,13 +125,13 @@ export function AdminToastProvider({ children }: { children: ReactNode }) {
             <div className="min-w-0 flex-1 pt-0.5">
               <p className="text-sm font-semibold text-white leading-snug">{t.title}</p>
               {t.message && (
-                <p className="mt-0.5 text-xs text-white/45 leading-relaxed">{t.message}</p>
+                <p className="mt-0.5 text-xs text-white/60 leading-relaxed">{t.message}</p>
               )}
             </div>
             <button
               type="button"
               onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
-              className="self-start rounded-lg p-1 text-white/25 hover:text-white/70"
+              className="self-start rounded-lg p-2.5 text-white/70 hover:text-white md:p-1"
               aria-label="Dismiss"
             >
               <X className="h-3.5 w-3.5" />

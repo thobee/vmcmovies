@@ -16,7 +16,7 @@ export default function QualityPicker({
 
   return (
     <div>
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">Available qualities</p>
+      <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-white/60">Available qualities</p>
       <div className="flex flex-wrap gap-2">
         {QUALITY_OPTIONS.map((q) => {
           const on = value.includes(q);
@@ -28,8 +28,8 @@ export default function QualityPicker({
               className={cn(
                 "min-h-11 min-w-[4.5rem] px-4 rounded-xl text-sm font-bold border transition-colors",
                 on
-                  ? "bg-[var(--amber)] border-[var(--amber)] text-white"
-                  : "bg-[#141414] border-white/10 text-white/45 hover:text-white"
+                  ? "bg-[var(--amber)] border-[var(--amber)] text-black"
+                  : "bg-[#141414] border-white/10 text-white/60 hover:text-white"
               )}
             >
               {q}

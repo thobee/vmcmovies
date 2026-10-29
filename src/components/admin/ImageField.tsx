@@ -59,11 +59,11 @@ export default function ImageField({
 
   return (
     <div className="min-w-0">
-      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+      <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.14em] text-white/60">
         {label}
         {required && <span className="text-[var(--amber)]"> *</span>}
       </label>
-      <p className="text-[12px] text-white/35 mb-2 leading-5">{hint}</p>
+      <p className="text-[12px] text-white/60 mb-2 leading-5">{hint}</p>
 
       <div className="flex flex-col gap-3">
         {value && (
