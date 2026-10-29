@@ -44,7 +44,7 @@ export function isValidSlug(slug: string): boolean {
 
 /** ponytail: O(n) scan per candidate; fine for catalog size — upgrade to DB counter if slug churn gets heavy. */
 export function dedupeSlug(base: string, taken: Set<string>): string {
-  let candidate = base || "untitled";
+  const candidate = base || "untitled";
   if (!taken.has(candidate)) return candidate;
   let n = 2;
   while (taken.has(`${candidate}-${n}`)) n += 1;

@@ -12,7 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build output from local load checks (scripts/test-local-load.cjs).
+    ".next-load-check/**",
   ]),
+  {
+    // Operational scripts are plain CommonJS run directly with node.
+    files: ["scripts/**/*.cjs"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
 ]);
 
 export default eslintConfig;
