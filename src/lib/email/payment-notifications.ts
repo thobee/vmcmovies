@@ -9,7 +9,7 @@ import {
   markUserReceiptSent,
 } from "@/lib/payments/records";
 import { getAdminNotifyEmail } from "./config";
-import { adminPaymentAlertEmail, userReceiptEmail } from "./templates";
+import { adminPaymentAlertEmail, adminPaymentProblemEmail, userReceiptEmail } from "./templates";
 import { sendEmail } from "./resend";
 
 function formatExpiry(date: Date): string {
@@ -123,5 +123,45 @@ export async function ensurePaymentNotificationEmails(
     }
   } catch (err) {
     console.error("[email] ensure notifications failed", reference, err);
+  }
+}
+
+/**
+ * Tell the admin about a payment event that needs a human (rejected paid payment,
+ * refund, dispute, unmatched webhook). Never throws: alerting must not break the
+ * webhook response that tells Bachs whether to retry.
+ */
+export async function notifyAdminPaymentProblem(input: {
+  headline: string;
+  summary: string;
+  action: string;
+  details: Record<string, string | null | undefined>;
+}): Promise<void> {
+  const rows = Object.entries(input.details)
+    .filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].length > 0)
+    .map(([label, value]) => ({ label, value, mono: /ref|id/i.test(label) }));
+
+  console.error("[payments] needs attention:", input.headline, input.details);
+
+  const to = getAdminNotifyEmail();
+  if (!to) {
+    console.warn("[email] ADMIN_NOTIFY_EMAIL / ADMIN_EMAIL not set — payment problem alert skipped");
+    return;
+  }
+  try {
+    const sent = await sendEmail({
+      to,
+      subject: `Action needed: ${input.headline}`,
+      html: adminPaymentProblemEmail({
+        headline: input.headline,
+        summary: input.summary,
+        rows,
+        action: input.action,
+        appUrl: getAppUrl(),
+      }),
+    });
+    if (!sent.ok) console.error("[email] payment problem alert failed", sent.detail);
+  } catch (err) {
+    console.error("[email] payment problem alert failed", err);
   }
 }

@@ -151,12 +151,17 @@ export async function findPaymentByReference(
   return doc ? toPayment(doc) : null;
 }
 
+/**
+ * Atomically claim a payment for fulfillment. Only one caller can flip
+ * `premiumActivated` from unset to true, so a duplicate webhook or a webhook
+ * racing the return page gets `false` and must not grant Premium again.
+ */
 export async function markPaymentFulfilled(
   reference: string,
   paidAt: Date,
   session?: ClientSession,
-): Promise<Payment | null> {
-  const result = await (await payments()).findOneAndUpdate(
+): Promise<boolean> {
+  const result = await (await payments()).updateOne(
     { reference, premiumActivated: { $ne: true } },
     {
       $set: {
@@ -167,9 +172,9 @@ export async function markPaymentFulfilled(
         updatedAt: new Date(),
       },
     },
-    { returnDocument: "after", session }
+    { session }
   );
-  return result ? toPayment(result) : findPaymentByReference(reference, session);
+  return result.modifiedCount === 1;
 }
 
 export async function markPremiumActivated(reference: string): Promise<void> {
@@ -195,12 +200,13 @@ export async function markAdminNotified(reference: string): Promise<void> {
   );
 }
 
+/** Returns true only for the call that moved the payment out of "pending" (used to alert once). */
 export async function markPaymentFailed(
   reference: string,
   reason: string,
   session?: ClientSession,
-): Promise<void> {
-  await (await payments()).updateOne(
+): Promise<boolean> {
+  const result = await (await payments()).updateOne(
     { reference, status: "pending" },
     {
       $set: {
@@ -211,6 +217,7 @@ export async function markPaymentFailed(
     },
     { session },
   );
+  return result.modifiedCount === 1;
 }
 
 export async function getPaymentsForUser(userId: string): Promise<Payment[]> {

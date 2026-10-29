@@ -374,6 +374,53 @@ export function adminPaymentAlertEmail(input: {
   });
 }
 
+/** Admin alert for payment events that need a human: rejected paid payments, refunds, disputes. */
+export function adminPaymentProblemEmail(input: {
+  headline: string;
+  summary: string;
+  rows: { label: string; value: string; mono?: boolean }[];
+  action: string;
+  appUrl: string;
+}): string {
+  const adminUrl = `${input.appUrl}/admin/payments`;
+  const body = `
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="padding-bottom:8px;">${statusBadge("Needs attention", "info")}</td>
+    </tr>
+    <tr>
+      <td style="font-size:22px;font-weight:700;color:${C.text};line-height:1.3;padding:4px 0;">
+        ${escapeHtml(input.headline)}
+      </td>
+    </tr>
+    <tr>
+      <td style="font-size:14px;line-height:1.6;color:${C.textDim};">${escapeHtml(input.summary)}</td>
+    </tr>
+  </table>
+
+  ${divider()}
+
+  ${sectionTitle("Details")}
+  ${detailTable(input.rows)}
+
+  ${calloutBox(escapeHtml(input.action), "gold")}
+
+  <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:28px;">
+    <tr>
+      <td>${primaryButton(adminUrl, "Open payments dashboard")}</td>
+    </tr>
+  </table>`;
+
+  return emailShell({
+    preheader: input.headline,
+    title: "VMC Admin — Payment needs attention",
+    body,
+    footer: `
+      Internal admin notification · ${escapeHtml(new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }))}<br/>
+      <a href="${escapeHtml(adminUrl)}" style="color:${C.textMuted};text-decoration:underline;">Admin payments</a>`,
+  });
+}
+
 export function adminResetOtpEmail(otp: string): string {
   const digits = escapeHtml(otp);
   const body = `

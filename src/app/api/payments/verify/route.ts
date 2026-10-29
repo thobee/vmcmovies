@@ -7,6 +7,7 @@ import { retrieveCheckoutSession } from "@/lib/payments/bachs";
 import type { PaymentVerifyData } from "@/lib/payments/provider";
 import { isPaymentPaid } from "@/lib/payments/provider";
 import { findPaymentByCheckoutId, findPaymentByReference } from "@/lib/payments/records";
+import { clientIp, rateLimited, RATE_LIMIT_MSG } from "@/lib/security/rate-limit";
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -35,6 +36,16 @@ export async function GET(request: Request) {
 
     if (!reference && !checkoutId) {
       return NextResponse.json({ error: "Missing payment reference" }, { status: 400 });
+    }
+
+    // Each call can poll Bachs for several seconds. Generous limits because many
+    // mobile users share one carrier IP; the return page makes up to 4 checks per visit.
+    const ip = clientIp(request);
+    if (
+      (await rateLimited(`verify:${ip}:${reference ?? checkoutId}`, 20)) ||
+      (await rateLimited(`verify:${ip}`, 120))
+    ) {
+      return NextResponse.json({ error: RATE_LIMIT_MSG, retryable: true }, { status: 429 });
     }
 
     const payment = reference
