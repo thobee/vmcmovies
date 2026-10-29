@@ -325,7 +325,7 @@ export default function FeaturedStrip({
                         fallback={active.heroSrc || active.heroFallback}
                         alt={active.title}
                         fill
-                        priority
+                        // No `priority`: this poster is hidden on phones, and the backdrop is the LCP image.
                         sizes="(max-width: 1024px) 28vw, 20rem"
                         className="object-cover"
                       />

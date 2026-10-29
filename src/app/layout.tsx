@@ -3,9 +3,7 @@ import { Baloo_2, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import SessionIdleMonitor from "@/components/auth/SessionIdleMonitor";
 import { SiteToastProvider } from "@/components/ui/SiteToast";
-import AppLaunchScreen from "@/components/loading-ui/AppLaunchScreen";
 import MotionProvider from "@/components/ui/MotionProvider";
-import { getSession } from "@/lib/auth/session";
 import { getAppUrl } from "@/lib/payments/app-url";
 import "./globals.css";
 
@@ -55,13 +53,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
-
   return (
     <html
       lang="en"
@@ -70,9 +66,8 @@ export default async function RootLayout({
     >
       <body className="min-h-screen antialiased">
         <MotionProvider>
-          <AuthProvider initialUser={session?.user ?? null}>
+          <AuthProvider>
             <SiteToastProvider>
-              <AppLaunchScreen />
               <SessionIdleMonitor />
               {children}
             </SiteToastProvider>

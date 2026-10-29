@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import VmcLogo from "@/components/brand/VmcLogo";
+import { cn } from "@/lib/cn";
 
 const FOOTER_GROUPS = [
   {
@@ -28,11 +29,13 @@ const FOOTER_GROUPS = [
   },
 ] as const;
 
-export default function Footer() {
+/** The green "Compare plans" banner is a homepage-only sales prompt; other pages get the plain footer. */
+export default function Footer({ showPlansBanner = false }: { showPlansBanner?: boolean }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-16 overflow-hidden text-white">
+    <footer className={cn("relative mt-16 overflow-hidden text-white", !showPlansBanner && "border-t border-emerald-300/[0.12]")}>
+      {showPlansBanner && (
       <div className="relative border-y border-emerald-400/25 bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-300 text-black">
         <div className="mx-auto flex max-w-screen-2xl flex-col items-start justify-between gap-5 px-4 py-6 sm:flex-row sm:items-center sm:px-6 lg:px-10">
           <div>
@@ -49,6 +52,7 @@ export default function Footer() {
           </Link>
         </div>
       </div>
+      )}
 
       <div className="relative bg-[#0c1410]">
         <div

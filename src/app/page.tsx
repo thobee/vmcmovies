@@ -1,6 +1,5 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { Sparkle } from "@phosphor-icons/react/dist/ssr";
 import {
   getFeaturedContent,
   getMovies,
@@ -15,6 +14,7 @@ import { getHomepageSettings } from "@/lib/site";
 import SitePage from "@/components/layout/SitePage";
 import Footer from "@/components/layout/Footer";
 import FeaturedStrip from "@/components/home/FeaturedStrip";
+import TrialSignupLink from "@/components/home/TrialSignupLink";
 import HowItWorks from "@/components/home/HowItWorks";
 import ContentRail from "@/components/home/ContentRail";
 import PremiumBanner from "@/components/access/PremiumBanner";
@@ -22,7 +22,6 @@ import { getBillingConfig } from "@/lib/payments/billing/db";
 import { buildResolvedPlans, isWelcomeTrialWindowActive } from "@/lib/payments/billing/resolve";
 import { toPublicContent } from "@/lib/catalog/public";
 import { getAppUrl } from "@/lib/payments/app-url";
-import { getSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Download Movies & Series on Telegram | VMC",
@@ -54,13 +53,12 @@ export const metadata: Metadata = {
 export const revalidate = 120;
 
 export default async function HomePage() {
-  const [featured, movies, series, homepage, billing, session] = await Promise.all([
+  const [featured, movies, series, homepage, billing] = await Promise.all([
     getFeaturedContent(),
     getMovies(),
     getSeriesList(),
     getHomepageSettings(),
     getBillingConfig(),
-    getSession(),
   ]);
 
   const titles = homepage.sectionTitles;
@@ -149,15 +147,7 @@ export default async function HomePage() {
                   </p>
                 </div>
               </div>
-              {!session && (
-                <Link
-                  href="/signup"
-                  className="group inline-flex w-fit shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-300 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-emerald-200"
-                >
-                  Create account
-                  <ArrowRight className="h-3.5 w-3.5 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5" weight="bold" />
-                </Link>
-              )}
+              <TrialSignupLink />
             </div>
           </div>
         </section>
@@ -185,7 +175,7 @@ export default async function HomePage() {
             : null
         }
       />
-      <Footer />
+      <Footer showPlansBanner />
     </SitePage>
   );
 }
