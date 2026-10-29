@@ -125,15 +125,19 @@ function SearchInner() {
             </div>
             <p className="break-words text-lg font-semibold text-white">No matches for &ldquo;{trimmed}&rdquo;</p>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-white/55">
-              This title may not be available yet. Check the spelling or request it below.
+              It may not be on VMC yet. Check the spelling, or request it and we&apos;ll add it.
             </p>
-            <SearchRequestAction key={trimmed} query={trimmed} />
+            <SearchRequestAction
+              key={trimmed}
+              query={trimmed}
+              autoOpen={searchParams.get("request") === "1" && trimmed === initialQ.trim()}
+            />
           </div>
         )}
 
         {!loading && results.length > 0 && (
           <>
-            <p className="mb-6 text-sm text-white/45">
+            <p className="mb-6 text-sm text-white/55">
               <span className="font-semibold text-white/75">{results.length}</span>{" "}
               {results.length === 1 ? "result" : "results"} for &ldquo;{trimmed}&rdquo;
             </p>
@@ -146,6 +150,19 @@ function SearchInner() {
               {results.map((item, i) => (
                 <MovieCard key={item.id} item={item} index={i} className="w-full" />
               ))}
+            </div>
+
+            {/* Search is fuzzy, so a missing title can still return near-matches: keep the request path visible. */}
+            <div className="mt-12 rounded-[24px] border border-white/10 bg-[#101214] px-6 py-8 text-center">
+              <p className="text-base font-semibold text-white">Not what you&apos;re looking for?</p>
+              <p className="mx-auto mt-1 max-w-md break-words text-sm leading-6 text-white/60">
+                If &ldquo;{trimmed}&rdquo; isn&apos;t on VMC yet, request it and we&apos;ll add it.
+              </p>
+              <SearchRequestAction
+                key={`more-${trimmed}`}
+                query={trimmed}
+                autoOpen={searchParams.get("request") === "1" && trimmed === initialQ.trim()}
+              />
             </div>
           </>
         )}

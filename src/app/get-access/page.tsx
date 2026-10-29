@@ -219,6 +219,10 @@ export default async function GetAccessPage({ searchParams }: { searchParams: Pr
                 <ShieldCheck className="h-4 w-4 text-emerald-300" weight="duotone" />
                 Access linked to your account
               </span>
+              <span className="inline-flex items-center gap-2">
+                <FilmSlate className="h-4 w-4 text-emerald-300" weight="duotone" />
+                Request any movie or series
+              </span>
             </div>
           </div>
         </section>

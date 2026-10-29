@@ -249,7 +249,7 @@ export default function PricingGrid({
         </button>
 
         <div className="mt-3 flex items-center justify-between gap-3 px-1 text-xs text-white/55">
-          <span>Pay once · No auto-renewal · Activates instantly</span>
+          <span>Pay once · No auto-renewal · Request any title</span>
           <Link
             href="/account"
             className="font-semibold text-white/45 transition duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white"

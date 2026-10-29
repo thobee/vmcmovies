@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { CircleNotch, FilmStrip, MagnifyingGlass, Television, X } from "@phosphor-icons/react";
+import { CircleNotch, FilmSlate, FilmStrip, MagnifyingGlass, Television, X } from "@phosphor-icons/react";
 import { contentDetailPath } from "@/lib/catalog/paths";
 import { useCatalogSearch } from "@/hooks/useCatalogSearch";
 import { cn } from "@/lib/cn";
@@ -37,6 +37,22 @@ export default function NavbarSearch({
     window.addEventListener("pointerdown", onPointer);
     return () => window.removeEventListener("pointerdown", onPointer);
   }, [showPanel]);
+
+  // Desktop: press "/" anywhere (outside a text field) to jump into search.
+  useEffect(() => {
+    if (variant !== "desktop") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      // Only the visible copy of the desktop search should take focus.
+      if (!inputRef.current || inputRef.current.offsetParent === null) return;
+      e.preventDefault();
+      inputRef.current.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [variant]);
 
   const goTo = (href: string) => {
     setOpen(false);
@@ -110,9 +126,19 @@ export default function NavbarSearch({
           autoComplete="off"
           role="combobox"
           aria-label="Search movies and TV shows"
+          aria-keyshortcuts={variant === "desktop" ? "/" : undefined}
           aria-expanded={showPanel}
           aria-controls={showPanel ? resultsId : undefined}
         />
+        {!query && variant === "desktop" && (
+          <kbd
+            aria-hidden
+            title='Press "/" to search'
+            className="hidden shrink-0 rounded-md border border-white/15 px-1.5 font-sans text-[11px] font-semibold leading-5 text-white/55 lg:inline"
+          >
+            /
+          </kbd>
+        )}
         {query && (
           <button
             type="button"
@@ -151,8 +177,13 @@ export default function NavbarSearch({
           {!loading && !error && results.length === 0 && (
             <div className="px-4 py-5 text-center">
               <p className="text-sm font-semibold text-white/80">No matches</p>
-              <p className="mt-1 text-sm leading-6 text-white/60">This title may not be available yet. Check the spelling or request it.</p>
-              <button type="button" onClick={submitAll} className="mt-2 min-h-11 rounded-lg px-3 text-sm font-bold text-emerald-300 underline underline-offset-4 hover:bg-emerald-400/10 focus-visible:outline-2 focus-visible:outline-emerald-300">
+              <p className="mt-1 text-sm leading-6 text-white/60">It may not be on VMC yet. Check the spelling or request it.</p>
+              <button
+                type="button"
+                onClick={() => goTo(`/search?q=${encodeURIComponent(trimmed)}&request=1`)}
+                className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-400 px-5 text-sm font-bold text-black transition-[background-color,scale] duration-200 hover:bg-emerald-300 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+              >
+                <FilmSlate className="h-4 w-4" weight="bold" />
                 Request this title
               </button>
             </div>

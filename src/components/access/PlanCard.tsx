@@ -15,7 +15,7 @@ const TAGLINES: Record<string, string> = {
 };
 
 // Every plan unlocks the same things; plans differ only in length and price.
-const INCLUDED = ["All movies & series", "Delivered on Telegram", "No auto-renewal"];
+const INCLUDED = ["All movies & series", "Request any movie or series", "Delivered on Telegram", "No auto-renewal"];
 
 type PlanCardProps = {
   plan: ResolvedPlanOffer;

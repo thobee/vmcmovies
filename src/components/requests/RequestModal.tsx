@@ -120,13 +120,13 @@ export default function RequestModal({
             >
               Request a title
             </h2>
-            <p className="mt-2 max-w-sm text-sm leading-6 text-white/58">
-              Tell us the movie or series you want added. We review premium requests first.
+            <p className="mt-2 max-w-sm text-sm leading-6 text-white/60">
+              Tell us the movie or series you want on VMC. Add the release year so we get the right one.
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <div>
-                <label className="mb-2.5 block text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                <label className="mb-2.5 block text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
                   Type
                 </label>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -160,9 +160,9 @@ export default function RequestModal({
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
+              <div className="grid gap-4 sm:grid-cols-[1fr_9.5rem]">
                 <div>
-                  <label htmlFor="request-name" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                  <label htmlFor="request-name" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
                     Title
                   </label>
                   <input
@@ -178,8 +178,8 @@ export default function RequestModal({
                 </div>
 
                 <div>
-                  <label htmlFor="request-year" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
-                    Year
+                  <label htmlFor="request-year" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
+                    Release year
                   </label>
                   <input
                     id="request-year"
@@ -189,7 +189,7 @@ export default function RequestModal({
                     max={new Date().getFullYear() + 2}
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    placeholder="Optional"
+                    placeholder="e.g. 2024"
                     className="auth-field min-h-12 w-full rounded-2xl px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none"
                   />
                 </div>
